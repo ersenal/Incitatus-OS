@@ -1,0 +1,5 @@
+timeout 0
+
+title   Incitatus OS
+    kernel /kernel
+    boot
