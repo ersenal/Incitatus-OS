@@ -40,7 +40,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 			GDB 7.4
 
 	 Programming
-		 ☐ Rudimentary debugging functions, screen output
+		 ✔ Rudimentary debugging functions, screen output
 		 ☐ Module manager
 		 ☐ Global descriptor table
 		 ☐ Interrupt descriptor table
