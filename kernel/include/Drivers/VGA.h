@@ -41,8 +41,8 @@
 |
 | PARAM:           "index"  buffer offset
 |                  "data"   two-byte data representing color and character
-|                               first byte is color attribute
-|                               second byte is the character itself
+|                               higher byte is color attribute
+|                               lower byte is the character itself
 \------------------------------------------------------------------------*/
 static inline void VGA_put(u16int index, u16int data) {
 
