@@ -18,7 +18,7 @@
 #include <Debug.h>
 #include <Sys.h>
 
-void Kernel(void) {
+PUBLIC void Kernel(void) {
 
     Console_init();
     Console_clearScreen();

@@ -11,6 +11,10 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 	› Or, you may test-run(at your own risk) the OS on a 32-bit or 64-bit X86 PC.
 		› Burn "image.iso" and boot from CD.
 
+##Progress
+
+	![alt text](http://oi50.tinypic.com/34zls20.jpg "Progress screenshot")
+
 ##Objectives
 
 	› Modular
