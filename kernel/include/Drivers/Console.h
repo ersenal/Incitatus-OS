@@ -37,6 +37,7 @@
 | PRECONDITION:   "template"    tokens which are valid:
 |
 |                 %a    set console color
+|                 %d    base-10 number
 |                 %c    ASCII char
 |                 %s    string(char*)
 |
@@ -96,7 +97,7 @@ void Console_setColor(u8int colorAttribute);
 /*-------------------------------------------------------------------------
 | Initialise console driver
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Sets the text-mode console driver.
+| DESCRIPTION:     Initialises the text-mode console driver.
 |
 | NOTES:           This function needs to be called before any printing
 |                  attempt.

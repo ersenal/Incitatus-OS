@@ -16,6 +16,7 @@
 
 #include <Drivers/Console.h>
 #include <Debug.h>
+#include <Sys.h>
 
 void Kernel(void) {
 
@@ -25,7 +26,7 @@ void Kernel(void) {
     Debug_logInfo("%s", "Hello World!");
     Sys_panic("Goodbye World!");
 
-    while(1) asm volatile("hlt");
+    while(1) Sys_haltCPU();
 
 }
 

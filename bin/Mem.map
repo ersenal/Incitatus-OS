@@ -16,9 +16,9 @@ Linker script and memory map
                 0x0000000000100000                mbHead
                 0x0000000000100020                Start
  *fill*         0x000000000010002d        0x3 00
- .text          0x0000000000100030       0x83 kernel.o
+ .text          0x0000000000100030       0x87 kernel.o
                 0x0000000000100030                Kernel
- *fill*         0x00000000001000b3        0xd 00
+ *fill*         0x00000000001000b7        0x9 00
  .text          0x00000000001000c0       0x56 io.o
                 0x00000000001000c0                IO_outB
                 0x00000000001000d0                IO_outW
