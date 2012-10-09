@@ -16,30 +16,69 @@ Linker script and memory map
                 0x0000000000100000                mbHead
                 0x0000000000100020                Start
  *fill*         0x000000000010002d        0x3 00
- .text          0x0000000000100030       0x23 kernel.o
+ .text          0x0000000000100030       0x83 kernel.o
                 0x0000000000100030                Kernel
+ *fill*         0x00000000001000b3        0xd 00
+ .text          0x00000000001000c0       0x56 io.o
+                0x00000000001000c0                IO_outB
+                0x00000000001000d0                IO_outW
+                0x00000000001000e0                IO_outL
+                0x00000000001000f0                IO_inB
+                0x0000000000100100                IO_inW
+                0x0000000000100110                IO_inL
+ *fill*         0x0000000000100116        0xa 00
+ .text          0x0000000000100120      0x376 console.o
+                0x0000000000100120                Console_printChar
+                0x0000000000100230                Console_printString
+                0x0000000000100260                Console_printf
+                0x00000000001003c0                Console_clearScreen
+                0x0000000000100470                Console_setColor
+                0x0000000000100480                Console_init
+ *fill*         0x0000000000100496        0xa 00
+ .text          0x00000000001004a0       0x61 sys.o
+                0x00000000001004a0                Sys_restart
+                0x00000000001004c0                Sys_haltCPU
+                0x00000000001004d0                Sys_panic
                 0x0000000000101000                . = ALIGN (0x1000)
- *fill*         0x0000000000100053      0xfad 00
+ *fill*         0x0000000000100501      0xaff 00
 
-.eh_frame       0x0000000000101000       0x2c
- .eh_frame      0x0000000000101000       0x2c kernel.o
+.rodata.str1.1  0x0000000000101000       0x64
+ .rodata.str1.1
+                0x0000000000101000       0x4a kernel.o
+ .rodata.str1.1
+                0x000000000010104a       0x11 console.o
+ .rodata.str1.1
+                0x000000000010105b        0x9 sys.o
+                                          0xe (size before relaxing)
 
-.iplt           0x0000000000101030        0x0
+.eh_frame       0x0000000000101064      0x1c0
+ .eh_frame      0x0000000000101064       0x2c kernel.o
+ .eh_frame      0x0000000000101090       0x78 io.o
+                                         0x90 (size before relaxing)
+ .eh_frame      0x0000000000101108       0xd8 console.o
+                                         0xf0 (size before relaxing)
+ .eh_frame      0x00000000001011e0       0x44 sys.o
+                                         0x5c (size before relaxing)
+
+.iplt           0x0000000000101230        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x000000000010102c        0x0
+.rel.dyn        0x0000000000101224        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x000000000010102c      0xfd4
-                0x000000000010102c                data = .
-                0x000000000010102c                _data = .
-                0x000000000010102c                __data = .
+.data           0x0000000000101224      0xddc
+                0x0000000000101224                data = .
+                0x0000000000101224                _data = .
+                0x0000000000101224                __data = .
  *(.data)
- .data          0x000000000010102c        0x0 kernel.o
+ .data          0x0000000000101224        0x0 kernel.o
+ .data          0x0000000000101224        0x0 io.o
+ .data          0x0000000000101224        0x0 console.o
+ .data          0x0000000000101224        0x0 sys.o
  *(.rodata)
                 0x0000000000102000                . = ALIGN (0x1000)
- *fill*         0x000000000010102c      0xfd4 00
+ *fill*         0x0000000000101224      0xddc 00
 
 .igot.plt       0x0000000000102000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
@@ -51,15 +90,25 @@ Linker script and memory map
  *(.bss)
  .bss           0x0000000000102000     0xff00 start.o
  .bss           0x0000000000111f00        0x0 kernel.o
+ .bss           0x0000000000111f00        0x0 io.o
+ .bss           0x0000000000111f00       0x42 console.o
+ *fill*         0x0000000000111f42        0x2 00
+ .bss           0x0000000000111f44        0x0 sys.o
                 0x0000000000112000                . = ALIGN (0x1000)
- *fill*         0x0000000000111f00      0x100 00
+ *fill*         0x0000000000111f44       0xbc 00
                 0x0000000000112000                end = .
                 0x0000000000112000                _end = .
                 0x0000000000112000                __end = .
 LOAD start.o
 LOAD kernel.o
+LOAD io.o
+LOAD console.o
+LOAD sys.o
 OUTPUT(bootloader/kernel elf32-i386)
 
 .comment        0x0000000000000000       0x11
  .comment       0x0000000000000000       0x11 kernel.o
                                          0x12 (size before relaxing)
+ .comment       0x0000000000000000       0x12 io.o
+ .comment       0x0000000000000000       0x12 console.o
+ .comment       0x0000000000000000       0x12 sys.o

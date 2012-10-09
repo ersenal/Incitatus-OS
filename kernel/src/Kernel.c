@@ -14,17 +14,16 @@
 \------------------------------------------------------------------------*/
 
 
+#include <Drivers/Console.h>
+#include <Debug.h>
+
 void Kernel(void) {
 
-    char* framebuffer = (char*) 0xB8000;
+    Console_init();
+    Console_clearScreen();
 
-    //Fill screen with 'A'
-    for(int i = 0; i < 2000; i++) {
-
-
-        *(framebuffer + (i * 2)) = 'A';
-
-    }
+    Debug_logInfo("%s", "Hello World!");
+    Sys_panic("Goodbye World!");
 
     while(1) asm volatile("hlt");
 
