@@ -45,7 +45,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 
 	 Programming
 		 ✔ Rudimentary debugging functions, screen output
-		 ☐ Module manager
+		 ✔ Module manager
 		 ☐ Global descriptor table
 		 ☐ Interrupt descriptor table
 		 ☐ Interrupt service routines
