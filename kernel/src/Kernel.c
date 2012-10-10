@@ -15,16 +15,14 @@
 
 
 #include <Drivers/Console.h>
+#include <Drivers/VGA.h>
 #include <Debug.h>
 #include <Sys.h>
 
 PUBLIC void Kernel(void) {
 
-    Console_init();
-    Console_clearScreen();
-
-    Debug_logInfo("%s", "Hello World!");
-    Sys_panic("Goodbye World!");
+    Module_load(VGA_getModule());
+    Module_load(Console_getModule());
 
     while(1) Sys_haltCPU();
 

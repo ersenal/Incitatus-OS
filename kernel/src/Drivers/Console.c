@@ -22,6 +22,7 @@
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
+PRIVATE Module console;
 PRIVATE u8int cursorX;
 PRIVATE u8int cursorY;
 PRIVATE u8int colorAttribute;
@@ -31,11 +32,11 @@ PRIVATE u8int colorAttribute;
 =========================================================*/
 PRIVATE void Console_clearLine(u32int lineNo) {
 
-    Debug_assert(lineNo < VGA_HEIGHT);
+    Debug_assert(lineNo < vgaHeight);
 
-    for(int i = 0; i < VGA_WIDTH; i++) {
+    for(int i = 0; i < vgaWidth; i++) {
 
-        VGA_put(lineNo * VGA_WIDTH + i, (CONSOLE_NORMAL << 0x8) + ' ');
+        VGA_put(lineNo * vgaWidth + i, (CONSOLE_NORMAL << 0x8) + ' ');
 
     }
 }
@@ -84,6 +85,14 @@ PRIVATE void Console_printInt(int integer) {
 
 }
 
+PRIVATE void Console_init(void) {
+
+    cursorX = 0;
+    cursorY = 0;
+    colorAttribute = CONSOLE_NORMAL;
+
+}
+
 PUBLIC void Console_printf(const char* template, ...) {
 
     va_list args;
@@ -127,16 +136,16 @@ PUBLIC void Console_printChar(u8int c) {
         break;
 
         default:
-        VGA_put(cursorY * VGA_WIDTH + cursorX, (colorAttribute << 0x8) + c);
+        VGA_put(cursorY * vgaWidth + cursorX, (colorAttribute << 0x8) + c);
         cursorX++;
 
-        if(cursorX >= VGA_WIDTH)
+        if(cursorX >= vgaWidth)
             Console_nextLine();
         break;
     }
 
     //TODO: scroll down if(cursorY >= VGA_HEIGHT)
-    VGA_moveCursor(cursorY * VGA_WIDTH + cursorX);
+    VGA_moveCursor(cursorY * vgaWidth + cursorX);
 }
 
 PUBLIC void Console_printString(const char* str) {
@@ -150,12 +159,12 @@ PUBLIC void Console_printString(const char* str) {
 
 PUBLIC void Console_clearScreen(void) {
 
-    for(int i = 0; i < VGA_HEIGHT; i++)
+    for(int i = 0; i < vgaHeight; i++)
         Console_clearLine(i);
 
     cursorX = 0;
     cursorY = 0;
-    VGA_moveCursor(cursorY * VGA_WIDTH + cursorX);
+    VGA_moveCursor(cursorY * vgaWidth + cursorX);
 }
 
 PUBLIC void Console_setColor(u8int attribute) {
@@ -164,11 +173,16 @@ PUBLIC void Console_setColor(u8int attribute) {
 
 }
 
-PUBLIC void Console_init(void) {
+PUBLIC Module* Console_getModule(void) {
 
-    cursorX = 0;
-    cursorY = 0;
-    colorAttribute = CONSOLE_NORMAL;
+    console.moduleName = "Console Driver";
+    console.dependencies[0] = MODULE_VGA;
+    console.numberOfDependencies = 1;
+    console.init = &Console_init;
+    console.isLoaded = 0;
+    console.moduleID = MODULE_CONSOLE;
+
+    return &console;
 
 }
 

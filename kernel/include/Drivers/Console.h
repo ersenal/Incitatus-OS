@@ -18,6 +18,7 @@
 #define CONSOLE_H
 
 #include <Common.h>
+#include <Module.h>
 
 /** Console colors */
 #define CONSOLE_ERROR   0x0C //light-red
@@ -95,12 +96,10 @@ void Console_clearScreen(void);
 void Console_setColor(u8int colorAttribute);
 
 /*-------------------------------------------------------------------------
-| Initialise console driver
+| Get console module
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Initialises the text-mode console driver.
+| DESCRIPTION:     Returns the console module.
 |
-| NOTES:           This function needs to be called before any printing
-|                  attempt.
 \------------------------------------------------------------------------*/
-void Console_init(void);
+Module* Console_getModule(void);
 #endif

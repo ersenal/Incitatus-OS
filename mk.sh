@@ -5,6 +5,7 @@ nasm -f elf -o start.o  kernel/src/Start.s
 
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o kernel.o -c    kernel/src/Kernel.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o io.o -c        kernel/src/IO.c
+/usr/local/cross/bin/i586-elf-gcc $CFlags -o vga.o -c       kernel/src/Drivers/VGA.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o console.o -c   kernel/src/Drivers/Console.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o sys.o -c       kernel/src/Sys.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o module.o -c    kernel/src/Module.c
@@ -12,6 +13,7 @@ nasm -f elf -o start.o  kernel/src/Start.s
 /usr/local/cross/bin/i586-elf-ld -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel        start.o \
                                                                                                       kernel.o \
                                                                                                       io.o \
+                                                                                                      vga.o \
                                                                                                       console.o \
                                                                                                       sys.o \
                                                                                                       module.o \

@@ -20,22 +20,6 @@
     DEFINE
 =========================================================*/
 #define MAX_LOADED_MODULES    32
-#define MAX_MODULE_NAME_CHARS 63
-#define MAX_MODULE_DEPENDENCY  8
-
-/*=======================================================
-    STRUCT
-=========================================================*/
-struct Module {
-
-    void    (*init) (void);
-    bool    isLoaded;
-    char    moduleName[MAX_MODULE_NAME_CHARS + 1];
-    u32int  moduleID;
-    u32int  dependencies[MAX_MODULE_DEPENDENCY];
-    u32int  numberOfDependencies;
-
-};
 
 /*=======================================================
     PRIVATE DATA
