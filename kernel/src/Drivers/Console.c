@@ -20,7 +20,7 @@
 #include <Debug.h>
 
 /*=======================================================
-    DEFINE
+    PRIVATE DATA
 =========================================================*/
 PRIVATE u8int cursorX;
 PRIVATE u8int cursorY;
