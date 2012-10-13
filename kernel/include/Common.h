@@ -17,8 +17,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+/* Null type */
 #define NULL   ((void *)0)
-#define UNUSED (var) ((void) var)
+
+/* Mark a variable as unused */
+#define UNUSED(var) ((void) var)
 
 /** Used mainly for casting structs */
 #define FORCE_CAST(var, type) *(type*)&var

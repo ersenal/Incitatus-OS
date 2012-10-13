@@ -24,6 +24,11 @@ PUBLIC void Kernel(void) {
     Module_load(VGA_getModule());
     Module_load(Console_getModule());
 
+    Console_clearScreen();
+
+    for(int row = 0; row < 50; row++)
+            Console_printf("%s%d%c", "Line ", row, '\n');
+
     while(1) Sys_haltCPU();
 
 }

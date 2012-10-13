@@ -7,7 +7,7 @@
 | Module.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Manages OS modules(components).
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -22,12 +22,11 @@
     DEFINE
 =========================================================*/
 
+#define MAX_MODULE_DEPENDENCY  8
+
 /* Module IDs */
 #define MODULE_VGA     100
 #define MODULE_CONSOLE 101
-
-#define MAX_MODULE_NAME_CHARS 63
-#define MAX_MODULE_DEPENDENCY  8
 
 /*=======================================================
     STRUCT
@@ -48,6 +47,23 @@ struct Module {
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+/*-------------------------------------------------------------------------
+| Load module
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Loads a given module.
+|
+| PARAM:           "module"    the module to load
+\------------------------------------------------------------------------*/
 void Module_load(Module* module);
+
+/*-------------------------------------------------------------------------
+| Unload module
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Unloads a given module.
+|
+| PARAM:           "module"    the module to unload
+\------------------------------------------------------------------------*/
+void Module_unload(Module* module);
 
 #endif

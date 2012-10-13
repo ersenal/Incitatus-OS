@@ -7,9 +7,9 @@
 | Module.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Manages OS modules(components).
 |
-| AUTHOR:          Ali Ersenal, aliersenal@gmail.com
+| AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
@@ -32,7 +32,6 @@ PRIVATE u32int  numberOfLoadedModules = 0;
 =========================================================*/
 PUBLIC void Module_load(Module* module) {
 
-    /* TODO: return some kind of error message */
     /* TODO: support for var-args in init function */
 
     /* Check if there is any place in loadedModules */
@@ -73,4 +72,9 @@ PUBLIC void Module_load(Module* module) {
 
 }
 
-/* TODO: PUBLIC void Module_unload(Module* module) */
+PUBLIC void Module_unload(Module* module) {
+
+    /* TODO: Implement */
+    UNUSED(module);
+
+}

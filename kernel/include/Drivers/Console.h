@@ -20,11 +20,19 @@
 #include <Common.h>
 #include <Module.h>
 
+/*=======================================================
+    DEFINE
+=========================================================*/
+
 /** Console colors */
 #define CONSOLE_ERROR   0x0C //light-red
 #define CONSOLE_INFO    0x09 //light-blue
 #define CONSOLE_WARN    0x0E //yellow
 #define CONSOLE_NORMAL  0x07 //grey
+
+/*=======================================================
+    FUNCTION
+=========================================================*/
 
 /*-------------------------------------------------------------------------
 | Print formatted string

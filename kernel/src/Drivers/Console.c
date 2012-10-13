@@ -16,8 +16,9 @@
 
 #include <Drivers/Console.h>
 #include <Drivers/VGA.h>
-#include <stdarg.h> //we need var-args for printf
+#include <stdarg.h> /* we need var-args for printf */
 #include <Debug.h>
+#include <Memory.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -45,6 +46,25 @@ PRIVATE void Console_nextLine(void) {
 
     cursorX = 0;
     cursorY++;
+
+}
+
+PRIVATE void Console_scrollDown(void) {
+
+    /* move every char in line i to line i-1 */
+    for(int i = 1; i < vgaHeight; i++) {
+        for(int y = 0; y < vgaWidth; y++) {
+
+            char* dest  = (char*) vgaRam + (y * 2) + ((i - 1) * vgaWidth * 2);
+            char* src   = (char*) vgaRam + (y * 2) + ((i) * vgaWidth * 2);
+            Memory_copy(dest, src, 2);
+
+        }
+    }
+
+    /* clear last row */
+    cursorY = vgaHeight - 1;
+    Console_clearLine(cursorY);
 
 }
 
@@ -144,7 +164,7 @@ PUBLIC void Console_printChar(u8int c) {
         break;
     }
 
-    //TODO: scroll down if(cursorY >= VGA_HEIGHT)
+    if(cursorY >= vgaHeight) Console_scrollDown();
     VGA_moveCursor(cursorY * vgaWidth + cursorX);
 }
 
@@ -179,7 +199,6 @@ PUBLIC Module* Console_getModule(void) {
     console.dependencies[0] = MODULE_VGA;
     console.numberOfDependencies = 1;
     console.init = &Console_init;
-    console.isLoaded = 0;
     console.moduleID = MODULE_CONSOLE;
 
     return &console;

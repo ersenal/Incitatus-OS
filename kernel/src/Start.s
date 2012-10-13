@@ -1,3 +1,30 @@
+;
+; Copyright(C) 2012 Ali Ersenal
+; License: WTFPL v2
+; URL: http://sam.zoy.org/wtfpl/COPYING
+;
+;--------------------------------------------------------------------------
+; Start.s
+;--------------------------------------------------------------------------
+;
+; DESCRIPTION:  This is the first entry point for the kernel before jumping
+;               to Kernel() in Kernel.c. After GRUB finishes its job it jumps
+;               to Start in this file(we tell this to GRUB using the mbHead
+;               Multiboot struct).
+;
+;               GRUB drops us in this state:
+;
+;                   - CPU is in protected mode(A20 gate enabled)
+;                   - Interrupts are disabled
+;                   - Paging is disabled
+;                   - EAX register contains multiboot magic value
+;                   - EBX register contains pointer to multiboot info
+;                   - ESP(stack) register is undefined
+;
+;
+; AUTHOR:       Ali Ersenal, aliersenal@gmail.com
+;--------------------------------------------------------------------------
+
 [BITS 32]
 
 ; Setup multiboot
@@ -27,11 +54,10 @@ section .text
         dd  text                      ; Kernel start address
         dd  bss                       ; End of data segment
         dd  end                       ; End of bss segment
-        dd  Start                     ; Multiboot will call this
+        dd  Start                     ; GRUB will call this
 
     Start:
         mov  esp, stack + STACKSIZE ; Set up the stack
-        cli                         ; Disable interrupts
         push eax                    ; Push multiboot magic number
         push ebx                    ; Push multiboot info pointer
         call Kernel                 ; Jump to Kernel() in Kernel.c
@@ -39,4 +65,4 @@ section .text
 section .bss
 
     stack:
-        resb STACKSIZE; Reserve STACKSIZE bytes in bss segment
+        resb STACKSIZE ; Reserve STACKSIZE bytes in bss segment
