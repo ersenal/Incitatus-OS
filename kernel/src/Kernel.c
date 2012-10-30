@@ -18,11 +18,13 @@
 #include <Drivers/VGA.h>
 #include <Debug.h>
 #include <Sys.h>
+#include <CPU/GDT.h>
 
 PUBLIC void Kernel(void) {
 
     Module_load(VGA_getModule());
     Module_load(Console_getModule());
+    Module_load(GDT_getModule());
 
     Console_clearScreen();
 

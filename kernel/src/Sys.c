@@ -43,6 +43,6 @@ PUBLIC void Sys_panic(const char* str) {
 
     Console_setColor(CONSOLE_ERROR);
     Console_printf("%s%s", "[PANIC] ", str);
-    asm volatile("cli"); //we don't want CPU to wake up
+    asm volatile("cli"); /* We don't want CPU to wake up */
     asm volatile("hlt");
 }

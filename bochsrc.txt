@@ -1,0 +1,5 @@
+#gdbstub: enabled=1, port=4224, text_base=0, data_base=0, bss_base=0
+display_library: sdl
+ata0-slave: type=cdrom, path="bin/image.iso", status=inserted
+
+boot: cdrom, floppy, disk

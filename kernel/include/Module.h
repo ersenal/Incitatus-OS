@@ -27,6 +27,7 @@
 /* Module IDs */
 #define MODULE_VGA     100
 #define MODULE_CONSOLE 101
+#define MODULE_GDT     102
 
 /*=======================================================
     STRUCT
