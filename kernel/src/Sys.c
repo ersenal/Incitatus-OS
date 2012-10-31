@@ -4,7 +4,7 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| Sys.h
+| Sys.c
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Provides important system functions.

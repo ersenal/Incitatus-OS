@@ -4,7 +4,7 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| IO.h
+| IO.c
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Provides functions to read/write I/O ports.
