@@ -18,8 +18,8 @@
 #include <Drivers/VGA.h>
 #include <Debug.h>
 #include <Sys.h>
-#include <CPU/GDT.h>
-#include <CPU/IDT.h>
+#include <X86/GDT.h>
+#include <X86/IDT.h>
 
 PUBLIC void Kernel(void) {
 
