@@ -13,7 +13,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 
 ##Progress
 
-![ScreenShot](http://oi45.tinypic.com/2diq6aw.jpg)
+![ScreenShot](http://oi49.tinypic.com/bje97s.jpg)
 
 ##Objectives
 
@@ -47,7 +47,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 		 ✔ Rudimentary debugging functions, screen output
 		 ✔ Module manager
 		 ✔ Global descriptor table
-		 ☐ Interrupt descriptor table
+		 ✔ Interrupt descriptor table
 		 ☐ Interrupt service routines
 		 ☐ Physical memory management
 		 ☐ Virtual memory management
