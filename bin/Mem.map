@@ -22,96 +22,118 @@ Linker script and memory map
  .text          0x0000000000100000       0x2c start.o
                 0x0000000000100000                mbHead
                 0x0000000000100020                Start
- .text          0x000000000010002c       0x6e kernel.o
-                0x000000000010002c                Kernel
- *fill*         0x000000000010009a        0x2 00
- .text          0x000000000010009c       0xcb io.o
-                0x000000000010009c                IO_outB
-                0x00000000001000b8                IO_outW
-                0x00000000001000d6                IO_outL
-                0x00000000001000ec                IO_inB
-                0x0000000000100114                IO_inW
-                0x000000000010013f                IO_inL
- *fill*         0x0000000000100167        0x1 00
- .text          0x0000000000100168       0x4f vga.o
-                0x0000000000100185                VGA_getModule
- *fill*         0x00000000001001b7        0x1 00
- .text          0x00000000001001b8      0x596 console.o
-                0x00000000001004e1                Console_printf
-                0x0000000000100596                Console_printChar
-                0x0000000000100669                Console_printString
-                0x0000000000100691                Console_clearScreen
-                0x00000000001006fc                Console_setColor
-                0x0000000000100712                Console_getModule
- *fill*         0x000000000010074e        0x2 00
- .text          0x0000000000100750       0x53 sys.o
-                0x0000000000100750                Sys_restart
-                0x000000000010076c                Sys_haltCPU
-                0x0000000000100772                Sys_panic
- *fill*         0x00000000001007a3        0x1 00
- .text          0x00000000001007a4      0x26b module.o
-                0x00000000001007a4                Module_load
-                0x0000000000100a0a                Module_unload
- *fill*         0x0000000000100a0f        0x1 00
- .text          0x0000000000100a10      0x1ad mem.o
-                0x0000000000100a10                Memory_set
-                0x0000000000100aad                Memory_copy
- *fill*         0x0000000000100bbd        0x3 00
- .text          0x0000000000100bc0      0x379 gdt.o
-                0x0000000000100f07                GDT_getModule
- *fill*         0x0000000000100f39        0x7 00
- .text          0x0000000000100f40        0x8 gdtAsm.o
-                0x0000000000100f40                GDT_farJump
+ *fill*         0x000000000010002c        0x4 00
+ .text          0x0000000000100030       0xb1 kernel.o
+                0x0000000000100030                Kernel
+ *fill*         0x00000000001000e1        0xf 00
+ .text          0x00000000001000f0       0x56 io.o
+                0x00000000001000f0                IO_outB
+                0x0000000000100100                IO_outW
+                0x0000000000100110                IO_outL
+                0x0000000000100120                IO_inB
+                0x0000000000100130                IO_inW
+                0x0000000000100140                IO_inL
+ *fill*         0x0000000000100146        0xa 00
+ .text          0x0000000000100150       0x4e vga.o
+                0x0000000000100170                VGA_getModule
+ *fill*         0x000000000010019e        0x2 00
+ .text          0x00000000001001a0      0x4e8 console.o
+                0x00000000001001c0                Console_printString
+                0x00000000001001f0                Console_printf
+                0x0000000000100410                Console_printChar
+                0x00000000001005b0                Console_clearScreen
+                0x0000000000100640                Console_setColor
+                0x0000000000100650                Console_getModule
+ *fill*         0x0000000000100688        0x8 00
+ .text          0x0000000000100690       0x61 sys.o
+                0x0000000000100690                Sys_restart
+                0x00000000001006b0                Sys_haltCPU
+                0x00000000001006c0                Sys_panic
+ *fill*         0x00000000001006f1        0xf 00
+ .text          0x0000000000100700      0x2d1 module.o
+                0x0000000000100700                Module_load
+                0x0000000000100980                Module_getLoadedModuleNames
+                0x00000000001009c0                Module_getNumberOfLoadedModules
+                0x00000000001009d0                Module_unload
+ *fill*         0x00000000001009d1        0xf 00
+ .text          0x00000000001009e0      0x1b4 mem.o
+                0x00000000001009e0                Memory_set
+                0x0000000000100a80                Memory_copy
+ *fill*         0x0000000000100b94        0xc 00
+ .text          0x0000000000100ba0      0x13e gdt.o
+                0x0000000000100cb0                GDT_getModule
+ *fill*         0x0000000000100cde        0x2 00
+ .text          0x0000000000100ce0        0x8 gdtAsm.o
+                0x0000000000100ce0                GDT_farJump
+ *fill*         0x0000000000100ce8        0x8 00
+ .text          0x0000000000100cf0       0x78 idt.o
+                0x0000000000100d30                IDT_getModule
                 0x0000000000101000                . = ALIGN (0x1000)
- *fill*         0x0000000000100f48       0xb8 00
+ *fill*         0x0000000000100d68      0x298 00
 
-.eh_frame       0x0000000000101000      0x440
- .eh_frame      0x0000000000101000       0x34 kernel.o
- .eh_frame      0x0000000000101034       0xcc io.o
-                                         0xe4 (size before relaxing)
- .eh_frame      0x0000000000101100       0x40 vga.o
-                                         0x58 (size before relaxing)
- .eh_frame      0x0000000000101140      0x1c0 console.o
-                                        0x1d8 (size before relaxing)
- .eh_frame      0x0000000000101300       0x60 sys.o
-                                         0x78 (size before relaxing)
- .eh_frame      0x0000000000101360       0x40 module.o
-                                         0x58 (size before relaxing)
- .eh_frame      0x00000000001013a0       0x40 mem.o
-                                         0x58 (size before relaxing)
- .eh_frame      0x00000000001013e0       0x60 gdt.o
-                                         0x78 (size before relaxing)
+.rodata.str1.1  0x0000000000101000       0xf7
+ .rodata.str1.1
+                0x0000000000101000       0x16 kernel.o
+ .rodata.str1.1
+                0x0000000000101016       0x12 vga.o
+ .rodata.str1.1
+                0x0000000000101028       0x66 console.o
+ .rodata.str1.1
+                0x000000000010108e        0xe sys.o
+ .rodata.str1.1
+                0x000000000010109c       0x14 module.o
+                                         0x3d (size before relaxing)
+ .rodata.str1.1
+                0x00000000001010b0       0x14 mem.o
+                                         0x3d (size before relaxing)
+ .rodata.str1.1
+                0x00000000001010c4       0x18 gdt.o
+ .rodata.str1.1
+                0x00000000001010dc       0x1b idt.o
 
-.iplt           0x0000000000101440        0x0
+.eh_frame       0x00000000001010f8      0x380
+ .eh_frame      0x00000000001010f8       0x38 kernel.o
+ .eh_frame      0x0000000000101130       0x78 io.o
+                                         0x90 (size before relaxing)
+ .eh_frame      0x00000000001011a8       0x28 vga.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x00000000001011d0      0x128 console.o
+                                        0x140 (size before relaxing)
+ .eh_frame      0x00000000001012f8       0x44 sys.o
+                                         0x5c (size before relaxing)
+ .eh_frame      0x000000000010133c       0x7c module.o
+                                         0x94 (size before relaxing)
+ .eh_frame      0x00000000001013b8       0x64 mem.o
+                                         0x7c (size before relaxing)
+ .eh_frame      0x000000000010141c       0x30 gdt.o
+                                         0x48 (size before relaxing)
+ .eh_frame      0x000000000010144c       0x2c idt.o
+                                         0x44 (size before relaxing)
+
+.iplt           0x0000000000101480        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x0000000000101440        0x0
+.rel.dyn        0x0000000000101478        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x0000000000101440      0xbc0
-                0x0000000000101440                data = .
-                0x0000000000101440                _data = .
-                0x0000000000101440                __data = .
+.data           0x0000000000101478      0xb88
+                0x0000000000101478                data = .
+                0x0000000000101478                _data = .
+                0x0000000000101478                __data = .
  *(.data)
- .data          0x0000000000101440        0x0 kernel.o
- .data          0x0000000000101440        0x0 io.o
- .data          0x0000000000101440        0x0 vga.o
- .data          0x0000000000101440        0x0 console.o
- .data          0x0000000000101440        0x0 sys.o
- .data          0x0000000000101440        0x0 module.o
- .data          0x0000000000101440        0x0 mem.o
- .data          0x0000000000101440        0x0 gdt.o
+ .data          0x0000000000101478        0x0 kernel.o
+ .data          0x0000000000101478        0x0 io.o
+ .data          0x0000000000101478        0x0 vga.o
+ .data          0x0000000000101478        0x0 console.o
+ .data          0x0000000000101478        0x0 sys.o
+ .data          0x0000000000101478        0x0 module.o
+ .data          0x0000000000101478        0x0 mem.o
+ .data          0x0000000000101478        0x0 gdt.o
+ .data          0x0000000000101478        0x0 idt.o
  *(.rodata)
- .rodata        0x0000000000101440        0xd kernel.o
- .rodata        0x000000000010144d       0x12 vga.o
- .rodata        0x000000000010145f       0x66 console.o
- .rodata        0x00000000001014c5        0xe sys.o
- .rodata        0x00000000001014d3       0x3d module.o
- .rodata        0x0000000000101510       0x3d mem.o
- .rodata        0x000000000010154d       0x18 gdt.o
                 0x0000000000102000                . = ALIGN (0x1000)
- *fill*         0x0000000000101565      0xa9b 00
+ *fill*         0x0000000000101478      0xb88 00
 
 .igot.plt       0x0000000000102000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
@@ -126,14 +148,16 @@ Linker script and memory map
  .bss           0x0000000000111f00        0x0 io.o
  .bss           0x0000000000111f00       0x34 vga.o
  *fill*         0x0000000000111f34        0xc 00
- .bss           0x0000000000111f40       0x60 console.o
- .bss           0x0000000000111fa0        0x0 sys.o
- .bss           0x0000000000111fa0       0x84 module.o
- .bss           0x0000000000112024        0x0 mem.o
- *fill*         0x0000000000112024       0x1c 00
- .bss           0x0000000000112040       0x6e gdt.o
+ .bss           0x0000000000111f40       0x94 console.o
+ .bss           0x0000000000111fd4        0x0 sys.o
+ *fill*         0x0000000000111fd4        0xc 00
+ .bss           0x0000000000111fe0       0xa0 module.o
+ .bss           0x0000000000112080        0x0 mem.o
+ .bss           0x0000000000112080       0x6e gdt.o
+ *fill*         0x00000000001120ee       0x12 00
+ .bss           0x0000000000112100      0x840 idt.o
                 0x0000000000113000                . = ALIGN (0x1000)
- *fill*         0x00000000001120ae      0xf52 00
+ *fill*         0x0000000000112940      0x6c0 00
  COMMON         0x0000000000113000        0x6 kernel.o
                 0x0000000000113000                vgaRam
                 0x0000000000113004                vgaHeight
@@ -151,6 +175,7 @@ LOAD module.o
 LOAD mem.o
 LOAD gdt.o
 LOAD gdtAsm.o
+LOAD idt.o
 OUTPUT(bootloader/kernel elf32-i386)
 
 .comment        0x0000000000000000       0x11
@@ -163,3 +188,4 @@ OUTPUT(bootloader/kernel elf32-i386)
  .comment       0x0000000000000000       0x12 module.o
  .comment       0x0000000000000000       0x12 mem.o
  .comment       0x0000000000000000       0x12 gdt.o
+ .comment       0x0000000000000000       0x12 idt.o

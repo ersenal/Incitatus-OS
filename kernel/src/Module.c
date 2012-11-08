@@ -17,11 +17,6 @@
 #include <Debug.h>
 
 /*=======================================================
-    DEFINE
-=========================================================*/
-#define MAX_LOADED_MODULES    32
-
-/*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module* loadedModules[MAX_LOADED_MODULES];
@@ -49,7 +44,7 @@ PUBLIC void Module_load(Module* module) {
 
         bool found = FALSE;
 
-        for(u32int y = 0; y < numberOfLoadedModules; i++) {
+        for(u32int y = 0; y < numberOfLoadedModules; y++) {
 
             if(module->dependencies[i] == loadedModules[y]->moduleID) {
 
@@ -69,6 +64,22 @@ PUBLIC void Module_load(Module* module) {
     loadedModules[numberOfLoadedModules] = module;
     module->isLoaded = 1;
     numberOfLoadedModules++;
+
+}
+
+PUBLIC void Module_getLoadedModuleNames(char** buffer) {
+
+    for(u32int i = 0; i < numberOfLoadedModules; i++) {
+
+        *(buffer + i) = loadedModules[i]->moduleName;
+
+    }
+
+}
+
+PUBLIC u32int Module_getNumberOfLoadedModules(void) {
+
+    return numberOfLoadedModules;
 
 }
 

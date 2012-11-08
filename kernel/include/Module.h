@@ -21,13 +21,14 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-
+#define MAX_LOADED_MODULES    32
 #define MAX_MODULE_DEPENDENCY  8
 
 /* Module IDs */
 #define MODULE_VGA     100
 #define MODULE_CONSOLE 101
 #define MODULE_GDT     102
+#define MODULE_IDT     103
 
 /*=======================================================
     STRUCT
@@ -57,6 +58,25 @@ struct Module {
 | PARAM:           "module"    the module to load
 \------------------------------------------------------------------------*/
 void Module_load(Module* module);
+
+/*-------------------------------------------------------------------------
+| Get loaded module names
+|--------------------------------------------------------------------------
+| DESCRIPTION:      Fills the specified char* array with loaded module
+|                   names.
+|
+| PARAM:           "buffer"    the buffer to store module names
+\------------------------------------------------------------------------*/
+void Module_getLoadedModuleNames(char** buffer);
+
+/*-------------------------------------------------------------------------
+| Get number of loaded modules
+|--------------------------------------------------------------------------
+| DESCRIPTION:      Returns the number of loaded modules
+|
+| RETURN:           "u32int"    the number of loaded modules
+\------------------------------------------------------------------------*/
+u32int Module_getNumberOfLoadedModules(void);
 
 /*-------------------------------------------------------------------------
 | Unload module

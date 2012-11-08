@@ -15,7 +15,6 @@
 
 
 #include <CPU/GDT.h>
-#include <Debug.h>
 #include <Memory.h>
 
 /*=======================================================
@@ -23,11 +22,20 @@
 =========================================================*/
 #define NUMBER_OF_ENTRIES 5
 
+/* Segment selectors */
 #define NULL_SEGMENT        0x00
-#define KERNEL_CODE_SEGMENT 0x08
-#define KERNEL_DATA_SEGMENT 0x10
-#define USER_CODE_SEGMENT   0x18
-#define USER_DATA_SEGMENT   0x20
+#define KERNEL_CODE_SEGMENT 0x08 /* Base 0, Limit 4GB, Privilege 0 */
+#define KERNEL_DATA_SEGMENT 0x10 /* Base 0, Limit 4GB, Privilege 0 */
+#define USER_CODE_SEGMENT   0x18 /* Base 0, Limit 4GB, Privilege 3 */
+#define USER_DATA_SEGMENT   0x20 /* Base 0, Limit 4GB, Privilege 3 */
+
+ /* GDT privilege levels */
+#define KERNEL_MODE  0
+#define USER_MODE    3
+
+/* GDT segment executable types */
+#define CODE_SEGMENT 1
+#define DATA_SEGMENT 0
 
 /*=======================================================
     STRUCT
@@ -114,7 +122,7 @@ struct GDTEntry {
 /* 6-bytes long GDT pointer */
 struct GDTPointer {
 
-    /* The size limit of GDT */
+    /* Length of GDT in bytes*/
     u16int    limit;
 
     /* Points to first GDT entry */
@@ -172,9 +180,9 @@ PRIVATE void GDT_init(void) {
     gdtEntries[1].baseMiddle       = 0;
     gdtEntries[1].baseHigh         = 0;
     gdtEntries[1].present          = 1;
-    gdtEntries[1].privilege        = 0; /* Kernel mode */
+    gdtEntries[1].privilege        = KERNEL_MODE;
     gdtEntries[1].segmentType      = 1;
-    gdtEntries[1].executable       = 1; /* Code segment */
+    gdtEntries[1].executable       = CODE_SEGMENT;
     gdtEntries[1].directionConform = 0;
     gdtEntries[1].readWrite        = 1;
     gdtEntries[1].accessed         = 0;
@@ -189,9 +197,9 @@ PRIVATE void GDT_init(void) {
     gdtEntries[2].baseMiddle       = 0;
     gdtEntries[2].baseHigh         = 0;
     gdtEntries[2].present          = 1;
-    gdtEntries[2].privilege        = 0; /* Kernel mode */
+    gdtEntries[2].privilege        = KERNEL_MODE;
     gdtEntries[2].segmentType      = 1;
-    gdtEntries[2].executable       = 0; /* Data segment */
+    gdtEntries[2].executable       = DATA_SEGMENT;
     gdtEntries[2].directionConform = 0;
     gdtEntries[2].readWrite        = 1;
     gdtEntries[2].accessed         = 0;
@@ -206,9 +214,9 @@ PRIVATE void GDT_init(void) {
     gdtEntries[3].baseMiddle       = 0;
     gdtEntries[3].baseHigh         = 0;
     gdtEntries[3].present          = 1;
-    gdtEntries[3].privilege        = 3; /* User mode */
+    gdtEntries[3].privilege        = USER_MODE;
     gdtEntries[3].segmentType      = 1;
-    gdtEntries[3].executable       = 1; /* Code segment */
+    gdtEntries[3].executable       = CODE_SEGMENT;
     gdtEntries[3].directionConform = 0;
     gdtEntries[3].readWrite        = 1;
     gdtEntries[3].accessed         = 0;
@@ -223,9 +231,9 @@ PRIVATE void GDT_init(void) {
     gdtEntries[4].baseMiddle       = 0;
     gdtEntries[4].baseHigh         = 0;
     gdtEntries[4].present          = 1;
-    gdtEntries[4].privilege        = 3; /* User mode */
+    gdtEntries[4].privilege        = USER_MODE;
     gdtEntries[4].segmentType      = 1;
-    gdtEntries[4].executable       = 0; /* Data segment */
+    gdtEntries[4].executable       = DATA_SEGMENT;
     gdtEntries[4].directionConform = 0;
     gdtEntries[4].readWrite        = 1;
     gdtEntries[4].accessed         = 0;

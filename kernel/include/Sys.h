@@ -41,7 +41,7 @@ void Sys_haltCPU(void);
 |
 | PARAM:           "str"    the panic message
 |
-| NOTES:           The system becomes unresponsive after this call.
+| NOTES:           System becomes unresponsive after this call.
 \------------------------------------------------------------------------*/
 void Sys_panic(const char* str);
 #endif

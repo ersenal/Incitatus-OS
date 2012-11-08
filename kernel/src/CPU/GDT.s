@@ -2,7 +2,7 @@
 
 GDT_farJump:
 
-   jmp 0x08:.flush ; Set CS and EIP
+   jmp 0x08:dummy ; Set CS and EIP
 
-.flush:
+dummy:
    ret

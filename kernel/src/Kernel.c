@@ -19,17 +19,26 @@
 #include <Debug.h>
 #include <Sys.h>
 #include <CPU/GDT.h>
+#include <CPU/IDT.h>
 
 PUBLIC void Kernel(void) {
 
     Module_load(VGA_getModule());
     Module_load(Console_getModule());
     Module_load(GDT_getModule());
+    Module_load(IDT_getModule());
 
     Console_clearScreen();
+    Console_setColor(CONSOLE_INFO);
+    Console_printString("Loaded Modules:\n");
+    Console_setColor(CONSOLE_NORMAL);
 
-    for(int row = 0; row < 50; row++)
-            Console_printf("%s%d%c", "Line ", row, '\n');
+    char* moduleNames[MAX_LOADED_MODULES];
+    Module_getLoadedModuleNames(moduleNames);
+
+    for(u32int i = 0; i < Module_getNumberOfLoadedModules(); i++)
+        Console_printf("%s%c", moduleNames[i], '\n');
+
 
     while(1) Sys_haltCPU();
 
