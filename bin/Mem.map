@@ -2,9 +2,9 @@
 Allocating common symbols
 Common symbol       size              file
 
-vgaRam              0x4               kernel.o
-vgaHeight           0x1               kernel.o
-vgaWidth            0x1               kernel.o
+vgaRam              0x4               vga.o
+vgaHeight           0x1               vga.o
+vgaWidth            0x1               vga.o
 
 Memory Configuration
 
@@ -227,7 +227,7 @@ Linker script and memory map
  .bss           0x0000000000113140      0xc46 idt.o
                 0x0000000000114000                . = ALIGN (0x1000)
  *fill*         0x0000000000113d86      0x27a 00
- COMMON         0x0000000000114000        0x6 kernel.o
+ COMMON         0x0000000000114000        0x6 vga.o
                 0x0000000000114000                vgaRam
                 0x0000000000114004                vgaHeight
                 0x0000000000114005                vgaWidth

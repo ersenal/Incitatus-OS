@@ -28,11 +28,11 @@
 #define CRTC_MODIFY 0x3D5
 
 /*=======================================================
-    DATA
+    PUBLIC DATA
 =========================================================*/
-char*  vgaRam;
-u8int  vgaHeight;
-u8int  vgaWidth;
+extern char*  vgaRam;
+extern u8int  vgaHeight;
+extern u8int  vgaWidth;
 
 /*=======================================================
     FUNCTION
@@ -74,12 +74,12 @@ static inline void VGA_moveCursor(u16int cursorLoc) {
     /* Select register 14 */
     IO_outB(CRTC_SELECT, 14);
     /* Modify register 14 */
-    IO_outB(CRTC_MODIFY, cursorLoc >> 8); //send low byte
+    IO_outB(CRTC_MODIFY, cursorLoc >> 8); /* Send low byte */
 
     /* Select register 15 */
     IO_outB(CRTC_SELECT, 15);
     /* Modify register 15 */
-    IO_outB(CRTC_MODIFY, cursorLoc); //send high byte
+    IO_outB(CRTC_MODIFY, cursorLoc); /* Send high byte */
 
 }
 
