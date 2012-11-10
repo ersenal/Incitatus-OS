@@ -17,6 +17,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+/* Get the number of elements in an array */
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
 /* Null type */
 #define NULL   ((void *)0)
 

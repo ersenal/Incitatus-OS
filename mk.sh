@@ -3,6 +3,7 @@ CFlags="-nostdlib -fno-builtin -fno-stack-protector -O2 -Wall -Wextra -Werror -s
 
 nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o gdtAsm.o  kernel/src/X86/GDT.s
+nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o kernel.o  -c   kernel/src/Kernel.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o io.o      -c   kernel/src/IO.c
@@ -12,6 +13,7 @@ nasm -f elf -o gdtAsm.o  kernel/src/X86/GDT.s
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o module.o  -c   kernel/src/Module.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o mem.o     -c   kernel/src/Memory.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o gdt.o     -c   kernel/src/X86/GDT.c
+/usr/local/cross/bin/i586-elf-gcc $CFlags -o pic.o     -c   kernel/src/X86/PIC8259.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o idt.o     -c   kernel/src/X86/IDT.c
 
 /usr/local/cross/bin/i586-elf-ld -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel        start.o \
@@ -24,7 +26,10 @@ nasm -f elf -o gdtAsm.o  kernel/src/X86/GDT.s
                                                                                                       mem.o \
                                                                                                       gdt.o \
                                                                                                       gdtAsm.o \
+                                                                                                      pic.o \
                                                                                                       idt.o \
+                                                                                                      idtAsm.o \
+
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
 

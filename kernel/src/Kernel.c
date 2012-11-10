@@ -16,29 +16,29 @@
 
 #include <Drivers/Console.h>
 #include <Drivers/VGA.h>
-#include <Debug.h>
 #include <Sys.h>
 #include <X86/GDT.h>
+#include <X86/PIC8259.h>
 #include <X86/IDT.h>
 
 PUBLIC void Kernel(void) {
 
-    Module_load(VGA_getModule());
-    Module_load(Console_getModule());
-    Module_load(GDT_getModule());
-    Module_load(IDT_getModule());
+    Module* modules[] = {
+
+        VGA_getModule(),
+        Console_getModule(),
+        GDT_getModule(),
+        PIC8259_getModule(),
+        IDT_getModule(),
+
+    };
+
+    for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
+        Module_load(modules[i]);
 
     Console_clearScreen();
-    Console_setColor(CONSOLE_INFO);
-    Console_printString("Loaded Modules:\n");
-    Console_setColor(CONSOLE_NORMAL);
 
-    char* moduleNames[MAX_LOADED_MODULES];
-    Module_getLoadedModuleNames(moduleNames);
-
-    for(u32int i = 0; i < Module_getNumberOfLoadedModules(); i++)
-        Console_printf("%s%c", moduleNames[i], '\n');
-
+    asm volatile("sti"); /* Enable interrupts */
 
     while(1) Sys_haltCPU();
 

@@ -22,13 +22,6 @@
 =========================================================*/
 #define NUMBER_OF_ENTRIES 5
 
-/* Segment selectors */
-#define NULL_SEGMENT        0x00
-#define KERNEL_CODE_SEGMENT 0x08 /* Base 0, Limit 4GB, Privilege 0 */
-#define KERNEL_DATA_SEGMENT 0x10 /* Base 0, Limit 4GB, Privilege 0 */
-#define USER_CODE_SEGMENT   0x18 /* Base 0, Limit 4GB, Privilege 3 */
-#define USER_DATA_SEGMENT   0x20 /* Base 0, Limit 4GB, Privilege 3 */
-
  /* GDT privilege levels */
 #define KERNEL_MODE  0
 #define USER_MODE    3

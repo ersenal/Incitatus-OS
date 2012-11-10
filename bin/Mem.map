@@ -14,7 +14,7 @@ Name             Origin             Length             Attributes
 Linker script and memory map
 
 
-.text           0x0000000000100000     0x1000
+.text           0x0000000000100000     0x2000
                 0x0000000000100000                text = .
                 0x0000000000100000                _text = .
                 0x0000000000100000                __text = .
@@ -23,148 +23,217 @@ Linker script and memory map
                 0x0000000000100000                mbHead
                 0x0000000000100020                Start
  *fill*         0x000000000010002c        0x4 00
- .text          0x0000000000100030       0xb1 kernel.o
+ .text          0x0000000000100030       0x67 kernel.o
                 0x0000000000100030                Kernel
- *fill*         0x00000000001000e1        0xf 00
- .text          0x00000000001000f0       0x56 io.o
-                0x00000000001000f0                IO_outB
-                0x0000000000100100                IO_outW
-                0x0000000000100110                IO_outL
-                0x0000000000100120                IO_inB
-                0x0000000000100130                IO_inW
-                0x0000000000100140                IO_inL
- *fill*         0x0000000000100146        0xa 00
- .text          0x0000000000100150       0x4e vga.o
-                0x0000000000100170                VGA_getModule
- *fill*         0x000000000010019e        0x2 00
- .text          0x00000000001001a0      0x4e8 console.o
-                0x00000000001001c0                Console_printString
-                0x00000000001001f0                Console_printf
-                0x0000000000100410                Console_printChar
-                0x00000000001005b0                Console_clearScreen
-                0x0000000000100640                Console_setColor
-                0x0000000000100650                Console_getModule
- *fill*         0x0000000000100688        0x8 00
- .text          0x0000000000100690       0x61 sys.o
-                0x0000000000100690                Sys_restart
-                0x00000000001006b0                Sys_haltCPU
-                0x00000000001006c0                Sys_panic
- *fill*         0x00000000001006f1        0xf 00
- .text          0x0000000000100700      0x2d1 module.o
-                0x0000000000100700                Module_load
-                0x0000000000100980                Module_getLoadedModuleNames
-                0x00000000001009c0                Module_getNumberOfLoadedModules
-                0x00000000001009d0                Module_unload
- *fill*         0x00000000001009d1        0xf 00
- .text          0x00000000001009e0      0x1b4 mem.o
-                0x00000000001009e0                Memory_set
-                0x0000000000100a80                Memory_copy
- *fill*         0x0000000000100b94        0xc 00
- .text          0x0000000000100ba0      0x13e gdt.o
-                0x0000000000100cb0                GDT_getModule
- *fill*         0x0000000000100cde        0x2 00
- .text          0x0000000000100ce0        0x8 gdtAsm.o
-                0x0000000000100ce0                GDT_farJump
- *fill*         0x0000000000100ce8        0x8 00
- .text          0x0000000000100cf0       0x78 idt.o
-                0x0000000000100d30                IDT_getModule
-                0x0000000000101000                . = ALIGN (0x1000)
- *fill*         0x0000000000100d68      0x298 00
+ *fill*         0x0000000000100097        0x9 00
+ .text          0x00000000001000a0       0x56 io.o
+                0x00000000001000a0                IO_outB
+                0x00000000001000b0                IO_outW
+                0x00000000001000c0                IO_outL
+                0x00000000001000d0                IO_inB
+                0x00000000001000e0                IO_inW
+                0x00000000001000f0                IO_inL
+ *fill*         0x00000000001000f6        0xa 00
+ .text          0x0000000000100100       0x4e vga.o
+                0x0000000000100120                VGA_getModule
+ *fill*         0x000000000010014e        0x2 00
+ .text          0x0000000000100150      0x4e8 console.o
+                0x0000000000100170                Console_printString
+                0x00000000001001a0                Console_printf
+                0x00000000001003c0                Console_printChar
+                0x0000000000100560                Console_clearScreen
+                0x00000000001005f0                Console_setColor
+                0x0000000000100600                Console_getModule
+ *fill*         0x0000000000100638        0x8 00
+ .text          0x0000000000100640       0x61 sys.o
+                0x0000000000100640                Sys_restart
+                0x0000000000100660                Sys_haltCPU
+                0x0000000000100670                Sys_panic
+ *fill*         0x00000000001006a1        0xf 00
+ .text          0x00000000001006b0      0x2d1 module.o
+                0x00000000001006b0                Module_load
+                0x0000000000100930                Module_getLoadedModuleNames
+                0x0000000000100970                Module_getNumberOfLoadedModules
+                0x0000000000100980                Module_unload
+ *fill*         0x0000000000100981        0xf 00
+ .text          0x0000000000100990      0x1b4 mem.o
+                0x0000000000100990                Memory_set
+                0x0000000000100a30                Memory_copy
+ *fill*         0x0000000000100b44        0xc 00
+ .text          0x0000000000100b50      0x13e gdt.o
+                0x0000000000100c60                GDT_getModule
+ *fill*         0x0000000000100c8e        0x2 00
+ .text          0x0000000000100c90        0x8 gdtAsm.o
+                0x0000000000100c90                GDT_farJump
+ *fill*         0x0000000000100c98        0x8 00
+ .text          0x0000000000100ca0      0x1ae pic.o
+                0x0000000000100d70                PIC8259_setMask
+                0x0000000000100de0                PIC8259_sendEOI
+                0x0000000000100e20                PIC8259_getModule
+ *fill*         0x0000000000100e4e        0x2 00
+ .text          0x0000000000100e50      0xa92 idt.o
+                0x00000000001016c0                IDT_registerHandler
+                0x0000000000101770                IDT_handlerException
+                0x0000000000101800                IDT_handlerIRQ
+                0x00000000001018a0                IDT_getModule
+ *fill*         0x00000000001018e2        0xe 00
+ .text          0x00000000001018f0      0x212 idtAsm.o
+                0x0000000000101940                IDT_handler0
+                0x0000000000101947                IDT_handler1
+                0x000000000010194e                IDT_handler2
+                0x0000000000101955                IDT_handler3
+                0x000000000010195c                IDT_handler4
+                0x0000000000101963                IDT_handler5
+                0x000000000010196a                IDT_handler6
+                0x0000000000101974                IDT_handler7
+                0x000000000010197e                IDT_handler8
+                0x0000000000101986                IDT_handler9
+                0x0000000000101990                IDT_handler10
+                0x0000000000101998                IDT_handler11
+                0x00000000001019a0                IDT_handler12
+                0x00000000001019a8                IDT_handler13
+                0x00000000001019b0                IDT_handler14
+                0x00000000001019b8                IDT_handler15
+                0x00000000001019c2                IDT_handler16
+                0x00000000001019cc                IDT_handler17
+                0x00000000001019d6                IDT_handler18
+                0x00000000001019e0                IDT_handler19
+                0x00000000001019ea                IDT_handler20
+                0x00000000001019f4                IDT_handler21
+                0x00000000001019fe                IDT_handler22
+                0x0000000000101a08                IDT_handler23
+                0x0000000000101a12                IDT_handler24
+                0x0000000000101a1c                IDT_handler25
+                0x0000000000101a26                IDT_handler26
+                0x0000000000101a30                IDT_handler27
+                0x0000000000101a3a                IDT_handler28
+                0x0000000000101a44                IDT_handler29
+                0x0000000000101a4e                IDT_handler30
+                0x0000000000101a58                IDT_handler31
+                0x0000000000101a62                IDT_request0
+                0x0000000000101a6c                IDT_request1
+                0x0000000000101a76                IDT_request2
+                0x0000000000101a80                IDT_request3
+                0x0000000000101a8a                IDT_request4
+                0x0000000000101a94                IDT_request5
+                0x0000000000101a9e                IDT_request6
+                0x0000000000101aa8                IDT_request7
+                0x0000000000101ab2                IDT_request8
+                0x0000000000101abc                IDT_request9
+                0x0000000000101ac6                IDT_request10
+                0x0000000000101ad0                IDT_request11
+                0x0000000000101ada                IDT_request12
+                0x0000000000101ae4                IDT_request13
+                0x0000000000101aee                IDT_request14
+                0x0000000000101af8                IDT_request15
+                0x0000000000102000                . = ALIGN (0x1000)
+ *fill*         0x0000000000101b02      0x4fe 00
 
-.rodata.str1.1  0x0000000000101000       0xf7
- .rodata.str1.1
-                0x0000000000101000       0x16 kernel.o
- .rodata.str1.1
-                0x0000000000101016       0x12 vga.o
- .rodata.str1.1
-                0x0000000000101028       0x66 console.o
- .rodata.str1.1
-                0x000000000010108e        0xe sys.o
- .rodata.str1.1
-                0x000000000010109c       0x14 module.o
-                                         0x3d (size before relaxing)
- .rodata.str1.1
-                0x00000000001010b0       0x14 mem.o
-                                         0x3d (size before relaxing)
- .rodata.str1.1
-                0x00000000001010c4       0x18 gdt.o
- .rodata.str1.1
-                0x00000000001010dc       0x1b idt.o
-
-.eh_frame       0x00000000001010f8      0x380
- .eh_frame      0x00000000001010f8       0x38 kernel.o
- .eh_frame      0x0000000000101130       0x78 io.o
+.eh_frame       0x0000000000102000      0x460
+ .eh_frame      0x0000000000102000       0x38 kernel.o
+ .eh_frame      0x0000000000102038       0x78 io.o
                                          0x90 (size before relaxing)
- .eh_frame      0x00000000001011a8       0x28 vga.o
+ .eh_frame      0x00000000001020b0       0x28 vga.o
                                          0x40 (size before relaxing)
- .eh_frame      0x00000000001011d0      0x128 console.o
+ .eh_frame      0x00000000001020d8      0x128 console.o
                                         0x140 (size before relaxing)
- .eh_frame      0x00000000001012f8       0x44 sys.o
+ .eh_frame      0x0000000000102200       0x44 sys.o
                                          0x5c (size before relaxing)
- .eh_frame      0x000000000010133c       0x7c module.o
+ .eh_frame      0x0000000000102244       0x7c module.o
                                          0x94 (size before relaxing)
- .eh_frame      0x00000000001013b8       0x64 mem.o
+ .eh_frame      0x00000000001022c0       0x64 mem.o
                                          0x7c (size before relaxing)
- .eh_frame      0x000000000010141c       0x30 gdt.o
+ .eh_frame      0x0000000000102324       0x30 gdt.o
                                          0x48 (size before relaxing)
- .eh_frame      0x000000000010144c       0x2c idt.o
-                                         0x44 (size before relaxing)
+ .eh_frame      0x0000000000102354       0x68 pic.o
+                                         0x80 (size before relaxing)
+ .eh_frame      0x00000000001023bc       0xa4 idt.o
+                                         0xbc (size before relaxing)
 
-.iplt           0x0000000000101480        0x0
+.rodata.str1.1  0x0000000000102460      0x126
+ .rodata.str1.1
+                0x0000000000102460       0x12 vga.o
+ .rodata.str1.1
+                0x0000000000102472       0x66 console.o
+ .rodata.str1.1
+                0x00000000001024d8        0xe sys.o
+ .rodata.str1.1
+                0x00000000001024e6       0x14 module.o
+                                         0x3d (size before relaxing)
+ .rodata.str1.1
+                0x00000000001024fa       0x14 mem.o
+                                         0x3d (size before relaxing)
+ .rodata.str1.1
+                0x000000000010250e       0x18 gdt.o
+ .rodata.str1.1
+                0x0000000000102526        0xa pic.o
+ .rodata.str1.1
+                0x0000000000102530       0x56 idt.o
+                                         0x7f (size before relaxing)
+
+.rodata.str1.4  0x0000000000102588       0x20
+ .rodata.str1.4
+                0x0000000000102588       0x20 idt.o
+                                         0x1f (size before relaxing)
+
+.iplt           0x00000000001025b0        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x0000000000101478        0x0
+.rel.dyn        0x00000000001025a8        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x0000000000101478      0xb88
-                0x0000000000101478                data = .
-                0x0000000000101478                _data = .
-                0x0000000000101478                __data = .
+.data           0x00000000001025a8      0xa58
+                0x00000000001025a8                data = .
+                0x00000000001025a8                _data = .
+                0x00000000001025a8                __data = .
  *(.data)
- .data          0x0000000000101478        0x0 kernel.o
- .data          0x0000000000101478        0x0 io.o
- .data          0x0000000000101478        0x0 vga.o
- .data          0x0000000000101478        0x0 console.o
- .data          0x0000000000101478        0x0 sys.o
- .data          0x0000000000101478        0x0 module.o
- .data          0x0000000000101478        0x0 mem.o
- .data          0x0000000000101478        0x0 gdt.o
- .data          0x0000000000101478        0x0 idt.o
+ .data          0x00000000001025a8        0x0 kernel.o
+ .data          0x00000000001025a8        0x0 io.o
+ .data          0x00000000001025a8        0x0 vga.o
+ .data          0x00000000001025a8        0x0 console.o
+ .data          0x00000000001025a8        0x0 sys.o
+ .data          0x00000000001025a8        0x0 module.o
+ .data          0x00000000001025a8        0x0 mem.o
+ .data          0x00000000001025a8        0x0 gdt.o
+ .data          0x00000000001025a8        0x0 pic.o
+ .data          0x00000000001025a8        0x0 idt.o
  *(.rodata)
-                0x0000000000102000                . = ALIGN (0x1000)
- *fill*         0x0000000000101478      0xb88 00
+                0x0000000000103000                . = ALIGN (0x1000)
+ *fill*         0x00000000001025a8      0xa58 00
 
-.igot.plt       0x0000000000102000        0x0
+.igot.plt       0x0000000000103000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
 
-.bss            0x0000000000102000    0x11006
-                0x0000000000102000                bss = .
-                0x0000000000102000                _bss = .
-                0x0000000000102000                __bss = .
+.bss            0x0000000000103000    0x11006
+                0x0000000000103000                bss = .
+                0x0000000000103000                _bss = .
+                0x0000000000103000                __bss = .
  *(.bss)
- .bss           0x0000000000102000     0xff00 start.o
- .bss           0x0000000000111f00        0x0 kernel.o
- .bss           0x0000000000111f00        0x0 io.o
- .bss           0x0000000000111f00       0x34 vga.o
- *fill*         0x0000000000111f34        0xc 00
- .bss           0x0000000000111f40       0x94 console.o
- .bss           0x0000000000111fd4        0x0 sys.o
- *fill*         0x0000000000111fd4        0xc 00
- .bss           0x0000000000111fe0       0xa0 module.o
- .bss           0x0000000000112080        0x0 mem.o
- .bss           0x0000000000112080       0x6e gdt.o
- *fill*         0x00000000001120ee       0x12 00
- .bss           0x0000000000112100      0x840 idt.o
-                0x0000000000113000                . = ALIGN (0x1000)
- *fill*         0x0000000000112940      0x6c0 00
- COMMON         0x0000000000113000        0x6 kernel.o
-                0x0000000000113000                vgaRam
-                0x0000000000113004                vgaHeight
-                0x0000000000113005                vgaWidth
-                0x0000000000113006                end = .
-                0x0000000000113006                _end = .
-                0x0000000000113006                __end = .
+ .bss           0x0000000000103000     0xff00 start.o
+ .bss           0x0000000000112f00        0x0 kernel.o
+ .bss           0x0000000000112f00        0x0 io.o
+ .bss           0x0000000000112f00       0x34 vga.o
+ *fill*         0x0000000000112f34        0xc 00
+ .bss           0x0000000000112f40       0x94 console.o
+ .bss           0x0000000000112fd4        0x0 sys.o
+ *fill*         0x0000000000112fd4        0xc 00
+ .bss           0x0000000000112fe0       0xa0 module.o
+ .bss           0x0000000000113080        0x0 mem.o
+ .bss           0x0000000000113080       0x6e gdt.o
+ *fill*         0x00000000001130ee       0x12 00
+ .bss           0x0000000000113100       0x34 pic.o
+ *fill*         0x0000000000113134        0xc 00
+ .bss           0x0000000000113140      0xc46 idt.o
+                0x0000000000114000                . = ALIGN (0x1000)
+ *fill*         0x0000000000113d86      0x27a 00
+ COMMON         0x0000000000114000        0x6 kernel.o
+                0x0000000000114000                vgaRam
+                0x0000000000114004                vgaHeight
+                0x0000000000114005                vgaWidth
+                0x0000000000114006                end = .
+                0x0000000000114006                _end = .
+                0x0000000000114006                __end = .
 LOAD start.o
 LOAD kernel.o
 LOAD io.o
@@ -175,7 +244,9 @@ LOAD module.o
 LOAD mem.o
 LOAD gdt.o
 LOAD gdtAsm.o
+LOAD pic.o
 LOAD idt.o
+LOAD idtAsm.o
 OUTPUT(bootloader/kernel elf32-i386)
 
 .comment        0x0000000000000000       0x11
@@ -188,4 +259,5 @@ OUTPUT(bootloader/kernel elf32-i386)
  .comment       0x0000000000000000       0x12 module.o
  .comment       0x0000000000000000       0x12 mem.o
  .comment       0x0000000000000000       0x12 gdt.o
+ .comment       0x0000000000000000       0x12 pic.o
  .comment       0x0000000000000000       0x12 idt.o
