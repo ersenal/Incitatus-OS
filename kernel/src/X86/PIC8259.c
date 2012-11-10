@@ -176,7 +176,7 @@ PRIVATE void PIC8259_init(void) {
     IO_outB(SLAVE_DATA, icw4);
 
     /* Initially mask all IRQs */
-    OCW ocw1 = 0b00000000;
+    OCW ocw1 = 0b11111111;
     IO_outB(MASTER_DATA, ocw1);
     IO_outB(SLAVE_DATA, ocw1);
 
