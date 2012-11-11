@@ -13,7 +13,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 
 ##Progress
 
-![ScreenShot](http://oi49.tinypic.com/bje97s.jpg)
+![ScreenShot](http://oi45.tinypic.com/33fdk6g.jpg)
 
 ##Objectives
 
