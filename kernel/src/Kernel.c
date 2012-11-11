@@ -20,6 +20,7 @@
 #include <X86/GDT.h>
 #include <X86/PIC8259.h>
 #include <X86/IDT.h>
+#include <X86/PIT8253.h>
 
 PUBLIC void Kernel(void) {
 
@@ -30,6 +31,7 @@ PUBLIC void Kernel(void) {
         GDT_getModule(),
         PIC8259_getModule(),
         IDT_getModule(),
+        PIT8253_getModule()
 
     };
 
@@ -37,8 +39,6 @@ PUBLIC void Kernel(void) {
         Module_load(modules[i]);
 
     Console_clearScreen();
-
-    asm volatile("sti"); /* Enable interrupts */
 
     while(1) Sys_haltCPU();
 

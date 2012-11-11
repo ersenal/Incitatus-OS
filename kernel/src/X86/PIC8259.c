@@ -4,10 +4,11 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| 8259PIC.h
+| PIC8259.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Provides an interface for programmable interrupt controller
+| DESCRIPTION:  Provides an interface for Intel 8259 programmable interrupt
+|               controller.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 |
@@ -42,43 +43,43 @@
 Initialization Command Word 1 at Port 20h and A0h
 
     |7|6|5|4|3|2|1|0|  ICW1
-    | | | | | | | `---- 1=ICW4 is needed, 0=no ICW4 needed
-    | | | | | | `----- 1=single 8259, 0=cascading 8259's
-    | | | | | `------ 1=4 byte interrupt vectors, 0=8 byte int vectors
-    | | | | `------- 1=level triggered mode, 0=edge triggered mode
-    | | | `-------- must be 1 for ICW1 (port must also be 20h or A0h)
-    `------------- must be zero for PC systems
+     | | | | | | | `---- 1=ICW4 is needed, 0=no ICW4 needed
+     | | | | | | `----- 1=single 8259, 0=cascading 8259's
+     | | | | | `------ 1=4 byte interrupt vectors, 0=8 byte int vectors
+     | | | | `------- 1=level triggered mode, 0=edge triggered mode
+     | | | `-------- must be 1 for ICW1 (port must also be 20h or A0h)
+     `------------- must be zero for PC systems
 
 Initialization Command Word 2 at Port 21h and A1h
 
     |7|6|5|4|3|2|1|0|  ICW2
-    | | | | | `-------- 000= on 80x86 systems
-    `----------------- A7-A3 of 80x86 interrupt vector
+     | | | | | `-------- 000= on 80x86 systems
+     `----------------- A7-A3 of 80x86 interrupt vector
 
 Initialization Command Word 3 at Port 21h and A1h
 
     |7|6|5|4|3|2|1|0|  ICW3 for Master Device
-    | | | | | | | `---- 1=interrupt request 0 has slave, 0=no slave
-    | | | | | | `----- 1=interrupt request 1 has slave, 0=no slave
-    | | | | | `------ 1=interrupt request 2 has slave, 0=no slave
-    | | | | `------- 1=interrupt request 3 has slave, 0=no slave
-    | | | `-------- 1=interrupt request 4 has slave, 0=no slave
-    | | `--------- 1=interrupt request 5 has slave, 0=no slave
-    | `---------- 1=interrupt request 6 has slave, 0=no slave
-    `----------- 1=interrupt request 7 has slave, 0=no slave
+     | | | | | | | `---- 1=interrupt request 0 has slave, 0=no slave
+     | | | | | | `----- 1=interrupt request 1 has slave, 0=no slave
+     | | | | | `------ 1=interrupt request 2 has slave, 0=no slave
+     | | | | `------- 1=interrupt request 3 has slave, 0=no slave
+     | | | `-------- 1=interrupt request 4 has slave, 0=no slave
+     | | `--------- 1=interrupt request 5 has slave, 0=no slave
+     | `---------- 1=interrupt request 6 has slave, 0=no slave
+     `----------- 1=interrupt request 7 has slave, 0=no slave
 
     |7|6|5|4|3|2|1|0|  ICW3 for Slave Device
-    | | | | | `-------- master interrupt request slave is attached to
-    `----------------- must be zero
+     | | | | | `-------- master interrupt request slave is attached to
+     `----------------- must be zero
 
 Initialization Command Word 4 at Port 21h and A1h
 
     |7|6|5|4|3|2|1|0|  ICW4
-    | | | | | | | `---- 1 for 80x86 mode, 0 = MCS 80/85 mode
-    | | | | | | `----- 1 = auto EOI, 0=normal EOI
-    | | | | `-------- slave/master buffered mode (see below)
-    | | | `--------- 1 = special fully nested mode (SFNM), 0=sequential
-    `-------------- unused (set to zero)
+     | | | | | | | `---- 1 for 80x86 mode, 0 = MCS 80/85 mode
+     | | | | | | `----- 1 = auto EOI, 0=normal EOI
+     | | | | `-------- slave/master buffered mode (see below)
+     | | | `--------- 1 = special fully nested mode (SFNM), 0=sequential
+     `-------------- unused (set to zero)
 
     Bits Buffering Mode
 
@@ -94,23 +95,23 @@ typedef unsigned char ICW;
 Operation Control Word 1 / Interrupt Mask Reg.  (Ports 21h & A1h)
 
     |7|6|5|4|3|2|1|0|  OCW1 - IMR Interrupt Mask Register
-    | | | | | | | `---- 0 = service IRQ0, 1 = mask off
-    | | | | | | `----- 0 = service IRQ1, 1 = mask off
-    | | | | | `------ 0 = service IRQ2, 1 = mask off
-    | | | | `------- 0 = service IRQ3, 1 = mask off
-    | | | `-------- 0 = service IRQ4, 1 = mask off
-    | | `--------- 0 = service IRQ5, 1 = mask off
-    | `---------- 0 = service IRQ6, 1 = mask off
-    `----------- 0 = service IRQ7, 1 = mask off
+     | | | | | | | `---- 0 = service IRQ0, 1 = mask off
+     | | | | | | `----- 0 = service IRQ1, 1 = mask off
+     | | | | | `------ 0 = service IRQ2, 1 = mask off
+     | | | | `------- 0 = service IRQ3, 1 = mask off
+     | | | `-------- 0 = service IRQ4, 1 = mask off
+     | | `--------- 0 = service IRQ5, 1 = mask off
+     | `---------- 0 = service IRQ6, 1 = mask off
+     `----------- 0 = service IRQ7, 1 = mask off
 
 
 Operation Control Word 2 / Interrupt Command Reg. (Ports 20h & A0h)
 
     |7|6|5|4|3|2|1|0|  OCW2 - ICR Interrupt Command Register
-    | | | | | `-------- interrupt request level to act upon
-    | | | | `--------- must be 0 for OCW2
-    | | | `---------- must be 0 for OCW2
-    `--------------- EOI type (see table)
+     | | | | | `-------- interrupt request level to act upon
+     | | | | `--------- must be 0 for OCW2
+     | | | `---------- must be 0 for OCW2
+     `--------------- EOI type (see table)
 
     Bits EOI - End Of Interrupt code (PC specific)
 
@@ -126,14 +127,14 @@ Operation Control Word 2 / Interrupt Command Reg. (Ports 20h & A0h)
 Operation Control Word 3   (Ports 20h & A0h)
 
     |7|6|5|4|3|2|1|0|  OCW3
-    | | | | | | | `--- 1=read IRR on next read, 0=read ISR on next read
-    | | | | | | `---- 1=act on value of bit 0, 0=no action if bit 0 set
-    | | | | | `----- 1=poll command issued, 0=no poll command issued
-    | | | | `------ must be 1 for OCW3
-    | | | `------- must be 0 for OCW3
-    | | `-------- 1=set special mask, 0=reset special mask
-    | `--------- 1=act on value of bit 5, 0=no action if bit 5 set
-    `---------- not used (zero)
+     | | | | | | | `--- 1=read IRR on next read, 0=read ISR on next read
+     | | | | | | `---- 1=act on value of bit 0, 0=no action if bit 0 set
+     | | | | | `----- 1=poll command issued, 0=no poll command issued
+     | | | | `------ must be 1 for OCW3
+     | | | `------- must be 0 for OCW3
+     | | `-------- 1=set special mask, 0=reset special mask
+     | `--------- 1=act on value of bit 5, 0=no action if bit 5 set
+     `---------- not used (zero)
 */
 typedef unsigned char OCW;
 

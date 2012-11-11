@@ -196,8 +196,8 @@ PUBLIC void Console_setColor(u8int attribute) {
 PUBLIC Module* Console_getModule(void) {
 
     console.moduleName = "Console Driver";
-    console.dependencies[0] = MODULE_VGA;
     console.numberOfDependencies = 1;
+    console.dependencies[0] = MODULE_VGA;
     console.init = &Console_init;
     console.moduleID = MODULE_CONSOLE;
 

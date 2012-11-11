@@ -29,7 +29,8 @@
 #define MODULE_CONSOLE 101
 #define MODULE_GDT     102
 #define MODULE_IDT     103
-#define MODULE_PIC8259 104;
+#define MODULE_PIC8259 104
+#define MODULE_PIT8253 105
 
 /*=======================================================
     STRUCT

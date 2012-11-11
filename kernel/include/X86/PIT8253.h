@@ -4,11 +4,18 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| PIC8259.h
+| PIT8253.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Provides an interface for Intel 8259 programmable interrupt
-|               controller.
+| DESCRIPTION:  Provides an interface for Intel 8253 Programmable Interval
+|               Timer(PIT).
+|
+|               PIT consists of three timers(channels). Each has a different
+|               purpose.
+|
+|               First Timer  - Used as the System timer
+|               Second Timer - Used for RAM refreshing
+|               Third Timer  - Connected to PC speaker(that annoying beeper)
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 |
@@ -17,37 +24,25 @@
 \------------------------------------------------------------------------*/
 
 
-#ifndef PIC_H
-#define PIC_H
+#ifndef PIT_H
+#define PIT_H
 
 #include <Common.h>
 #include <Module.h>
 
 /*-------------------------------------------------------------------------
-| Set IRQ mask
+| Sleep
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Masks a given IRQ.
+| DESCRIPTION:     Puts the entire system on a busy-wait
 |
-| PARAM:           "irqNo"   the irq to mask
-|                  "state"   0 = unmasked, 1 = masked
+| PARAM:           "ms"  time in milliseconds
 \------------------------------------------------------------------------*/
-void PIC8259_setMask(u8int irqNo, bool state);
+void PIT8253_sleep(u32int ms);
 
 /*-------------------------------------------------------------------------
-| End of interrupt
+| Get PIT module
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Sends an end of interrupt command to appropriate PIC
-|                  (or PICs if the request originated from slave)
-|
-| PARAM:           "interruptNo"  the interrupt number of IRQ
+| DESCRIPTION:     Returns the PIT module.
 \------------------------------------------------------------------------*/
-void PIC8259_sendEOI(u8int interruptNo);
-
-/*-------------------------------------------------------------------------
-| Get PIC module
-|--------------------------------------------------------------------------
-| DESCRIPTION:     Returns the PIC module.
-\------------------------------------------------------------------------*/
-Module* PIC8259_getModule(void);
-
+Module* PIT8253_getModule(void);
 #endif
