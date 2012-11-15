@@ -21,7 +21,6 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-#define MAX_LOADED_MODULES    32
 #define MAX_MODULE_DEPENDENCY  8
 
 /* Module IDs */
@@ -79,14 +78,5 @@ void Module_getLoadedModuleNames(char** buffer);
 | RETURN:           "u32int"    the number of loaded modules
 \------------------------------------------------------------------------*/
 u32int Module_getNumberOfLoadedModules(void);
-
-/*-------------------------------------------------------------------------
-| Unload module
-|--------------------------------------------------------------------------
-| DESCRIPTION:     Unloads a given module.
-|
-| PARAM:           "module"    the module to unload
-\------------------------------------------------------------------------*/
-void Module_unload(Module* module);
 
 #endif

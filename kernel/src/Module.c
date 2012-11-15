@@ -17,10 +17,15 @@
 #include <Debug.h>
 
 /*=======================================================
+    DEFINE
+=========================================================*/
+#define MAX_LOADED_MODULES    32
+
+/*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module* loadedModules[MAX_LOADED_MODULES];
-PRIVATE u32int  numberOfLoadedModules = 0;
+PRIVATE u32int  numberOfLoadedModules;
 
 /*=======================================================
     FUNCTION
@@ -33,7 +38,7 @@ PUBLIC void Module_load(Module* module) {
     Debug_assert(numberOfLoadedModules < MAX_LOADED_MODULES);
 
     /* Module should not be loaded already */
-    Debug_assert(module->isLoaded == 0);
+    Debug_assert(!module->isLoaded);
 
     /* Module should not share the same ID with another loaded module */
     for(u32int i = 0; i < numberOfLoadedModules; i++)
@@ -54,7 +59,7 @@ PUBLIC void Module_load(Module* module) {
 
         }
 
-        Debug_assert(found == TRUE);
+        Debug_assert(found);
     }
 
     /* call initialisation function of module */
@@ -80,12 +85,5 @@ PUBLIC void Module_getLoadedModuleNames(char** buffer) {
 PUBLIC u32int Module_getNumberOfLoadedModules(void) {
 
     return numberOfLoadedModules;
-
-}
-
-PUBLIC void Module_unload(Module* module) {
-
-    /* TODO: Implement */
-    UNUSED(module);
 
 }

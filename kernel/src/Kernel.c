@@ -22,6 +22,13 @@
 #include <X86/IDT.h>
 #include <X86/PIT8253.h>
 
+void test() {
+
+    for(u64int y = 0; y < 10000; y++)
+        Console_printf("%s", "Hello World\n");
+
+}
+
 PUBLIC void Kernel(void) {
 
     Module* modules[] = {
@@ -39,6 +46,7 @@ PUBLIC void Kernel(void) {
         Module_load(modules[i]);
 
     Console_clearScreen();
+    Console_printf("%d", PIT8253_measureRuntime(test));
 
     while(1) Sys_haltCPU();
 

@@ -163,9 +163,6 @@ PRIVATE void GDT_init(void) {
     ** Simulate a flat-memory model(all segments 0 to 4GB)
     */
 
-    /* Null segment  */
-    Memory_set(&gdtEntries[0], 0, sizeof(GDTEntry));
-
     /* Kernel mode code segment */
     gdtEntries[1].limitLow         = 0xFFFF;
     gdtEntries[1].limitHigh        = 0xF;
@@ -245,7 +242,6 @@ PUBLIC Module* GDT_getModule(void) {
     gdtModule.init = &GDT_init;
     gdtModule.moduleName = "Global Descriptor Table";
     gdtModule.moduleID = MODULE_GDT;
-    gdtModule.numberOfDependencies = 0;
 
     return &gdtModule;
 }

@@ -51,15 +51,13 @@ PRIVATE void Console_nextLine(void) {
 
 PRIVATE void Console_scrollDown(void) {
 
-    /* move every char in line i to line i-1 */
+    /* move every line i to line i-1 */
     for(int i = 1; i < vgaHeight; i++) {
-        for(int y = 0; y < vgaWidth; y++) {
 
-            char* dest  = (char*) vgaRam + (y * 2) + ((i - 1) * vgaWidth * 2);
-            char* src   = (char*) vgaRam + (y * 2) + ((i) * vgaWidth * 2);
-            Memory_copy(dest, src, 2);
+        char* src   = (char*) vgaRam + ((i) * vgaWidth * 2);
+        char* dest  = (char*) vgaRam + ((i - 1) * vgaWidth * 2);
+        Memory_copy(dest, src, vgaWidth * 2);
 
-        }
     }
 
     /* clear last row */
@@ -107,8 +105,6 @@ PRIVATE void Console_printInt(int integer) {
 
 PRIVATE void Console_init(void) {
 
-    cursorX = 0;
-    cursorY = 0;
     colorAttribute = CONSOLE_NORMAL;
 
 }

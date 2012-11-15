@@ -220,7 +220,6 @@ PUBLIC Module* PIC8259_getModule(void) {
 
     picModule.moduleName = "8259A PIC";
     picModule.init = &PIC8259_init;
-    picModule.numberOfDependencies = 0;
     picModule.moduleID = MODULE_PIC8259;
 
     return &picModule;

@@ -42,7 +42,6 @@ PUBLIC Module* VGA_getModule(void) {
 
     vga.moduleName = "VGA Buffer Driver";
     vga.moduleID = MODULE_VGA;
-    vga.numberOfDependencies = 0;
     vga.init = &VGA_init;
 
     return &vga;

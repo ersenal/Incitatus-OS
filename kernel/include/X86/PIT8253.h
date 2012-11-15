@@ -31,6 +31,18 @@
 #include <Module.h>
 
 /*-------------------------------------------------------------------------
+| Measure runtime
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Returns the number of ticks it takes to compute
+|                  specified function.
+|
+| PARAM:           "functionAddr"  the function to be measured
+|
+| RETURN:          "u32int"        the number of ticks
+\------------------------------------------------------------------------*/
+u32int PIT8253_measureRuntime(void* functionAddr);
+
+/*-------------------------------------------------------------------------
 | Sleep
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Puts the entire system on a busy-wait

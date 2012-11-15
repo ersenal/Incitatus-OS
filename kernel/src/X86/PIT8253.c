@@ -114,7 +114,6 @@ PRIVATE void PIT8253_timerHandler(void) {
 
 PRIVATE void PIT8253_init(void) {
 
-    tick = 0;
     u16int divisor = INPUT_HZ / OUTPUT_HZ;
 
     /* Set channel 0 control mode */
@@ -133,6 +132,30 @@ PRIVATE void PIT8253_init(void) {
 
 }
 
+PUBLIC u32int PIT8253_measureRuntime(void* functionAddr) {
+
+  u32int beforeTick = tick;
+
+  void (*function) (void) = functionAddr;
+  function();
+
+  return tick - beforeTick;
+
+}
+
+/* GCC without O0 tends to optimise busy waits, prevent that for this function */
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+PUBLIC void PIT8253_sleep(u32int ms) {
+
+    ms /= 10;
+    u32int begin = tick;
+    while(tick < (ms + begin))
+      asm volatile("hlt");
+
+}
+#pragma GCC pop_options
+
 PUBLIC Module* PIT8253_getModule(void) {
 
     pitModule.moduleName = "8253 PIT";
@@ -143,15 +166,3 @@ PUBLIC Module* PIT8253_getModule(void) {
 
     return &pitModule;
 }
-
-/* GCC without O0 tends to optimise busy waits, prevent that for this function */
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-PUBLIC void PIT8253_sleep(u32int ms) {
-
-    ms /= 10;
-    tick = 0;
-    while(tick < ms);
-
-}
-#pragma GCC pop_options

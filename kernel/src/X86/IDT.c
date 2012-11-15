@@ -258,10 +258,6 @@ PRIVATE void IDT_initIRQHandlers(void) {
 
 PRIVATE void IDT_init(void) {
 
-    /* Initially all descriptor entries and handlers are null */
-    Memory_set(&idtEntries, 0, sizeof(IDTEntry) * NUMBER_OF_INTERRUPTS);
-    Memory_set(&handlers, 0, sizeof(void*) * NUMBER_OF_INTERRUPTS);
-
     /* Initialise interrupt service routines */
     IDT_initExceptionHandlers();
     IDT_initIRQHandlers();
