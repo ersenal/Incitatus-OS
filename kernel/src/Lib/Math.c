@@ -14,8 +14,9 @@
 
 
 #include <Lib/Math.h>
+#include <Common.h>
 
-double Math_abs(double number) {
+PUBLIC double Math_abs(double number) {
 
     asm volatile("fld %0;"
                  "fabs;"
@@ -25,7 +26,7 @@ double Math_abs(double number) {
     return number;
 }
 
-double Math_sqrt(double number) {
+PUBLIC double Math_sqrt(double number) {
 
     asm volatile("fld %0;"
                  "fsqrt;"
@@ -36,7 +37,7 @@ double Math_sqrt(double number) {
 
 }
 
-double Math_sin(double radian) {
+PUBLIC double Math_sin(double radian) {
 
     asm volatile("fld %0;"
                  "fsin;"
@@ -47,7 +48,7 @@ double Math_sin(double radian) {
 
 }
 
-double Math_cos(double radian) {
+PUBLIC double Math_cos(double radian) {
 
     asm volatile("fld %0;"
                  "fcos;"
@@ -58,7 +59,7 @@ double Math_cos(double radian) {
 
 }
 
-double Math_tan(double radian) {
+PUBLIC double Math_tan(double radian) {
 
     asm volatile("fld %0;"
                  "fptan;"
