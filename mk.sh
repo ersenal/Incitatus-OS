@@ -16,6 +16,10 @@ nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o pic.o     -c   kernel/src/X86/PIC8259.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o idt.o     -c   kernel/src/X86/IDT.c
 /usr/local/cross/bin/i586-elf-gcc $CFlags -o pit.o     -c   kernel/src/X86/PIT8253.c
+/usr/local/cross/bin/i586-elf-gcc $CFlags -o cpu.o     -c   kernel/src/X86/CPU.c
+
+/usr/local/cross/bin/i586-elf-gcc $CFlags -o bitmap.o  -c   kernel/src/Lib/Bitmap.c
+/usr/local/cross/bin/i586-elf-gcc $CFlags -o math.o  -c     kernel/src/Lib/Math.c
 
 /usr/local/cross/bin/i586-elf-ld -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel        start.o \
                                                                                                       kernel.o \
@@ -31,6 +35,9 @@ nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
                                                                                                       idt.o \
                                                                                                       idtAsm.o \
                                                                                                       pit.o \
+                                                                                                      cpu.o \
+                                                                                                      bitmap.o \
+                                                                                                      math.o \
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
