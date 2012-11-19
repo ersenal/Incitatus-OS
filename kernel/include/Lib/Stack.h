@@ -4,38 +4,40 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| Bitmap.h
+| Stack.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Bit array data structure implementation.
+| DESCRIPTION:  Stack data structure implementation.
+|               Stores pointers.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
-#ifndef BITMAP_H
-#define BITMAP_H
+#ifndef STACK_H
+#define STACK_H
 
 #include <Common.h>
 
 /*=======================================================
     STRUCT
 =========================================================*/
-typedef struct Bitmap Bitmap;
+typedef struct Stack Stack;
 
-struct Bitmap {
+struct Stack {
 
-    void*  start; /* Bitmap start address */
-    u32int length; /* Length of bitmap in bytes */
+    void** start;  /* Stack start address */
+    u32int  length; /* Length of stack in bytes */
+    u32int  size;   /* Number of items(void*) in stack */
 
 };
 
 /*=======================================================
     FUNCTION
 =========================================================*/
-void Bitmap_setBit(Bitmap* self, u32int index);
-void Bitmap_clearBit(Bitmap* self, u32int index);
-bool Bitmap_isSet(Bitmap* self, u32int index);
-void Bitmap_toggle(Bitmap* self, u32int index);
-void Bitmap_init(Bitmap* self, void* start, u32int length);
+
+void  Stack_push(Stack* self, void* item);
+void* Stack_pop(Stack* self);
+void* Stack_peek(Stack* self);
+void  Stack_init(Stack* self, void* start, u32int length);
 #endif

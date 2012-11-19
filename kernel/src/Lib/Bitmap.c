@@ -16,8 +16,14 @@
 #include <Lib/Bitmap.h>
 #include <Debug.h>
 
+/*=======================================================
+    DEFINE
+=========================================================*/
 #define CHECK_INDEX Debug_assert((index / 8) < self->length);
 
+/*=======================================================
+    FUNCTION
+=========================================================*/
 PUBLIC void Bitmap_setBit(Bitmap* self, u32int index) {
 
     CHECK_INDEX
@@ -53,5 +59,12 @@ PUBLIC void Bitmap_toggle(Bitmap* self, u32int index) {
         Bitmap_clearBit(self, index);
     else
         Bitmap_setBit(self, index);
+
+}
+
+PUBLIC void Bitmap_init(Bitmap* self, void* start, u32int length) {
+
+    self->start = start;
+    self->length = length;
 
 }
