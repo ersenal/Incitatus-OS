@@ -39,7 +39,7 @@ PUBLIC void* Stack_pop(Stack* self) {
 
 PUBLIC void* Stack_peek(Stack* self) {
 
-    return *(self->start + (self->size * sizeof(void*)));
+    return *(self->start + ((self->size - 1) * sizeof(void*)));
 
 }
 
