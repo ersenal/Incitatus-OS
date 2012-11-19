@@ -8,7 +8,8 @@
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Stack data structure implementation.
-|               Stores pointers.
+|                   - Stores pointers(4 bytes in 32-bit)
+|                   - Grows upwards
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -17,10 +18,7 @@
 #include <Lib/Stack.h>
 #include <Debug.h>
 
-/*=======================================================
-    FUNCTION
-=========================================================*/
-void  Stack_push(Stack* self, void* item) {
+PUBLIC void  Stack_push(Stack* self, void* item) {
 
     Debug_assert(self->size * sizeof(void*) < self->length);
 
@@ -29,7 +27,7 @@ void  Stack_push(Stack* self, void* item) {
 
 }
 
-void* Stack_pop(Stack* self) {
+PUBLIC void* Stack_pop(Stack* self) {
 
     Debug_assert(self->size > 0);
 
@@ -39,13 +37,13 @@ void* Stack_pop(Stack* self) {
 
 }
 
-void* Stack_peek(Stack* self) {
+PUBLIC void* Stack_peek(Stack* self) {
 
     return *(self->start + (self->size * sizeof(void*)));
 
 }
 
-void  Stack_init(Stack* self, void* start, u32int length) {
+PUBLIC void  Stack_init(Stack* self, void* start, u32int length) {
 
     self->start = start;
     self->length = length;

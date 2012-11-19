@@ -8,7 +8,8 @@
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Stack data structure implementation.
-|               Stores pointers.
+|                   - Stores pointers(4 bytes in 32-bit)
+|                   - Grows upwards
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
