@@ -76,8 +76,10 @@ PUBLIC void* BitmapPMM_allocateFrame(void) {
         return NULL;
 
     for(u32int i = 0; i < totalFrames; i++)
-        if(!Bitmap_isSet(&bitmap, i))
+        if(!Bitmap_isSet(&bitmap, i)) {
             frameIndex = i;
+            break;
+        }
 
     Bitmap_setBit(&bitmap, frameIndex);
     usedFrames++;
