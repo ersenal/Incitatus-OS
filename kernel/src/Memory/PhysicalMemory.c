@@ -15,13 +15,11 @@
 
 
 #include <Memory/PhysicalMemory.h>
+
 /* Include your PMM implementation here */
 /* #include Memory/BitmapPMM.h */
 #include <Memory/StackPMM.h>
-/* -- */
-#include <Debug.h>
-#include <Memory.h>
-#include <Lib/Bitmap.h>
+
 
 /*=======================================================
     PRIVATE DATA
