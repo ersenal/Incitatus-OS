@@ -8,7 +8,7 @@
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Stack data structure implementation.
-|                   - Stores pointers(4 bytes in 32-bit)
+|                   - Stores 4-byte items
 |                   - Grows upwards
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
@@ -22,7 +22,7 @@ PUBLIC void  Stack_push(Stack* self, void* item) {
 
     Debug_assert(self->size * sizeof(void*) < self->length);
 
-    *(self->start + (self->size * sizeof(void*))) = item;
+    *((int*) (self->start + self->size * sizeof(void*))) = (int) item;
     self->size++;
 
 }
@@ -31,15 +31,15 @@ PUBLIC void* Stack_pop(Stack* self) {
 
     Debug_assert(self->size > 0);
 
-    void* item = *(self->start + ((self->size - 1) * sizeof(void*)));
+    int item = *((int*) (self->start + ((self->size - 1) * sizeof(void*))));
     self->size--;
-    return item;
+    return (void*) item;
 
 }
 
 PUBLIC void* Stack_peek(Stack* self) {
 
-    return *(self->start + ((self->size - 1) * sizeof(void*)));
+    return (void*) *((int*) (self->start + ((self->size - 1) * sizeof(void*))));
 
 }
 

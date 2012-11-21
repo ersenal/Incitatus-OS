@@ -27,7 +27,7 @@ typedef struct Stack Stack;
 
 struct Stack {
 
-    void** start;  /* Stack start address */
+    void*   start;  /* Stack start address */
     u32int  length; /* Length of stack in bytes */
     u32int  size;   /* Number of items(void*) in stack */
 

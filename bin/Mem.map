@@ -5,6 +5,12 @@ Common symbol       size              file
 vgaRam              0x4               vga.o
 vgaHeight           0x1               vga.o
 vgaWidth            0x1               vga.o
+PhysicalMemory_allocateFrame
+                    0x4               pmm.o
+PhysicalMemory_printInfo
+                    0x4               pmm.o
+PhysicalMemory_freeFrame
+                    0x4               pmm.o
 
 Memory Configuration
 
@@ -23,241 +29,275 @@ Linker script and memory map
                 0x0000000000100000                mbHead
                 0x0000000000100020                Start
  *fill*         0x000000000010002c        0x4 00
- .text          0x0000000000100030       0x67 kernel.o
+ .text          0x0000000000100030      0x167 kernel.o
                 0x0000000000100030                Kernel
- *fill*         0x0000000000100097        0x9 00
- .text          0x00000000001000a0       0x56 io.o
-                0x00000000001000a0                IO_outB
-                0x00000000001000b0                IO_outW
-                0x00000000001000c0                IO_outL
-                0x00000000001000d0                IO_inB
-                0x00000000001000e0                IO_inW
-                0x00000000001000f0                IO_inL
- *fill*         0x00000000001000f6        0xa 00
- .text          0x0000000000100100       0x44 vga.o
-                0x0000000000100120                VGA_getModule
- *fill*         0x0000000000100144        0xc 00
- .text          0x0000000000100150      0x4e8 console.o
-                0x0000000000100160                Console_printString
-                0x0000000000100190                Console_printf
-                0x00000000001003b0                Console_printChar
-                0x0000000000100560                Console_clearScreen
-                0x00000000001005f0                Console_setColor
-                0x0000000000100600                Console_getModule
- *fill*         0x0000000000100638        0x8 00
- .text          0x0000000000100640       0x61 sys.o
-                0x0000000000100640                Sys_restart
-                0x0000000000100660                Sys_haltCPU
-                0x0000000000100670                Sys_panic
- *fill*         0x00000000001006a1        0xf 00
- .text          0x00000000001006b0      0x2c6 module.o
-                0x00000000001006b0                Module_load
-                0x0000000000100930                Module_getLoadedModuleNames
-                0x0000000000100970                Module_getNumberOfLoadedModules
- *fill*         0x0000000000100976        0xa 00
- .text          0x0000000000100980      0x1b4 mem.o
-                0x0000000000100980                Memory_set
-                0x0000000000100a20                Memory_copy
- *fill*         0x0000000000100b34        0xc 00
- .text          0x0000000000100b40      0x114 gdt.o
-                0x0000000000100c30                GDT_getModule
- *fill*         0x0000000000100c54        0xc 00
- .text          0x0000000000100c60        0x8 gdtAsm.o
-                0x0000000000100c60                GDT_farJump
- *fill*         0x0000000000100c68        0x8 00
- .text          0x0000000000100c70      0x1a4 pic.o
-                0x0000000000100d40                PIC8259_setMask
-                0x0000000000100db0                PIC8259_sendEOI
-                0x0000000000100df0                PIC8259_getModule
- *fill*         0x0000000000100e14        0xc 00
- .text          0x0000000000100e20      0xa52 idt.o
-                0x0000000000101650                IDT_registerHandler
-                0x0000000000101700                IDT_handlerException
-                0x0000000000101790                IDT_handlerIRQ
-                0x0000000000101830                IDT_getModule
- *fill*         0x0000000000101872        0xe 00
- .text          0x0000000000101880      0x212 idtAsm.o
-                0x00000000001018d0                IDT_handler0
-                0x00000000001018d7                IDT_handler1
-                0x00000000001018de                IDT_handler2
-                0x00000000001018e5                IDT_handler3
-                0x00000000001018ec                IDT_handler4
-                0x00000000001018f3                IDT_handler5
-                0x00000000001018fa                IDT_handler6
-                0x0000000000101904                IDT_handler7
-                0x000000000010190e                IDT_handler8
-                0x0000000000101916                IDT_handler9
-                0x0000000000101920                IDT_handler10
-                0x0000000000101928                IDT_handler11
-                0x0000000000101930                IDT_handler12
-                0x0000000000101938                IDT_handler13
-                0x0000000000101940                IDT_handler14
-                0x0000000000101948                IDT_handler15
-                0x0000000000101952                IDT_handler16
-                0x000000000010195c                IDT_handler17
-                0x0000000000101966                IDT_handler18
-                0x0000000000101970                IDT_handler19
-                0x000000000010197a                IDT_handler20
-                0x0000000000101984                IDT_handler21
-                0x000000000010198e                IDT_handler22
-                0x0000000000101998                IDT_handler23
-                0x00000000001019a2                IDT_handler24
-                0x00000000001019ac                IDT_handler25
-                0x00000000001019b6                IDT_handler26
-                0x00000000001019c0                IDT_handler27
-                0x00000000001019ca                IDT_handler28
-                0x00000000001019d4                IDT_handler29
-                0x00000000001019de                IDT_handler30
-                0x00000000001019e8                IDT_handler31
-                0x00000000001019f2                IDT_request0
-                0x00000000001019fc                IDT_request1
-                0x0000000000101a06                IDT_request2
-                0x0000000000101a10                IDT_request3
-                0x0000000000101a1a                IDT_request4
-                0x0000000000101a24                IDT_request5
-                0x0000000000101a2e                IDT_request6
-                0x0000000000101a38                IDT_request7
-                0x0000000000101a42                IDT_request8
-                0x0000000000101a4c                IDT_request9
-                0x0000000000101a56                IDT_request10
-                0x0000000000101a60                IDT_request11
-                0x0000000000101a6a                IDT_request12
-                0x0000000000101a74                IDT_request13
-                0x0000000000101a7e                IDT_request14
-                0x0000000000101a88                IDT_request15
- *fill*         0x0000000000101a92        0xe 00
- .text          0x0000000000101aa0      0x118 pit.o
-                0x0000000000101b20                PIT8253_measureRuntime
-                0x0000000000101b40                PIT8253_sleep
-                0x0000000000101b80                PIT8253_getModule
- *fill*         0x0000000000101bb8        0x8 00
- .text          0x0000000000101bc0       0xd4 cpu.o
-                0x0000000000101bc0                CPU_getCR
-                0x0000000000101c30                CPU_setCR
- *fill*         0x0000000000101c94        0xc 00
- .text          0x0000000000101ca0      0x2b2 bitmap.o
-                0x0000000000101ca0                Bitmap_setBit
-                0x0000000000101d40                Bitmap_clearBit
-                0x0000000000101de0                Bitmap_isSet
-                0x0000000000101e80                Bitmap_toggle
-                0x0000000000101f40                Bitmap_init
- *fill*         0x0000000000101f52        0xe 00
- .text          0x0000000000101f60      0x169 stack.o
-                0x0000000000101f60                Stack_push
-                0x0000000000102000                Stack_pop
-                0x0000000000102090                Stack_peek
-                0x00000000001020b0                Stack_init
- *fill*         0x00000000001020c9        0x7 00
- .text          0x00000000001020d0       0x4d math.o
-                0x00000000001020d0                Math_abs
-                0x00000000001020e0                Math_sqrt
-                0x00000000001020f0                Math_sin
-                0x0000000000102100                Math_cos
-                0x0000000000102110                Math_tan
+ *fill*         0x0000000000100197        0x9 00
+ .text          0x00000000001001a0       0x56 io.o
+                0x00000000001001a0                IO_outB
+                0x00000000001001b0                IO_outW
+                0x00000000001001c0                IO_outL
+                0x00000000001001d0                IO_inB
+                0x00000000001001e0                IO_inW
+                0x00000000001001f0                IO_inL
+ *fill*         0x00000000001001f6        0xa 00
+ .text          0x0000000000100200       0x44 vga.o
+                0x0000000000100220                VGA_getModule
+ *fill*         0x0000000000100244        0xc 00
+ .text          0x0000000000100250      0x4e8 console.o
+                0x0000000000100260                Console_printString
+                0x0000000000100290                Console_printf
+                0x00000000001004b0                Console_printChar
+                0x0000000000100660                Console_clearScreen
+                0x00000000001006f0                Console_setColor
+                0x0000000000100700                Console_getModule
+ *fill*         0x0000000000100738        0x8 00
+ .text          0x0000000000100740       0x61 sys.o
+                0x0000000000100740                Sys_restart
+                0x0000000000100760                Sys_haltCPU
+                0x0000000000100770                Sys_panic
+ *fill*         0x00000000001007a1        0xf 00
+ .text          0x00000000001007b0      0x2c6 module.o
+                0x00000000001007b0                Module_load
+                0x0000000000100a30                Module_getLoadedModuleNames
+                0x0000000000100a70                Module_getNumberOfLoadedModules
+ *fill*         0x0000000000100a76        0xa 00
+ .text          0x0000000000100a80      0x1b4 mem.o
+                0x0000000000100a80                Memory_set
+                0x0000000000100b20                Memory_copy
+ *fill*         0x0000000000100c34        0xc 00
+ .text          0x0000000000100c40      0x114 gdt.o
+                0x0000000000100d30                GDT_getModule
+ *fill*         0x0000000000100d54        0xc 00
+ .text          0x0000000000100d60        0x8 gdtAsm.o
+                0x0000000000100d60                GDT_farJump
+ *fill*         0x0000000000100d68        0x8 00
+ .text          0x0000000000100d70      0x1a4 pic.o
+                0x0000000000100e40                PIC8259_setMask
+                0x0000000000100eb0                PIC8259_sendEOI
+                0x0000000000100ef0                PIC8259_getModule
+ *fill*         0x0000000000100f14        0xc 00
+ .text          0x0000000000100f20      0xa52 idt.o
+                0x0000000000101750                IDT_registerHandler
+                0x0000000000101800                IDT_handlerException
+                0x0000000000101890                IDT_handlerIRQ
+                0x0000000000101930                IDT_getModule
+ *fill*         0x0000000000101972        0xe 00
+ .text          0x0000000000101980      0x212 idtAsm.o
+                0x00000000001019d0                IDT_handler0
+                0x00000000001019d7                IDT_handler1
+                0x00000000001019de                IDT_handler2
+                0x00000000001019e5                IDT_handler3
+                0x00000000001019ec                IDT_handler4
+                0x00000000001019f3                IDT_handler5
+                0x00000000001019fa                IDT_handler6
+                0x0000000000101a04                IDT_handler7
+                0x0000000000101a0e                IDT_handler8
+                0x0000000000101a16                IDT_handler9
+                0x0000000000101a20                IDT_handler10
+                0x0000000000101a28                IDT_handler11
+                0x0000000000101a30                IDT_handler12
+                0x0000000000101a38                IDT_handler13
+                0x0000000000101a40                IDT_handler14
+                0x0000000000101a48                IDT_handler15
+                0x0000000000101a52                IDT_handler16
+                0x0000000000101a5c                IDT_handler17
+                0x0000000000101a66                IDT_handler18
+                0x0000000000101a70                IDT_handler19
+                0x0000000000101a7a                IDT_handler20
+                0x0000000000101a84                IDT_handler21
+                0x0000000000101a8e                IDT_handler22
+                0x0000000000101a98                IDT_handler23
+                0x0000000000101aa2                IDT_handler24
+                0x0000000000101aac                IDT_handler25
+                0x0000000000101ab6                IDT_handler26
+                0x0000000000101ac0                IDT_handler27
+                0x0000000000101aca                IDT_handler28
+                0x0000000000101ad4                IDT_handler29
+                0x0000000000101ade                IDT_handler30
+                0x0000000000101ae8                IDT_handler31
+                0x0000000000101af2                IDT_request0
+                0x0000000000101afc                IDT_request1
+                0x0000000000101b06                IDT_request2
+                0x0000000000101b10                IDT_request3
+                0x0000000000101b1a                IDT_request4
+                0x0000000000101b24                IDT_request5
+                0x0000000000101b2e                IDT_request6
+                0x0000000000101b38                IDT_request7
+                0x0000000000101b42                IDT_request8
+                0x0000000000101b4c                IDT_request9
+                0x0000000000101b56                IDT_request10
+                0x0000000000101b60                IDT_request11
+                0x0000000000101b6a                IDT_request12
+                0x0000000000101b74                IDT_request13
+                0x0000000000101b7e                IDT_request14
+                0x0000000000101b88                IDT_request15
+ *fill*         0x0000000000101b92        0xe 00
+ .text          0x0000000000101ba0      0x118 pit.o
+                0x0000000000101c20                PIT8253_measureRuntime
+                0x0000000000101c40                PIT8253_sleep
+                0x0000000000101c80                PIT8253_getModule
+ *fill*         0x0000000000101cb8        0x8 00
+ .text          0x0000000000101cc0       0xd4 cpu.o
+                0x0000000000101cc0                CPU_getCR
+                0x0000000000101d30                CPU_setCR
+ *fill*         0x0000000000101d94        0xc 00
+ .text          0x0000000000101da0      0x2b2 bitmap.o
+                0x0000000000101da0                Bitmap_setBit
+                0x0000000000101e40                Bitmap_clearBit
+                0x0000000000101ee0                Bitmap_isSet
+                0x0000000000101f80                Bitmap_toggle
+                0x0000000000102040                Bitmap_init
+ *fill*         0x0000000000102052        0xe 00
+ .text          0x0000000000102060      0x159 stack.o
+                0x0000000000102060                Stack_push
+                0x0000000000102100                Stack_pop
+                0x0000000000102190                Stack_peek
+                0x00000000001021a0                Stack_init
+ *fill*         0x00000000001021b9        0x7 00
+ .text          0x00000000001021c0       0x4d math.o
+                0x00000000001021c0                Math_abs
+                0x00000000001021d0                Math_sqrt
+                0x00000000001021e0                Math_sin
+                0x00000000001021f0                Math_cos
+                0x0000000000102200                Math_tan
+ *fill*         0x000000000010220d        0x3 00
+ .text          0x0000000000102210       0x80 pmm.o
+                0x0000000000102250                PhysicalMemory_getModule
+ .text          0x0000000000102290      0x301 smm.o
+                0x0000000000102290                StackPMM_allocateFrame
+                0x00000000001022b0                StackPMM_freeFrame
+                0x0000000000102350                StackPMM_init
+                0x0000000000102530                StackPMM_printInfo
+ *fill*         0x0000000000102591        0xf 00
+ .text          0x00000000001025a0      0x405 bmm.o
+                0x00000000001025a0                BitmapPMM_allocateFrame
+                0x0000000000102610                BitmapPMM_freeFrame
+                0x00000000001026c0                BitmapPMM_printInfo
+                0x0000000000102730                BitmapPMM_init
                 0x0000000000103000                . = ALIGN (0x1000)
- *fill*         0x000000000010211d      0xee3 00
+ *fill*         0x00000000001029a5      0x65b 00
 
-.eh_frame       0x0000000000103000      0x69c
- .eh_frame      0x0000000000103000       0x38 kernel.o
- .eh_frame      0x0000000000103038       0x78 io.o
-                                         0x90 (size before relaxing)
- .eh_frame      0x00000000001030b0       0x28 vga.o
-                                         0x40 (size before relaxing)
- .eh_frame      0x00000000001030d8      0x128 console.o
-                                        0x140 (size before relaxing)
- .eh_frame      0x0000000000103200       0x44 sys.o
-                                         0x5c (size before relaxing)
- .eh_frame      0x0000000000103244       0x68 module.o
-                                         0x80 (size before relaxing)
- .eh_frame      0x00000000001032ac       0x64 mem.o
-                                         0x7c (size before relaxing)
- .eh_frame      0x0000000000103310       0x28 gdt.o
-                                         0x40 (size before relaxing)
- .eh_frame      0x0000000000103338       0x68 pic.o
-                                         0x80 (size before relaxing)
- .eh_frame      0x00000000001033a0       0x9c idt.o
-                                         0xb4 (size before relaxing)
- .eh_frame      0x000000000010343c       0x78 pit.o
-                                         0x90 (size before relaxing)
- .eh_frame      0x00000000001034b4       0x28 cpu.o
-                                         0x40 (size before relaxing)
- .eh_frame      0x00000000001034dc       0xec bitmap.o
-                                        0x104 (size before relaxing)
- .eh_frame      0x00000000001035c8       0x70 stack.o
-                                         0x88 (size before relaxing)
- .eh_frame      0x0000000000103638       0x64 math.o
-                                         0x7c (size before relaxing)
-
-.rodata.str1.1  0x000000000010369c      0x15e
+.rodata.str1.1  0x0000000000103000      0x21f
  .rodata.str1.1
-                0x000000000010369c       0x12 vga.o
+                0x0000000000103000       0x3d kernel.o
  .rodata.str1.1
-                0x00000000001036ae       0x66 console.o
+                0x000000000010303d       0x12 vga.o
  .rodata.str1.1
-                0x0000000000103714        0xe sys.o
+                0x000000000010304f       0x3d console.o
+                                         0x66 (size before relaxing)
  .rodata.str1.1
-                0x0000000000103722       0x14 module.o
+                0x000000000010308c        0xe sys.o
+ .rodata.str1.1
+                0x000000000010309a       0x14 module.o
                                          0x3d (size before relaxing)
  .rodata.str1.1
-                0x0000000000103736       0x14 mem.o
+                0x00000000001030ae       0x14 mem.o
                                          0x3d (size before relaxing)
  .rodata.str1.1
-                0x000000000010374a       0x18 gdt.o
+                0x00000000001030c2       0x18 gdt.o
  .rodata.str1.1
-                0x0000000000103762        0xa pic.o
+                0x00000000001030da        0xa pic.o
  .rodata.str1.1
-                0x000000000010376c       0x56 idt.o
+                0x00000000001030e4       0x56 idt.o
                                          0x7f (size before relaxing)
  .rodata.str1.1
-                0x00000000001037c2        0x9 pit.o
+                0x000000000010313a        0x9 pit.o
  .rodata.str1.1
-                0x00000000001037cb       0x18 bitmap.o
+                0x0000000000103143       0x18 bitmap.o
                                          0x41 (size before relaxing)
  .rodata.str1.1
-                0x00000000001037e3       0x17 stack.o
+                0x000000000010315b       0x17 stack.o
                                          0x40 (size before relaxing)
+ .rodata.str1.1
+                0x0000000000103172       0x18 pmm.o
+ .rodata.str1.1
+                0x000000000010318a       0x69 smm.o
+                                         0x92 (size before relaxing)
+ .rodata.str1.1
+                0x00000000001031f3       0x2c bmm.o
+                                         0x93 (size before relaxing)
 
-.rodata.str1.4  0x00000000001037fc       0x20
+.eh_frame       0x0000000000103220      0x804
+ .eh_frame      0x0000000000103220       0x38 kernel.o
+ .eh_frame      0x0000000000103258       0x78 io.o
+                                         0x90 (size before relaxing)
+ .eh_frame      0x00000000001032d0       0x28 vga.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x00000000001032f8      0x128 console.o
+                                        0x140 (size before relaxing)
+ .eh_frame      0x0000000000103420       0x44 sys.o
+                                         0x5c (size before relaxing)
+ .eh_frame      0x0000000000103464       0x68 module.o
+                                         0x80 (size before relaxing)
+ .eh_frame      0x00000000001034cc       0x64 mem.o
+                                         0x7c (size before relaxing)
+ .eh_frame      0x0000000000103530       0x28 gdt.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x0000000000103558       0x68 pic.o
+                                         0x80 (size before relaxing)
+ .eh_frame      0x00000000001035c0       0x9c idt.o
+                                         0xb4 (size before relaxing)
+ .eh_frame      0x000000000010365c       0x78 pit.o
+                                         0x90 (size before relaxing)
+ .eh_frame      0x00000000001036d4       0x28 cpu.o
+                                         0x40 (size before relaxing)
+ .eh_frame      0x00000000001036fc       0xec bitmap.o
+                                        0x104 (size before relaxing)
+ .eh_frame      0x00000000001037e8       0x70 stack.o
+                                         0x88 (size before relaxing)
+ .eh_frame      0x0000000000103858       0x64 math.o
+                                         0x7c (size before relaxing)
+ .eh_frame      0x00000000001038bc       0x2c pmm.o
+                                         0x44 (size before relaxing)
+ .eh_frame      0x00000000001038e8       0x94 smm.o
+                                         0xac (size before relaxing)
+ .eh_frame      0x000000000010397c       0xa8 bmm.o
+                                         0xc0 (size before relaxing)
+
+.rodata.str1.4  0x0000000000103a24       0x20
  .rodata.str1.4
-                0x00000000001037fc       0x20 idt.o
+                0x0000000000103a24       0x20 idt.o
                                          0x1f (size before relaxing)
 
-.iplt           0x0000000000103820        0x0
+.iplt           0x0000000000103a50        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x000000000010381c        0x0
+.rel.dyn        0x0000000000103a44        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x000000000010381c      0x7e4
-                0x000000000010381c                data = .
-                0x000000000010381c                _data = .
-                0x000000000010381c                __data = .
+.data           0x0000000000103a44      0x5bc
+                0x0000000000103a44                data = .
+                0x0000000000103a44                _data = .
+                0x0000000000103a44                __data = .
  *(.data)
- .data          0x000000000010381c        0x0 kernel.o
- .data          0x000000000010381c        0x0 io.o
- .data          0x000000000010381c        0x0 vga.o
- .data          0x000000000010381c        0x0 console.o
- .data          0x000000000010381c        0x0 sys.o
- .data          0x000000000010381c        0x0 module.o
- .data          0x000000000010381c        0x0 mem.o
- .data          0x000000000010381c        0x0 gdt.o
- .data          0x000000000010381c        0x0 pic.o
- .data          0x000000000010381c        0x0 idt.o
- .data          0x000000000010381c        0x0 pit.o
- .data          0x000000000010381c        0x0 cpu.o
- .data          0x000000000010381c        0x0 bitmap.o
- .data          0x000000000010381c        0x0 stack.o
- .data          0x000000000010381c        0x0 math.o
+ .data          0x0000000000103a44        0x0 kernel.o
+ .data          0x0000000000103a44        0x0 io.o
+ .data          0x0000000000103a44        0x0 vga.o
+ .data          0x0000000000103a44        0x0 console.o
+ .data          0x0000000000103a44        0x0 sys.o
+ .data          0x0000000000103a44        0x0 module.o
+ .data          0x0000000000103a44        0x0 mem.o
+ .data          0x0000000000103a44        0x0 gdt.o
+ .data          0x0000000000103a44        0x0 pic.o
+ .data          0x0000000000103a44        0x0 idt.o
+ .data          0x0000000000103a44        0x0 pit.o
+ .data          0x0000000000103a44        0x0 cpu.o
+ .data          0x0000000000103a44        0x0 bitmap.o
+ .data          0x0000000000103a44        0x0 stack.o
+ .data          0x0000000000103a44        0x0 math.o
+ .data          0x0000000000103a44        0x0 pmm.o
+ .data          0x0000000000103a44        0x0 smm.o
+ .data          0x0000000000103a44        0x0 bmm.o
  *(.rodata)
- .rodata        0x000000000010381c       0x28 cpu.o
+ .rodata        0x0000000000103a44       0x28 cpu.o
                 0x0000000000104000                . = ALIGN (0x1000)
- *fill*         0x0000000000103844      0x7bc 00
+ *fill*         0x0000000000103a6c      0x594 00
 
 .igot.plt       0x0000000000104000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
 
-.bss            0x0000000000104000    0x11006
+.bss            0x0000000000104000    0x11014
                 0x0000000000104000                bss = .
                 0x0000000000104000                _bss = .
                 0x0000000000104000                __bss = .
@@ -282,15 +322,24 @@ Linker script and memory map
  .bss           0x0000000000114dd4        0x0 bitmap.o
  .bss           0x0000000000114dd4        0x0 stack.o
  .bss           0x0000000000114dd4        0x0 math.o
+ *fill*         0x0000000000114dd4        0xc 00
+ .bss           0x0000000000114de0       0x3c pmm.o
+ .bss           0x0000000000114e1c       0x14 smm.o
+ .bss           0x0000000000114e30       0x18 bmm.o
                 0x0000000000115000                . = ALIGN (0x1000)
- *fill*         0x0000000000114dd4      0x22c 00
+ *fill*         0x0000000000114e48      0x1b8 00
  COMMON         0x0000000000115000        0x6 vga.o
                 0x0000000000115000                vgaRam
                 0x0000000000115004                vgaHeight
                 0x0000000000115005                vgaWidth
-                0x0000000000115006                end = .
-                0x0000000000115006                _end = .
-                0x0000000000115006                __end = .
+ *fill*         0x0000000000115006        0x2 00
+ COMMON         0x0000000000115008        0xc pmm.o
+                0x0000000000115008                PhysicalMemory_allocateFrame
+                0x000000000011500c                PhysicalMemory_printInfo
+                0x0000000000115010                PhysicalMemory_freeFrame
+                0x0000000000115014                end = .
+                0x0000000000115014                _end = .
+                0x0000000000115014                __end = .
 LOAD start.o
 LOAD kernel.o
 LOAD io.o
@@ -309,6 +358,9 @@ LOAD cpu.o
 LOAD bitmap.o
 LOAD stack.o
 LOAD math.o
+LOAD pmm.o
+LOAD smm.o
+LOAD bmm.o
 OUTPUT(bootloader/kernel elf32-i386)
 
 .comment        0x0000000000000000       0x11
@@ -328,3 +380,6 @@ OUTPUT(bootloader/kernel elf32-i386)
  .comment       0x0000000000000000       0x12 bitmap.o
  .comment       0x0000000000000000       0x12 stack.o
  .comment       0x0000000000000000       0x12 math.o
+ .comment       0x0000000000000000       0x12 pmm.o
+ .comment       0x0000000000000000       0x12 smm.o
+ .comment       0x0000000000000000       0x12 bmm.o

@@ -21,9 +21,17 @@
 #include <X86/PIC8259.h>
 #include <X86/IDT.h>
 #include <X86/PIT8253.h>
+#include <Multiboot.h>
+#include <Debug.h>
+#include <Memory/PhysicalMemory.h>
 
 
-PUBLIC void Kernel(void) {
+PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
+
+    extern MultibootHeader mbHead;
+
+    Debug_assert(mbMagic == MULTIBOOT_BOOTLOADER_MAGIC);
+    Debug_assert(mbHead.magic == MULTIBOOT_HEADER_MAGIC);
 
     Module* modules[] = {
 
@@ -32,7 +40,8 @@ PUBLIC void Kernel(void) {
         GDT_getModule(),
         PIC8259_getModule(),
         IDT_getModule(),
-        PIT8253_getModule()
+        PIT8253_getModule(),
+        PhysicalMemory_getModule(mbInfo, &mbHead)
 
     };
 
@@ -40,6 +49,7 @@ PUBLIC void Kernel(void) {
         Module_load(modules[i]);
 
     Console_clearScreen();
+    PhysicalMemory_printInfo();
 
     while(1) Sys_haltCPU();
 

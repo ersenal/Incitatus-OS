@@ -30,6 +30,7 @@
 #define MODULE_IDT     103
 #define MODULE_PIC8259 104
 #define MODULE_PIT8253 105
+#define MODULE_PMM     106
 
 /*=======================================================
     STRUCT

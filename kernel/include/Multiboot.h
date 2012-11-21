@@ -139,8 +139,8 @@ struct MultibootHeader {
     /* These are only valid if MULTIBOOT_AOUT_KLUDGE is set. */
     u32int headerAddr;
     u32int loadAddr;
+    u32int loadEndAddr;
     u32int bssEndAddr;
-    u32int endAddr;
     u32int entryAddr;
 
 } __attribute__((packed));
