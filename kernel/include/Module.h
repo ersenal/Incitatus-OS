@@ -31,6 +31,7 @@
 #define MODULE_PIC8259 104
 #define MODULE_PIT8253 105
 #define MODULE_PMM     106
+#define MODULE_VMM     107
 
 /*=======================================================
     STRUCT

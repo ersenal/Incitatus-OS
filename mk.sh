@@ -27,6 +27,7 @@ $C_Compiler $CFlags -o math.o    -c   kernel/src/Lib/Math.c
 $C_Compiler $CFlags -o pmm.o     -c   kernel/src/Memory/PhysicalMemory.c
 $C_Compiler $CFlags -o smm.o     -c   kernel/src/Memory/StackPMM.c
 $C_Compiler $CFlags -o bmm.o     -c   kernel/src/Memory/BitmapPMM.c
+$C_Compiler $CFlags -o vmm.o     -c   kernel/src/Memory/VirtualMemory.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
@@ -49,6 +50,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         pmm.o \
                                                                         smm.o \
                                                                         bmm.o \
+                                                                        vmm.o \
 
 
 

@@ -56,7 +56,6 @@ PUBLIC Module* PhysicalMemory_getModule(MultibootInfo* mbI, MultibootHeader* mbH
     pmmModule.moduleName = "Physical Memory Manager";
     pmmModule.moduleID = MODULE_PMM;
     pmmModule.init = _PhysicalMemory_init;
-    pmmModule.numberOfDependencies = 0;
 
     multibootInfo = mbI;
     multibootHeader = mbH;

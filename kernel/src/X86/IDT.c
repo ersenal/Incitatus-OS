@@ -267,9 +267,6 @@ PRIVATE void IDT_init(void) {
     idtPointer.firstEntry = (IDTEntry*) &idtEntries;
     asm volatile ("lidt %0" : : "m" (idtPointer));
 
-    /* Enable interrupts - initially PIC module masks all IRQs */
-    asm volatile("sti");
-
 }
 
 PUBLIC void IDT_registerHandler(void* functionAddr, u8int interruptNo) {

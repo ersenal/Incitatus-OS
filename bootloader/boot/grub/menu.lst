@@ -1,5 +1,10 @@
 timeout 0
 
-title   Incitatus OS
-    kernel /kernel
-    boot
+title	Incitatus OS(Text-Mode)
+	kernel /kernel
+	boot
+
+title	Incitatus OS(VESA)
+	kernel /kernel
+	vbeset=0x115
+	boot

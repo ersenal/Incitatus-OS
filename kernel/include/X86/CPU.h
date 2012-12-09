@@ -57,8 +57,8 @@ struct CR0 {
 
 struct CR3 {
 
-    u32int PDBR : 20; /* Page directory base register */
     u16int      : 12;
+    u32int PDBR : 20; /* Page directory base register */
 
 } __attribute__((packed));
 

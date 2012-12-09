@@ -24,6 +24,7 @@
 #include <Multiboot.h>
 #include <Debug.h>
 #include <Memory/PhysicalMemory.h>
+#include <Memory/VirtualMemory.h>
 
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
@@ -41,13 +42,15 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         PIC8259_getModule(),
         IDT_getModule(),
         PIT8253_getModule(),
-        PhysicalMemory_getModule(mbInfo, &mbHead)
+        PhysicalMemory_getModule(mbInfo, &mbHead),
+        VirtualMemory_getModule()
 
     };
 
     for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
         Module_load(modules[i]);
 
+    asm volatile("sti");
     Console_clearScreen();
     PhysicalMemory_printInfo();
 
