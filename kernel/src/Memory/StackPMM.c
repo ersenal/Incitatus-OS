@@ -45,7 +45,7 @@ PUBLIC void* StackPMM_allocateFrame(void) {
 
 PUBLIC void StackPMM_freeFrame(void* b) {
 
-    Debug_assert(b != NULL);
+    Debug_assert(b != NULL && (u32int) b % FRAME_SIZE == 0);
     Stack_push(&stack, b);
 
 }

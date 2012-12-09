@@ -7,7 +7,7 @@
 | VirtualMemory.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Sets up and manages virtual memory.
+| DESCRIPTION:  Platform dependent X86 virtual memory manager, initialiser.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -15,10 +15,10 @@
 
 #include <Memory/VirtualMemory.h>
 #include <Memory/PhysicalMemory.h>
-#include <Debug.h>
-#include <Memory.h>
 #include <X86/CPU.h>
 #include <X86/IDT.h>
+#include <Debug.h>
+#include <Memory.h>
 #pragma GCC diagnostic ignored "-Wstrict-aliasing" /* ignore FORCE_CAST compiler warning */
 
 /*=======================================================
@@ -89,6 +89,7 @@ struct PageTable {
 
 };
 
+/* 4-Byte Page Directory Entry */
 struct PageDirectoryEntry {
 
     /* Whether the page table is in memory(is present) or not
@@ -156,12 +157,23 @@ struct PageDirectory {
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE Module vmModule;
+PRIVATE Module vmmModule;
 PRIVATE PageDirectory* currentDir;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+PRIVATE inline void VirtualMemory_invalidateTLB(void) {
+
+    asm volatile(
+
+        "movl  %cr3,%eax    \n"
+        "movl  %eax,%cr3    \n"
+
+    );
+
+}
 
 PRIVATE void VirtualMemory_setPaging(bool state) {
 
@@ -190,44 +202,106 @@ PRIVATE void VirtualMemory_switchPageDir(PageDirectory* dir) {
     reg.PDBR = (u32int) &currentDir->entries / FRAME_SIZE;
     CPU_setCR(3, FORCE_CAST(reg, u32int));
 
+    VirtualMemory_invalidateTLB();
 }
 
 PRIVATE void VirtualMemory_init(void) {
 
+    /* Create the initial page directory */
+    PageDirectory* dir = PhysicalMemory_allocateFrame();
+    Memory_set(dir, 0, sizeof(PageDirectory));
+    VirtualMemory_switchPageDir(dir);
+
+    /* Identity map first 4MB (except first 4096kb in order to catch NULLs) */
     PageTable* table = PhysicalMemory_allocateFrame();
     Memory_set(table, 0, sizeof(PageTable));
 
-    /* Identity map first 4MB (except first 4096kb in order to catch NULLs) */
     for (int i = 1; i < 1024; i++) {
 
-        table->entries[PTE_INDEX(i * 4096)].inMemory = TRUE;
-        table->entries[PTE_INDEX(i * 4096)].frameIndex = i;
+        table->entries[i].inMemory = TRUE;
+        table->entries[i].rwFlag = TRUE;
+        table->entries[i].frameIndex = i;
 
     }
 
-    PageDirectory* dir = PhysicalMemory_allocateFrame();
-    Memory_set(dir, 0, sizeof(PageDirectory));
-
-    PageDirectoryEntry* pde = &dir->entries[0];
+    PageDirectoryEntry* pde = &currentDir->entries[0];
     pde->inMemory = TRUE;
     pde->rwFlag = TRUE;
     pde->frameIndex = (u32int) table / FRAME_SIZE;
+    /* End of identity map */
+
+    currentDir->entries[1023] = currentDir->entries[0];
 
     IDT_registerHandler(&VirtualMemory_pageFaultHandler, 14);
-    VirtualMemory_switchPageDir(dir);
-    VirtualMemory_setPaging(TRUE);
+    VirtualMemory_setPaging(TRUE); /* Turn on paging */
 
+}
+
+PUBLIC void VirtualMemory_allocatePDE(void* virtualAddr) {
+
+    /* Address needs to be 4MB aligned */
+    Debug_assert((u32int) virtualAddr % 0x400000 == 0);
+
+    PageDirectoryEntry* pde = &currentDir->entries[PDE_INDEX(virtualAddr)];
+    Console_printf("%d", pde->frameIndex);
+
+    if(pde->inMemory) /* Need to free if already in memory */
+        VirtualMemory_deallocatePDE(virtualAddr);
+
+    /* Allocate a page table */
+    PageTable* p = PhysicalMemory_allocateFrame();
+    Memory_set(p, 0, sizeof(PageTable));
+    pde->inMemory = TRUE;
+    pde->rwFlag = TRUE;
+    pde->frameIndex = (u32int) p / FRAME_SIZE;
+
+    /* Allocate a frame for each PTE */
+    for(int i = 0; i < 1024; i++) {
+
+        p->entries[i].frameIndex = (u32int) PhysicalMemory_allocateFrame() / FRAME_SIZE;
+        p->entries[i].inMemory = TRUE;
+        p->entries[i].rwFlag = TRUE;
+
+    }
+
+    VirtualMemory_invalidateTLB();
+}
+
+PUBLIC void VirtualMemory_deallocatePDE(void* virtualAddr) {
+
+    /* Address needs to be 4MB aligned */
+    Debug_assert((u32int) virtualAddr % 0x400000 == 0);
+
+    PageDirectoryEntry* pde = &currentDir->entries[PDE_INDEX(virtualAddr)];
+
+    /* PDE should already be in memory */
+    Debug_assert(pde->inMemory);
+
+    PageTable* pageTable = (PageTable*) (pde->frameIndex * FRAME_SIZE);
+
+    /* Free physical frames */
+    for(int i = 0; i < 1024; i++)
+        PhysicalMemory_freeFrame((void*) (pageTable->entries[i].frameIndex * FRAME_SIZE));
+
+    /* Free page table */
+    PhysicalMemory_freeFrame(pageTable);
+
+    pde->inMemory = FALSE;
+    pde->rwFlag = FALSE;
+    pde->frameIndex = 0;
+
+    VirtualMemory_invalidateTLB();
 }
 
 PUBLIC Module* VirtualMemory_getModule(void) {
 
-    vmModule.moduleName = "Virtual Memory Manager";
-    vmModule.moduleID = MODULE_VMM;
-    vmModule.init = &VirtualMemory_init;
-    vmModule.numberOfDependencies = 2;
-    vmModule.dependencies[0] = MODULE_IDT;
-    vmModule.dependencies[1] = MODULE_PMM;
+    vmmModule.moduleName = "Virtual Memory Manager";
+    vmmModule.moduleID = MODULE_VMM;
+    vmmModule.init = &VirtualMemory_init;
+    vmmModule.numberOfDependencies = 2;
+    vmmModule.dependencies[0] = MODULE_IDT;
+    vmmModule.dependencies[1] = MODULE_PMM;
 
-    return &vmModule;
+    return &vmmModule;
 
 }

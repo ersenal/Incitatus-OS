@@ -32,8 +32,6 @@ PRIVATE u32int  numberOfLoadedModules;
 =========================================================*/
 PUBLIC void Module_load(Module* module) {
 
-    /* TODO: support for var-args in init function */
-
     /* Check if there is any place in loadedModules */
     Debug_assert(numberOfLoadedModules < MAX_LOADED_MODULES);
 

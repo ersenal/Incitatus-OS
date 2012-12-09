@@ -7,22 +7,26 @@
 | VirtualMemory.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Sets up and manages virtual memory.
+| DESCRIPTION:  Platform dependent X86 virtual memory manager, initialiser.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
-#ifndef VM_H
-#define VM_H
+#ifndef VMM_H
+#define VMM_H
 
 #include <Module.h>
 
 /*-------------------------------------------------------------------------
 | Get VMM module
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Returns virtual memory module.
+| DESCRIPTION:     Returns virtual memory manager module.
 |
 \------------------------------------------------------------------------*/
 Module* VirtualMemory_getModule(void);
+
+void VirtualMemory_allocatePDE(void* virtualAddr);
+
+void VirtualMemory_deallocatePDE(void* virtualAddr);
 #endif

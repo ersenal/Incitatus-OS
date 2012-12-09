@@ -54,8 +54,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     Console_clearScreen();
     PhysicalMemory_printInfo();
 
-    int* s = (int*) 0x400000;
-    *s = 0;
+    //VirtualMemory_allocatePDE((void*) 0xC00000);
 
     while(1) Sys_haltCPU();
 

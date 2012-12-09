@@ -164,22 +164,24 @@ Linker script and memory map
  .text          0x0000000000102210       0x76 pmm.o
                 0x0000000000102250                PhysicalMemory_getModule
  *fill*         0x0000000000102286        0xa 00
- .text          0x0000000000102290      0x301 smm.o
+ .text          0x0000000000102290      0x2f1 smm.o
                 0x0000000000102290                StackPMM_allocateFrame
                 0x00000000001022b0                StackPMM_freeFrame
-                0x0000000000102350                StackPMM_init
-                0x0000000000102530                StackPMM_printInfo
- *fill*         0x0000000000102591        0xf 00
- .text          0x00000000001025a0      0x415 bmm.o
-                0x00000000001025a0                BitmapPMM_allocateFrame
-                0x0000000000102620                BitmapPMM_freeFrame
-                0x00000000001026d0                BitmapPMM_printInfo
-                0x0000000000102740                BitmapPMM_init
- *fill*         0x00000000001029b5        0xb 00
- .text          0x00000000001029c0      0x182 vmm.o
-                0x0000000000102b00                VirtualMemory_getModule
+                0x0000000000102340                StackPMM_init
+                0x0000000000102520                StackPMM_printInfo
+ *fill*         0x0000000000102581        0xf 00
+ .text          0x0000000000102590      0x415 bmm.o
+                0x0000000000102590                BitmapPMM_allocateFrame
+                0x0000000000102610                BitmapPMM_freeFrame
+                0x00000000001026c0                BitmapPMM_printInfo
+                0x0000000000102730                BitmapPMM_init
+ *fill*         0x00000000001029a5        0xb 00
+ .text          0x00000000001029b0      0x4e2 vmm.o
+                0x0000000000102b70                VirtualMemory_deallocatePDE
+                0x0000000000102ce0                VirtualMemory_allocatePDE
+                0x0000000000102e50                VirtualMemory_getModule
                 0x0000000000103000                . = ALIGN (0x1000)
- *fill*         0x0000000000102b42      0x4be 00
+ *fill*         0x0000000000102e92      0x16e 00
 
 .rodata.str1.1  0x0000000000103000      0x242
  .rodata.str1.1
@@ -222,8 +224,9 @@ Linker script and memory map
                                          0x93 (size before relaxing)
  .rodata.str1.1
                 0x000000000010321f       0x23 vmm.o
+                                         0x4f (size before relaxing)
 
-.eh_frame       0x0000000000103244      0x860
+.eh_frame       0x0000000000103244      0x8c4
  .eh_frame      0x0000000000103244       0x38 kernel.o
  .eh_frame      0x000000000010327c       0x78 io.o
                                          0x90 (size before relaxing)
@@ -259,49 +262,52 @@ Linker script and memory map
                                          0xac (size before relaxing)
  .eh_frame      0x00000000001039a0       0xac bmm.o
                                          0xc4 (size before relaxing)
- .eh_frame      0x0000000000103a4c       0x58 vmm.o
-                                         0x70 (size before relaxing)
+ .eh_frame      0x0000000000103a4c       0xbc vmm.o
+                                         0xd4 (size before relaxing)
 
-.rodata.str1.4  0x0000000000103aa4       0x20
+.rodata.str1.4  0x0000000000103b08       0x44
  .rodata.str1.4
-                0x0000000000103aa4       0x20 idt.o
-                                         0x1f (size before relaxing)
+                0x0000000000103b08       0x1f idt.o
+ *fill*         0x0000000000103b27        0x1 00
+ .rodata.str1.4
+                0x0000000000103b28       0x24 vmm.o
+                                         0x22 (size before relaxing)
 
-.iplt           0x0000000000103ad0        0x0
+.iplt           0x0000000000103b50        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x0000000000103ac4        0x0
+.rel.dyn        0x0000000000103b4c        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x0000000000103ac4      0x53c
-                0x0000000000103ac4                data = .
-                0x0000000000103ac4                _data = .
-                0x0000000000103ac4                __data = .
+.data           0x0000000000103b4c      0x4b4
+                0x0000000000103b4c                data = .
+                0x0000000000103b4c                _data = .
+                0x0000000000103b4c                __data = .
  *(.data)
- .data          0x0000000000103ac4        0x0 kernel.o
- .data          0x0000000000103ac4        0x0 io.o
- .data          0x0000000000103ac4        0x0 vga.o
- .data          0x0000000000103ac4        0x0 console.o
- .data          0x0000000000103ac4        0x0 sys.o
- .data          0x0000000000103ac4        0x0 module.o
- .data          0x0000000000103ac4        0x0 mem.o
- .data          0x0000000000103ac4        0x0 gdt.o
- .data          0x0000000000103ac4        0x0 pic.o
- .data          0x0000000000103ac4        0x0 idt.o
- .data          0x0000000000103ac4        0x0 pit.o
- .data          0x0000000000103ac4        0x0 cpu.o
- .data          0x0000000000103ac4        0x0 bitmap.o
- .data          0x0000000000103ac4        0x0 stack.o
- .data          0x0000000000103ac4        0x0 math.o
- .data          0x0000000000103ac4        0x0 pmm.o
- .data          0x0000000000103ac4        0x0 smm.o
- .data          0x0000000000103ac4        0x0 bmm.o
- .data          0x0000000000103ac4        0x0 vmm.o
+ .data          0x0000000000103b4c        0x0 kernel.o
+ .data          0x0000000000103b4c        0x0 io.o
+ .data          0x0000000000103b4c        0x0 vga.o
+ .data          0x0000000000103b4c        0x0 console.o
+ .data          0x0000000000103b4c        0x0 sys.o
+ .data          0x0000000000103b4c        0x0 module.o
+ .data          0x0000000000103b4c        0x0 mem.o
+ .data          0x0000000000103b4c        0x0 gdt.o
+ .data          0x0000000000103b4c        0x0 pic.o
+ .data          0x0000000000103b4c        0x0 idt.o
+ .data          0x0000000000103b4c        0x0 pit.o
+ .data          0x0000000000103b4c        0x0 cpu.o
+ .data          0x0000000000103b4c        0x0 bitmap.o
+ .data          0x0000000000103b4c        0x0 stack.o
+ .data          0x0000000000103b4c        0x0 math.o
+ .data          0x0000000000103b4c        0x0 pmm.o
+ .data          0x0000000000103b4c        0x0 smm.o
+ .data          0x0000000000103b4c        0x0 bmm.o
+ .data          0x0000000000103b4c        0x0 vmm.o
  *(.rodata)
- .rodata        0x0000000000103ac4       0x28 cpu.o
+ .rodata        0x0000000000103b4c       0x28 cpu.o
                 0x0000000000104000                . = ALIGN (0x1000)
- *fill*         0x0000000000103aec      0x514 00
+ *fill*         0x0000000000103b74      0x48c 00
 
 .igot.plt       0x0000000000104000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
@@ -336,9 +342,9 @@ Linker script and memory map
  .bss           0x0000000000114e1c       0x14 smm.o
  .bss           0x0000000000114e30       0x18 bmm.o
  *fill*         0x0000000000114e48       0x18 00
- .bss           0x0000000000114e60       0x38 vmm.o
+ .bss           0x0000000000114e60       0x54 vmm.o
                 0x0000000000115000                . = ALIGN (0x1000)
- *fill*         0x0000000000114e98      0x168 00
+ *fill*         0x0000000000114eb4      0x14c 00
  COMMON         0x0000000000115000        0x6 vga.o
                 0x0000000000115000                vgaRam
                 0x0000000000115004                vgaHeight

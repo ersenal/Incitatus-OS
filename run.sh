@@ -2,7 +2,7 @@
 
 qemu-system-i386        \
     -net none           \
-    -m 4                \
+    -m 16              \
     -cdrom bin/image.iso\
     -monitor stdio      \
 
