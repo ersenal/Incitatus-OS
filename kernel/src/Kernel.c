@@ -54,6 +54,9 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     Console_clearScreen();
     PhysicalMemory_printInfo();
 
+    int* s = (int*) 0x400000;
+    *s = 0;
+
     while(1) Sys_haltCPU();
 
 }
