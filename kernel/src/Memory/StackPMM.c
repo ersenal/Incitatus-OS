@@ -40,6 +40,7 @@ PUBLIC void* StackPMM_allocateFrame(void) {
         return NULL;
 
     void* frame = Stack_pop(&stack);
+    Console_printf("%s%d%c", "Physical Allocation: ", frame, '\n');
     return frame;
 }
 

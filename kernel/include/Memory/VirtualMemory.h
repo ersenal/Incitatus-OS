@@ -25,8 +25,4 @@
 |
 \------------------------------------------------------------------------*/
 Module* VirtualMemory_getModule(void);
-
-void VirtualMemory_allocatePDE(void* virtualAddr);
-
-void VirtualMemory_deallocatePDE(void* virtualAddr);
 #endif

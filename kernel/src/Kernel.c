@@ -25,6 +25,7 @@
 #include <Debug.h>
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
+#include <Memory.h>
 
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
@@ -34,10 +35,12 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     Debug_assert(mbMagic == MULTIBOOT_BOOTLOADER_MAGIC);
     Debug_assert(mbHead.magic == MULTIBOOT_HEADER_MAGIC);
 
+    Module_load(VGA_getModule());
+    Module_load(Console_getModule());
+    Console_clearScreen();
+
     Module* modules[] = {
 
-        VGA_getModule(),
-        Console_getModule(),
         GDT_getModule(),
         PIC8259_getModule(),
         IDT_getModule(),
@@ -51,10 +54,6 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         Module_load(modules[i]);
 
     asm volatile("sti");
-    Console_clearScreen();
-    PhysicalMemory_printInfo();
-
-    //VirtualMemory_allocatePDE((void*) 0xC00000);
 
     while(1) Sys_haltCPU();
 
