@@ -177,6 +177,12 @@ PRIVATE inline void VirtualMemory_invalidateTLB(void) {
 
 }
 
+PRIVATE inline void VirtualMemory_invalidateTLBEntry(void* addr) {
+
+    asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+
+}
+
 PRIVATE void VirtualMemory_setPaging(bool state) {
 
     u32int cr0 = CPU_getCR(0);
@@ -204,6 +210,7 @@ PRIVATE void VirtualMemory_switchPageDir(PageDirectory* dir) {
     reg.PDBR = (u32int) &currentDir->entries / FRAME_SIZE;
     CPU_setCR(3, FORCE_CAST(reg, u32int));
 
+    /* Flush all TLB entries */
     VirtualMemory_invalidateTLB();
 }
 
@@ -274,7 +281,12 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
 
     if(!pde->inMemory) { /* Need to allocate a page table */
 
+        Console_printf("%s%d%c", "Allocating PDE: ", PDE_INDEX(virtualAddr), '\n');
         PageTable* pageTable = PhysicalMemory_allocateFrame();
+
+        if(pageTable == NULL)
+            Sys_panic("Out of physical memory!");
+
         VirtualMemory_setPDE(pde, pageTable);
         pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
         Memory_set(pageTable, 0, sizeof(PageTable));
@@ -284,6 +296,7 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
     PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
     VirtualMemory_setPTE(pte, physicalAddr);
+    VirtualMemory_invalidateTLBEntry(virtualAddr);
 
 }
 
