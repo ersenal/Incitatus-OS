@@ -25,6 +25,7 @@
 #include <Debug.h>
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
+#include <Memory/HeapMemory.h>
 #include <Memory.h>
 
 
@@ -46,7 +47,8 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         IDT_getModule(),
         PIT8253_getModule(),
         PhysicalMemory_getModule(mbInfo, &mbHead),
-        VirtualMemory_getModule()
+        VirtualMemory_getModule(),
+        HeapMemory_getModule()
 
     };
 

@@ -45,4 +45,14 @@ void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
 |
 \------------------------------------------------------------------------*/
 void VirtualMemory_unmapPage(void* virtualAddr);
+
+/*-------------------------------------------------------------------------
+| Get physical address
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Returns the physical address of a mapped virtual address.
+|
+| PARAM:           "virtualAddr"   4KB aligned virtual address
+|
+\------------------------------------------------------------------------*/
+void* VirtualMemory_getPhysicalAddress(void* virtualAddr);
 #endif

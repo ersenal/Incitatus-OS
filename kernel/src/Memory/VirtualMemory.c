@@ -319,6 +319,24 @@ PUBLIC void VirtualMemory_unmapPage(void* virtualAddr) {
 
 }
 
+PUBLIC void* VirtualMemory_getPhysicalAddress(void* virtualAddr) {
+
+    /* Address should be page aligned */
+    Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0);
+
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000;
+    PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
+
+    Debug_assert(pde->inMemory);
+
+    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
+
+    Debug_assert(pte->inMemory);
+
+    return (void*) FRAME_INDEX_TO_ADDR(pte->frameIndex);
+}
+
 PUBLIC Module* VirtualMemory_getModule(void) {
 
     vmmModule.moduleName = "Virtual Memory Manager";
