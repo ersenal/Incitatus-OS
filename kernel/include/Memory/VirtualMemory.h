@@ -25,4 +25,6 @@
 |
 \------------------------------------------------------------------------*/
 Module* VirtualMemory_getModule(void);
+
+void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
 #endif

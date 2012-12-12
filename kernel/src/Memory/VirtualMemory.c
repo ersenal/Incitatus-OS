@@ -25,7 +25,7 @@
     DEFINE
 =========================================================*/
 #define PDE_INDEX(x) ((u32int) x >> 22)
-#define PTE_INDEX(x) ((u32int) x >> 12)
+#define PTE_INDEX(x) ((u32int) x >> 12  & 0x03FF)
 #define ADDR_TO_FRAME_INDEX(addr) ((u32int) addr / FRAME_SIZE)
 #define FRAME_INDEX_TO_ADDR(index) ((void*) (index * FRAME_SIZE))
 
@@ -229,23 +229,6 @@ PRIVATE void VirtualMemory_setPTE(PageTableEntry* pte, void* physicalAddr) {
 
 }
 
-// PRIVATE void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
-
-//     /* Addresses should be page aligned */
-//     Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0 && (u32int) physicalAddr % FRAME_SIZE == 0);
-
-//     PageDirectoryEntry* pde = &currentDir->entries[PDE_INDEX(virtualAddr)];
-//     PageTable* pageTable = FRAME_INDEX_TO_ADDR(pde->frameIndex); /* Assume Page table is allocated and is in memory*/
-
-//     if(pageTable == NULL)
-//         Sys_panic("Page table NULL");
-
-
-//     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
-//     VirtualMemory_setPTE(pte, physicalAddr);
-
-// }
-
 PRIVATE void VirtualMemory_init(void) {
 
     /* Create the initial page directory */
@@ -268,14 +251,39 @@ PRIVATE void VirtualMemory_init(void) {
     VirtualMemory_setPDE(&currentDir->entries[0], first4MB);
     /* End of identity map */
 
-    /* Map directory to last virtual 4MB - recursive mapping */
-    //VirtualMemory_mapPage(0, currentDir);
+    /* Map directory to last virtual 4MB - recursive mapping, lets us manipulate the page directory after paging is enabled */
+    currentDir->entries[1023].frameIndex = ADDR_TO_FRAME_INDEX(currentDir);
+    currentDir->entries[1023].inMemory = TRUE;
+    currentDir->entries[1023].rwFlag = TRUE;
 
     /* Register page fault handler */
     IDT_registerHandler(&VirtualMemory_pageFaultHandler, 14);
 
     /* Turn on paging */
     VirtualMemory_setPaging(TRUE);
+
+}
+
+PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
+
+    /* Addresses should be page aligned */
+    Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0 && (u32int) physicalAddr % FRAME_SIZE == 0);
+
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000;
+    PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
+
+    if(!pde->inMemory) { /* Need to allocate a page table */
+
+        PageTable* pageTable = PhysicalMemory_allocateFrame();
+        VirtualMemory_setPDE(pde, pageTable);
+        pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+        Memory_set(pageTable, 0, sizeof(PageTable));
+
+    }
+
+    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
+    VirtualMemory_setPTE(pte, physicalAddr);
 
 }
 
