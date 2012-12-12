@@ -26,5 +26,23 @@
 \------------------------------------------------------------------------*/
 Module* VirtualMemory_getModule(void);
 
+/*-------------------------------------------------------------------------
+| Map virtual address
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Maps a virtual address to a physical address
+|
+| PARAM:           "virtualAddr"   4KB aligned virtual address
+|                  "physicalAddr"  4KB aligned physical address
+\------------------------------------------------------------------------*/
 void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
+
+/*-------------------------------------------------------------------------
+| Unmap virtual address
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Unmaps a virtual address
+|
+| PARAM:           "virtualAddr"   4KB aligned virtual address
+|
+\------------------------------------------------------------------------*/
+void VirtualMemory_unmapPage(void* virtualAddr);
 #endif

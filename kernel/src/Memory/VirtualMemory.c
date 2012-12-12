@@ -284,8 +284,7 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
         Console_printf("%s%d%c", "Allocating PDE: ", PDE_INDEX(virtualAddr), '\n');
         PageTable* pageTable = PhysicalMemory_allocateFrame();
 
-        if(pageTable == NULL)
-            Sys_panic("Out of physical memory!");
+        Debug_assert(pageTable != NULL); /* Out of physical memory */
 
         VirtualMemory_setPDE(pde, pageTable);
         pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
@@ -296,6 +295,26 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
     PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
     VirtualMemory_setPTE(pte, physicalAddr);
+    VirtualMemory_invalidateTLBEntry(virtualAddr);
+
+}
+
+PUBLIC void VirtualMemory_unmapPage(void* virtualAddr) {
+
+    /* Address should be page aligned */
+    Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0);
+
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000;
+    PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
+
+    Debug_assert(pde->inMemory);
+
+    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
+
+    Debug_assert(pte->inMemory);
+
+    Memory_set(pte, 0, sizeof(PageTableEntry));
     VirtualMemory_invalidateTLBEntry(virtualAddr);
 
 }
