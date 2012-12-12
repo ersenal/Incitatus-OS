@@ -84,7 +84,7 @@ PUBLIC void* BitmapPMM_allocateFrame(void) {
     Bitmap_setBit(&bitmap, frameIndex);
     usedFrames++;
 
-    Console_printf("%s%d%c", "Physical Allocation: ", (frameIndex * FRAME_SIZE), '\n');
+    //Console_printf("%s%d%c", "Physical Allocation: ", (frameIndex * FRAME_SIZE), '\n');
 
     return (void*) (frameIndex * FRAME_SIZE);
 }

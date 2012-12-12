@@ -239,13 +239,12 @@ PRIVATE void VirtualMemory_setPTE(PageTableEntry* pte, void* physicalAddr) {
 PRIVATE void VirtualMemory_init(void) {
 
     /* Create the initial page directory */
-    Console_printString("Allocating page directory\n");
     PageDirectory* dir = PhysicalMemory_allocateFrame();
     Memory_set(dir, 0, sizeof(PageDirectory));
     VirtualMemory_switchPageDir(dir);
 
     /* Identity map first 4MB (except first 4096kb in order to catch NULLs) */
-    Console_printString("Allocating PDE: 0\n");
+    //Console_printString("Allocating PDE: 0\n");
     PageTable* first4MB = PhysicalMemory_allocateFrame();
 
     for(int i = 1; i < 1024; i++) {
@@ -281,7 +280,7 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
 
     if(!pde->inMemory) { /* Need to allocate a page table */
 
-        Console_printf("%s%d%c", "Allocating PDE: ", PDE_INDEX(virtualAddr), '\n');
+        //Console_printf("%s%d%c", "Allocating PDE: ", PDE_INDEX(virtualAddr), '\n');
         PageTable* pageTable = PhysicalMemory_allocateFrame();
 
         Debug_assert(pageTable != NULL); /* Out of physical memory */

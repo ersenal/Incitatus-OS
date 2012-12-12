@@ -15,7 +15,7 @@
 |               or read the control registers:
 |
 |               u32int tmp = CPU_getCR(0);
-|               CR0 cr0 = FORCE_CAST(temp, CR0);
+|               CR0 cr0 = FORCE_CAST(tmp, CR0);
 |               cr0.PG = 1;
 |               CPU_setCR(0, FORCE_CAST(cr0, u32int));
 |
