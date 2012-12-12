@@ -51,8 +51,8 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 		 ✔ Interrupt service routines
 		 ✔ Physical memory management
 		 ✔ Virtual memory management
+		 ✔ Kernel heap memory management
 		 ☐ Context switching, multi-tasking
-		 ☐ Heap memory management
 		 ☐ Driver Interface
 
 ##License
