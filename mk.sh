@@ -33,6 +33,7 @@ $C_Compiler $CFlags -o bmm.o     -c   kernel/src/Memory/BitmapPMM.c
 $C_Compiler $CFlags -o vmm.o     -c   kernel/src/Memory/VirtualMemory.c
 $C_Compiler $CFlags -o heap.o    -c   kernel/src/Memory/HeapMemory.c
 $C_Compiler $CFlags -o dl.o      -c   kernel/src/Memory/DougLea.c
+$C_Compiler $CFlags -o dumbH.o   -c   kernel/src/Memory/DumbHeapManager.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
@@ -59,6 +60,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         heap.o \
                                                                         dl.o \
                                                                         arrlist.o \
+                                                                        dumbH.o \
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/

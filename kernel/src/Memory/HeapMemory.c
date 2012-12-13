@@ -21,6 +21,7 @@
 #include <Debug.h>
 
 /* Include Heap manager implementation */
+/* #include <Memory/DumbHeapManager.h> */
 #include <Memory/DougLea.h>
 
 /*=======================================================
@@ -45,7 +46,7 @@ PRIVATE void HeapMemory_init(void) {
 
     heapTop = (void*) KERNEL_HEAP_VADDR;
 
-    /* Point to memory manager implementation */
+    /* Point to heap manager implementation */
     HeapMemory_alloc   = &DougLea_malloc;
     HeapMemory_realloc = &DougLea_realloc;
     HeapMemory_calloc  = &DougLea_calloc;
