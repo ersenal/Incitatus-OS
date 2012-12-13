@@ -9,11 +9,13 @@ nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 
 $C_Compiler $CFlags -o kernel.o  -c   kernel/src/Kernel.c
 $C_Compiler $CFlags -o io.o      -c   kernel/src/IO.c
-$C_Compiler $CFlags -o vga.o     -c   kernel/src/Drivers/VGA.c
-$C_Compiler $CFlags -o console.o -c   kernel/src/Drivers/Console.c
 $C_Compiler $CFlags -o sys.o     -c   kernel/src/Sys.c
 $C_Compiler $CFlags -o module.o  -c   kernel/src/Module.c
 $C_Compiler $CFlags -o mem.o     -c   kernel/src/Memory.c
+
+$C_Compiler $CFlags -o vga.o     -c   kernel/src/Drivers/VGA.c
+$C_Compiler $CFlags -o console.o -c   kernel/src/Drivers/Console.c
+
 $C_Compiler $CFlags -o gdt.o     -c   kernel/src/X86/GDT.c
 $C_Compiler $CFlags -o pic.o     -c   kernel/src/X86/PIC8259.c
 $C_Compiler $CFlags -o idt.o     -c   kernel/src/X86/IDT.c
@@ -23,6 +25,7 @@ $C_Compiler $CFlags -o cpu.o     -c   kernel/src/X86/CPU.c
 $C_Compiler $CFlags -o bitmap.o  -c   kernel/src/Lib/Bitmap.c
 $C_Compiler $CFlags -o stack.o   -c   kernel/src/Lib/Stack.c
 $C_Compiler $CFlags -o math.o    -c   kernel/src/Lib/Math.c
+$C_Compiler $CFlags -o arrlist.o -c   kernel/src/Lib/ArrayList.c
 
 $C_Compiler $CFlags -o pmm.o     -c   kernel/src/Memory/PhysicalMemory.c
 $C_Compiler $CFlags -o smm.o     -c   kernel/src/Memory/StackPMM.c
@@ -55,6 +58,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         vmm.o \
                                                                         heap.o \
                                                                         dl.o \
+                                                                        arrlist.o \
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
