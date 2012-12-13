@@ -3,14 +3,16 @@
 #include <Memory/HeapMemory.h>
 #include <Memory.h>
 #include <Sys.h>
+#include <Common.h>
 
-#define size_t unsigned int
 #define sbrk HeapMemory_expand
 #define memset Memory_set
 #define memcpy Memory_copy
-#define NO_MALLOC_STATS 1
+#define abort Sys_restart
 #define HAVE_MMAP 0
+#define HAVE_MREMAP 0
 #define HAVE_MORECORE 1
+#define NO_MALLOC_STATS 1
 #define LACKS_UNISTD_H
 #define LACKS_FCNTL_H
 #define LACKS_SYS_PARAM_H
@@ -22,10 +24,8 @@
 #define LACKS_STDLIB_H
 #define LACKS_SCHED_H
 #define LACKS_TIME_H
-#define ENOMEM 5
+#define ENOMEM -1
 #define EINVAL -1
-#define ptrdiff_t unsigned int
-#define abort Sys_restart
 int errno;
 /* ------------------------------------------------------------------------- */
 
@@ -844,28 +844,28 @@ extern "C" {
 /* ------------------- Declarations of public routines ------------------- */
 
 #ifndef USE_DL_PREFIX
-#define dlcalloc               calloc
-#define dlfree                 free
-#define dlmalloc               malloc
-#define dlmemalign             memalign
-#define dlposix_memalign       posix_memalign
-#define dlrealloc              realloc
-#define dlrealloc_in_place     realloc_in_place
-#define dlvalloc               valloc
-#define dlpvalloc              pvalloc
-#define dlmallinfo             mallinfo
-#define dlmallopt              mallopt
-#define dlmalloc_trim          malloc_trim
-#define dlmalloc_stats         malloc_stats
-#define dlmalloc_usable_size   malloc_usable_size
-#define dlmalloc_footprint     malloc_footprint
-#define dlmalloc_max_footprint malloc_max_footprint
-#define dlmalloc_footprint_limit malloc_footprint_limit
-#define dlmalloc_set_footprint_limit malloc_set_footprint_limit
-#define dlmalloc_inspect_all   malloc_inspect_all
-#define dlindependent_calloc   independent_calloc
-#define dlindependent_comalloc independent_comalloc
-#define dlbulk_free            bulk_free
+#define dlcalloc               DougLea_calloc
+#define dlfree                 DougLea_free
+#define dlmalloc               DougLea_malloc
+#define dlmemalign             DougLea_memalign
+#define dlposix_memalign       DougLea_posix_memalign
+#define dlrealloc              DougLea_realloc
+#define dlrealloc_in_place     DougLea_realloc_in_place
+#define dlvalloc               DougLea_valloc
+#define dlpvalloc              DougLea_pvalloc
+#define dlmallinfo             DougLea_mallinfo
+#define dlmallopt              DougLea_mallopt
+#define dlmalloc_trim          DougLea_malloc_trim
+#define dlmalloc_stats         DougLea_malloc_stats
+#define dlmalloc_usable_size   DougLea_malloc_usable_size
+#define dlmalloc_footprint     DougLea_malloc_footprint
+#define dlmalloc_max_footprint DougLea_malloc_max_footprint
+#define dlmalloc_footprint_limit DougLea_malloc_footprint_limit
+#define dlmalloc_set_footprint_limit DougLea_malloc_set_footprint_limit
+#define dlmalloc_inspect_all   DougLea_malloc_inspect_all
+#define dlindependent_calloc   DougLea_independent_calloc
+#define dlindependent_comalloc DougLea_independent_comalloc
+#define dlbulk_free            DougLea_bulk_free
 #endif /* USE_DL_PREFIX */
 
 /*

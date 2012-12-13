@@ -20,11 +20,22 @@
 #include <Memory.h>
 #include <Debug.h>
 
+/* Include Heap manager implementation */
+#include <Memory/DougLea.h>
+
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module heapModule;
 PRIVATE char*  heapTop;
+
+/*=======================================================
+    PUBLIC DATA
+=========================================================*/
+PUBLIC void* (*HeapMemory_alloc)   (size_t bytes);
+PUBLIC void* (*HeapMemory_realloc) (void* oldmem, size_t bytes);
+PUBLIC void* (*HeapMemory_calloc)  (size_t numberOfElements, size_t elementSize);
+PUBLIC void  (*HeapMemory_free)    (void* mem);
 
 /*=======================================================
     FUNCTION
@@ -34,9 +45,15 @@ PRIVATE void HeapMemory_init(void) {
 
     heapTop = (void*) KERNEL_HEAP_VADDR;
 
+    /* Point to memory manager implementation */
+    HeapMemory_alloc   = &DougLea_malloc;
+    HeapMemory_realloc = &DougLea_realloc;
+    HeapMemory_calloc  = &DougLea_calloc;
+    HeapMemory_free    = &DougLea_free;
+
 }
 
-PUBLIC void* HeapMemory_expand(u32int size) {
+PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
     Debug_assert(size % FRAME_SIZE == 0);
 
@@ -50,7 +67,7 @@ PUBLIC void* HeapMemory_expand(u32int size) {
         void* physicalAddress = PhysicalMemory_allocateFrame();
         Debug_assert(physicalAddress != NULL);
         VirtualMemory_mapPage(heapTop, physicalAddress);
-        Memory_set(heapTop, 0, FRAME_SIZE);
+        //Memory_set(heapTop, 0, FRAME_SIZE); /* Let CALLOC handle this */
         heapTop += FRAME_SIZE;
 
     }

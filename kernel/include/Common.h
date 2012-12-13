@@ -35,6 +35,9 @@ typedef unsigned int        u32int;
 typedef unsigned short      u16int;
 typedef unsigned char       u8int;
 
+typedef unsigned int size_t;
+typedef signed int   ptrdiff_t;
+
 /** Boolean type **/
 typedef unsigned char bool;
 #define TRUE  1

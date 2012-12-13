@@ -16,7 +16,7 @@
 
 #include <Memory/PhysicalMemory.h>
 
-/* Include your PMM implementation here */
+/* Include PMM implementation */
 /* #include Memory/BitmapPMM.h */
 #include <Memory/StackPMM.h>
 
@@ -41,12 +41,12 @@ PUBLIC void  (*PhysicalMemory_freeFrame) (void* frame);
 
 PRIVATE void _PhysicalMemory_init() {
 
-    /* Point to your own PMM implementation */
+    /* Point to PMM implementation */
     PhysicalMemory_printInfo     = StackPMM_printInfo;
     PhysicalMemory_allocateFrame = StackPMM_allocateFrame;
     PhysicalMemory_freeFrame     = StackPMM_freeFrame;
 
-    /* Call your PMM init function */
+    /* Call PMM init function */
     StackPMM_init(multibootInfo, multibootHeader);
 
 }
