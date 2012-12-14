@@ -103,7 +103,7 @@ struct IDTPointer {
 struct Regs {
 
     /* Segment selectors */
-    u32int gs, ds, es, fs;
+    u32int gs, fs, es, ds;
 
     /* Pushed by pusha. */
     u32int edi, esi, ebp, esp, ebx, edx, ecx, eax;
