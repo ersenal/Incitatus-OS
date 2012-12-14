@@ -102,14 +102,14 @@ struct IDTPointer {
 /* Processor state just before interrupt + interrupt info(intNo, errCode) */
 struct Regs {
 
-    /* Data segment selector. */
-    u32int ds;
+    /* Segment selectors */
+    u32int gs, ds, es, fs;
 
     /* Pushed by pusha. */
     u32int edi, esi, ebp, esp, ebx, edx, ecx, eax;
 
     /* Interrupt number and error code (if applicable). */
-    u32int errCode, intNo;
+    u32int intNo, errCode;
 
     /* Pushed by the processor automatically. */
     u32int eip, cs, eflags, useresp, ss;
@@ -277,35 +277,35 @@ PUBLIC void IDT_registerHandler(void* functionAddr, u8int interruptNo) {
 
 }
 
-PUBLIC void IDT_handlerException(Regs regs) {
+PUBLIC void IDT_handlerException(Regs* regs) {
 
-    if(handlers[regs.intNo] != NULL) {
+    if(handlers[regs->intNo] != NULL) {
 
-        (*handlers[regs.intNo]) ();
+        (*handlers[regs->intNo]) ();
 
     } else {
 
-        Debug_logError("%d", regs.intNo);
+        Debug_logError("%d", regs->intNo);
         Sys_panic("Unhandled Exception Interrupt!");
 
     }
 
 }
 
-PUBLIC void IDT_handlerIRQ(Regs regs) {
+PUBLIC void IDT_handlerIRQ(Regs* regs) {
 
-    if(handlers[regs.intNo] != NULL) {
+    if(handlers[regs->intNo] != NULL) {
 
-        (*handlers[regs.intNo]) ();
+        (*handlers[regs->intNo]) ();
 
     } else{
 
-        Debug_logError("%d", regs.intNo);
+        Debug_logError("%d", regs->intNo);
         Sys_panic("Unhandled IRQ Interrupt!");
 
     }
 
-    PIC8259_sendEOI(regs.intNo);
+    PIC8259_sendEOI(regs->intNo);
 }
 
 PUBLIC Module* IDT_getModule(void) {

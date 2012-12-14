@@ -60,9 +60,11 @@ IDT_exceptionHandlerCommon:
     ; Save register state: Push EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI
     pusha
 
-    ; Save the current data segment selector
-    mov ax, ds
-    push eax
+    ; Save segment selectors
+    push ds
+    push es
+    push fs
+    push gs
 
     ; Switch to kernel data segment
     mov ax, 0x10
@@ -71,16 +73,15 @@ IDT_exceptionHandlerCommon:
     mov fs, ax
     mov gs, ax
 
-    push esp                  ; Push stack pointer(Regs* in IDT.c)
-    call IDT_handlerException ; Call C-level common exception handler
-    add esp, 4                ; Drop stack pointer
+    push esp                   ; Push stack pointer(Regs* in IDT.c)
+    call IDT_handlerException  ; Call C-level common exception handler
+    add esp, 4                 ; Drop stack pointer
 
-    ; Restore the original data segment selector
-    pop ebx
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
+    ; Restore the segment selectors
+    pop gs
+    pop fs
+    pop es
+    pop ds
 
     popa                     ; Restore register state, Pop EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX
     add esp, 8               ; Drop interrupt number and error code
@@ -93,9 +94,11 @@ IDT_irqHandlerCommon:
     ; Save register state: Push EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI
     pusha
 
-    ; Save the current data segment selector
-    mov ax, ds
-    push eax
+    ; Save segment selectors
+    push ds
+    push es
+    push fs
+    push gs
 
     ; Switch to kernel data segment
     mov ax, 0x10
@@ -108,12 +111,11 @@ IDT_irqHandlerCommon:
     call IDT_handlerIRQ  ; Call C-level common exception handler
     add esp, 4           ; Drop stack pointer
 
-    ; Restore the original data segment selector
-    pop ebx
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
+    ; Restore the segment selectors
+    pop gs
+    pop fs
+    pop es
+    pop ds
 
     popa                     ; Restore register state, Pop EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX
     add esp, 8               ; Drop interrupt number and error code

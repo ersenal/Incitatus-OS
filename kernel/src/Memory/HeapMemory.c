@@ -56,7 +56,8 @@ PRIVATE void HeapMemory_init(void) {
 
 PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
-    Debug_assert(size % FRAME_SIZE == 0);
+    Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
+    Debug_assert((u32int) heapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
 
     /* The number of needed pages */
     u32int pages = size / FRAME_SIZE;

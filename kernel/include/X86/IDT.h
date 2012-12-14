@@ -71,7 +71,7 @@ void IDT_registerHandler(void* functionAddr, u8int interruptNo);
 |
 | PARAM:           "regs"   cpu registers
 \------------------------------------------------------------------------*/
-void IDT_handlerException(Regs regs);
+void IDT_handlerException(Regs* regs);
 
 /*-------------------------------------------------------------------------
 | Request(IRQ) Handler
@@ -81,7 +81,7 @@ void IDT_handlerException(Regs regs);
 |
 | PARAM:           "regs"   cpu registers
 \------------------------------------------------------------------------*/
-void IDT_handlerIRQ(Regs regs);
+void IDT_handlerIRQ(Regs* regs);
 
 /*-------------------------------------------------------------------------
 | Get IDT module
