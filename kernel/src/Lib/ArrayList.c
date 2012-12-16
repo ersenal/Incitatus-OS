@@ -91,18 +91,14 @@ PUBLIC void ArrayList_removeAt(ArrayList* self, u32int index) {
 
     Debug_assert(index < self->usedSize);
 
-    /* shift to left */
+    *(self->arrayPointer + index) = NULL;
+
+    /* shift every element to the right of index to left */
     for(u32int i = index; i < self->usedSize - 1; i++)
          /* set the current element val to the val of element on the right */
         *(self->arrayPointer + i) = *(self->arrayPointer + (i + 1));
 
     self->usedSize--;
-    self->totalSize = self->usedSize + 1;
-
-    /* reallocate */
-    self->arrayPointer = (void**) HeapMemory_realloc(self->arrayPointer, self->totalSize * sizeof(void*));
-    Debug_assert(self->arrayPointer);
-
 }
 
 PUBLIC bool ArrayList_isEmpty(ArrayList* self) {
