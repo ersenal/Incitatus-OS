@@ -102,7 +102,7 @@ void*   HeapMemory_expand(ptrdiff_t size);
 |
 | PARAM:           "size"  Page aligned number of bytes
 \------------------------------------------------------------------------*/
-void    HeapMemory_contract(size_t size);
+void*    HeapMemory_contract(size_t size);
 
 /*-------------------------------------------------------------------------
 | Get kernel heap manager module

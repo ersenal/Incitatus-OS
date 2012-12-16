@@ -44,9 +44,26 @@
 #define IRQ15  47
 
 /*=======================================================
-    TYPE
+    STRUCT
 =========================================================*/
 typedef struct Regs Regs;
+
+/* Processor state just before interrupt + interrupt info(intNo, errCode) */
+struct Regs {
+
+    /* Segment selectors */
+    u32int gs, fs, es, ds;
+
+    /* Pushed by pusha. */
+    u32int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+
+    /* Interrupt number and error code (if applicable). */
+    u32int intNo, errCode;
+
+    /* Pushed by the processor automatically. */
+    u32int eip, cs, eflags, useresp, ss;
+
+} __attribute__((packed));
 
 /*=======================================================
     FUNCTION

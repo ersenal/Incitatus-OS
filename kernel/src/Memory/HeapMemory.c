@@ -59,6 +59,9 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
     Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
     Debug_assert((u32int) heapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
 
+    if(size < 0)
+        return HeapMemory_contract(size * -1);
+
     /* The number of needed pages */
     u32int pages = size / FRAME_SIZE;
 
@@ -77,7 +80,7 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
     return ret;
 }
 
-PUBLIC void HeapMemory_contract(u32int size) {
+PUBLIC void* HeapMemory_contract(u32int size) {
 
     Debug_assert(size % FRAME_SIZE == 0);
 
@@ -95,6 +98,8 @@ PUBLIC void HeapMemory_contract(u32int size) {
         VirtualMemory_unmapPage(heapTop);
 
     }
+
+    return heapTop;
 
 }
 

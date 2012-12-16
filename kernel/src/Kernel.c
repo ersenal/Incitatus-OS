@@ -26,7 +26,6 @@
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
 #include <Memory/HeapMemory.h>
-#include <Memory.h>
 
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {

@@ -26,6 +26,7 @@ $C_Compiler $CFlags -o bitmap.o  -c   kernel/src/Lib/Bitmap.c
 $C_Compiler $CFlags -o stack.o   -c   kernel/src/Lib/Stack.c
 $C_Compiler $CFlags -o math.o    -c   kernel/src/Lib/Math.c
 $C_Compiler $CFlags -o arrlist.o -c   kernel/src/Lib/ArrayList.c
+$C_Compiler $CFlags -o linkl.o   -c   kernel/src/Lib/LinkedList.c
 
 $C_Compiler $CFlags -o pmm.o     -c   kernel/src/Memory/PhysicalMemory.c
 $C_Compiler $CFlags -o smm.o     -c   kernel/src/Memory/StackPMM.c
@@ -61,6 +62,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         dl.o \
                                                                         arrlist.o \
                                                                         dumbH.o \
+                                                                        linkl.o \
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
