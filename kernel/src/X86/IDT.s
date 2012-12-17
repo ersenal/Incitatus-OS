@@ -1,3 +1,18 @@
+;
+; Copyright(C) 2012 Ali Ersenal
+; License: WTFPL v2
+; URL: http://sam.zoy.org/wtfpl/COPYING
+;
+;--------------------------------------------------------------------------
+; IDT.s
+;--------------------------------------------------------------------------
+;
+; DESCRIPTION:  Low level interrupt(exception and irq) handlers.
+;
+; AUTHOR:       Ali Ersenal, aliersenal@gmail.com
+;--------------------------------------------------------------------------
+
+
 [EXTERN IDT_handlerException] ; Common C-level exception handler in IDT.c
 [EXTERN IDT_handlerIRQ] ; Common C-level IRQ handler in IDT.c
 
