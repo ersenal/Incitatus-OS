@@ -17,6 +17,7 @@
 #define BIT_PMM
 
 #include <Multiboot.h>
+#include <Memory/PhysicalMemory.h>
 
 /*-------------------------------------------------------------------------
 | Allocate frame
@@ -50,11 +51,11 @@ void BitmapPMM_freeFrame(void* b);
 void BitmapPMM_init(MultibootInfo* mbI, MultibootHeader* mbH);
 
 /*-------------------------------------------------------------------------
-| Print current memory information
+| Get current memory information
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Prints out physical memory information.
+| DESCRIPTION:     Returns a structure containing physical memory info.
 |
 \------------------------------------------------------------------------*/
-void BitmapPMM_printInfo(void);
+PhysicalMemoryInfo BitmapPMM_getInfo(void);
 
 #endif

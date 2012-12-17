@@ -18,10 +18,6 @@
 #include <Debug.h>
 #include <Memory.h>
 
-/*=======================================================
-    DEFINE
-=========================================================*/
-#define FRAME_SIZE 0x1000 /* 4kB, page-sized */
 
 /*=======================================================
     PRIVATE DATA
@@ -94,11 +90,9 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
 
 }
 
-PUBLIC void StackPMM_printInfo(void) {
+PUBLIC PhysicalMemoryInfo StackPMM_getInfo(void) {
 
-    Console_printf("%s%d%c%s%d%c%s%d%c",
-        "Total physical memory(KB): ", totalPhysicalMemory / 1024, '\n',
-        "Total frames: ", totalFrames, '\n',
-        "Free frames: ", stack.size, '\n');
+    PhysicalMemoryInfo info = {totalPhysicalMemory, totalFrames, stack.size};
+    return info;
 
 }

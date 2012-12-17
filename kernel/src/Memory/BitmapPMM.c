@@ -18,10 +18,6 @@
 #include <Debug.h>
 #include <Memory.h>
 
-/*=======================================================
-    DEFINE
-=========================================================*/
-#define FRAME_SIZE 0x1000 /* 4kB, page-sized */
 
 /*=======================================================
     PRIVATE DATA
@@ -99,12 +95,10 @@ PUBLIC void BitmapPMM_freeFrame(void* b) {
 
 }
 
-PUBLIC void BitmapPMM_printInfo(void) {
+PUBLIC PhysicalMemoryInfo BitmapPMM_getInfo(void) {
 
-    Console_printf("%s%d%c%s%d%c%s%d%c",
-        "Total physical memory(KB): ", totalPhysicalMemory / 1024, '\n',
-        "Total frames: ", totalFrames, '\n',
-        "Used frames: ", usedFrames, '\n');
+    PhysicalMemoryInfo info = {totalPhysicalMemory, totalFrames, totalFrames - usedFrames};
+    return info;
 
 }
 

@@ -26,6 +26,19 @@
 #define FRAME_SIZE 4096
 
 /*=======================================================
+    STRUCT
+=========================================================*/
+typedef struct PhysicalMemoryInfo PhysicalMemoryInfo;
+
+struct PhysicalMemoryInfo {
+
+    u32int totalMemory; /* Total physical memory in bytes */
+    u32int totalFrames; /* Number of page frames */
+    u32int freeFrames; /* Number of free(not in use) page frames */
+
+};
+
+/*=======================================================
     INTERFACE
 =========================================================*/
 
@@ -41,12 +54,12 @@
 extern void (*PhysicalMemory_init) (MultibootInfo* mbI, MultibootHeader* mbH);
 
 /*-------------------------------------------------------------------------
-| Print current memory information
+| Get current memory information
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Prints out physical memory information.
+| DESCRIPTION:     Returns a structure containing physical memory info.
 |
 \------------------------------------------------------------------------*/
-extern void  (*PhysicalMemory_printInfo) (void);
+extern PhysicalMemoryInfo  (*PhysicalMemory_getInfo) (void);
 
 /*-------------------------------------------------------------------------
 | Allocate frame

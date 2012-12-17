@@ -31,7 +31,7 @@ PRIVATE MultibootHeader* multibootHeader;
 /*=======================================================
     PUBLIC DATA
 =========================================================*/
-PUBLIC void  (*PhysicalMemory_printInfo) (void);
+PUBLIC PhysicalMemoryInfo  (*PhysicalMemory_getInfo) (void);
 PUBLIC void* (*PhysicalMemory_allocateFrame) (void);
 PUBLIC void  (*PhysicalMemory_freeFrame) (void* frame);
 
@@ -42,7 +42,7 @@ PUBLIC void  (*PhysicalMemory_freeFrame) (void* frame);
 PRIVATE void _PhysicalMemory_init() {
 
     /* Point to PMM implementation */
-    PhysicalMemory_printInfo     = StackPMM_printInfo;
+    PhysicalMemory_getInfo       = StackPMM_getInfo;
     PhysicalMemory_allocateFrame = StackPMM_allocateFrame;
     PhysicalMemory_freeFrame     = StackPMM_freeFrame;
 
