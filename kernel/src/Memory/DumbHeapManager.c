@@ -23,7 +23,7 @@
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE char*  lastAllocAddr = (char*) KERNEL_HEAP_VADDR;
+PRIVATE char*  lastAllocAddr = (char*) KERNEL_HEAP_BASE_VADDR;
 PRIVATE u32int allocatedPages;
 
 /*=======================================================
@@ -33,7 +33,7 @@ PRIVATE u32int allocatedPages;
 PUBLIC void* DumbHeapManager_malloc(size_t bytes) {
 
     /* out of heap memory? */
-    if(((lastAllocAddr - ((char*) KERNEL_HEAP_VADDR) + bytes) / FRAME_SIZE) + 1 > allocatedPages) {
+    if(((lastAllocAddr - ((char*) KERNEL_HEAP_BASE_VADDR) + bytes) / FRAME_SIZE) + 1 > allocatedPages) {
 
         HeapMemory_expand(FRAME_SIZE);
         allocatedPages++;

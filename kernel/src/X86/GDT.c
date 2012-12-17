@@ -22,10 +22,6 @@
 =========================================================*/
 #define NUMBER_OF_ENTRIES 5
 
- /* GDT privilege levels */
-#define KERNEL_MODE  0
-#define USER_MODE    3
-
 /* GDT segment executable types */
 #define CODE_SEGMENT 1
 #define DATA_SEGMENT 0

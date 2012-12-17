@@ -35,7 +35,6 @@
 typedef struct PageTableEntry     PageTableEntry;
 typedef struct PageTable          PageTable;
 typedef struct PageDirectoryEntry PageDirectoryEntry;
-typedef struct PageDirectory      PageDirectory;
 
 /* 4-Byte Page Table Entry */
 struct PageTableEntry {

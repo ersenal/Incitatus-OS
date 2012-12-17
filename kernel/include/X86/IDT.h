@@ -48,7 +48,7 @@
 =========================================================*/
 typedef struct Regs Regs;
 
-/* Processor state just before interrupt + interrupt info(intNo, errCode) */
+/* CPU state just before interrupt + interrupt info(intNo, errCode) */
 struct Regs {
 
     /* Segment selectors */
@@ -61,7 +61,7 @@ struct Regs {
     u32int intNo, errCode;
 
     /* Pushed by the processor automatically. */
-    u32int eip, cs, eflags, useresp, ss;
+    u32int eip, cs, eflags, esp0, ss0;
 
 } __attribute__((packed));
 

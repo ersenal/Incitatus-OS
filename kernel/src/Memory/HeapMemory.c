@@ -44,7 +44,7 @@ PUBLIC void  (*HeapMemory_free)    (void* mem);
 
 PRIVATE void HeapMemory_init(void) {
 
-    heapTop = (void*) KERNEL_HEAP_VADDR;
+    heapTop = (void*) KERNEL_HEAP_BASE_VADDR;
 
     /* Point to heap manager implementation */
     HeapMemory_alloc   = &DougLea_malloc;
@@ -58,6 +58,7 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
     Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
     Debug_assert((u32int) heapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
+    Debug_assert((u32int) heapTop + size < KERNEL_HEAP_TOP_VADDR); /* heap should not overflow */
 
     if(size < 0)
         return HeapMemory_contract(size * -1);
@@ -90,7 +91,7 @@ PUBLIC void* HeapMemory_contract(u32int size) {
     for(u32int i = 0; i < pages; i++) {
 
         heapTop -= FRAME_SIZE;
-        Debug_assert(heapTop >= (char*) KERNEL_HEAP_VADDR)
+        Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR)
 
         void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
         Debug_assert(physicalAddress != NULL);

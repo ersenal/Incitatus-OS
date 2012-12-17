@@ -40,10 +40,6 @@
 #define GATE_TRAP      0b11111
 #define GATE_TASK      0b10101
 
- /* Privilege levels */
-#define KERNEL_MODE  0
-#define USER_MODE    3
-
 /*=======================================================
     STRUCT
 =========================================================*/
