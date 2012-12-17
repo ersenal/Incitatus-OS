@@ -28,6 +28,7 @@
 #include <IO.h>
 #include <X86/IDT.h>
 #include <X86/PIC8259.h>
+#include <Process/ProcessManager.h>
 
 /*=======================================================
     DEFINE
@@ -106,9 +107,12 @@ PRIVATE u32int tick;
     FUNCTION
 =========================================================*/
 
-PRIVATE void PIT8253_timerHandler(void) {
+PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
+
+    if(tick % 100 == 0)
+      ProcessManager_schedule(regs);
 
 }
 

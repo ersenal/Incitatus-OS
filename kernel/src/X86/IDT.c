@@ -101,7 +101,7 @@ struct IDTPointer {
 PRIVATE Module     idtModule;
 PRIVATE IDTEntry   idtEntries[NUMBER_OF_INTERRUPTS];
 PRIVATE IDTPointer idtPointer;
-PRIVATE void       (*handlers[NUMBER_OF_INTERRUPTS]) (void); /* Interrupt handler function pointers */
+PRIVATE void       (*handlers[NUMBER_OF_INTERRUPTS]) (Regs*); /* Interrupt handler function pointers */
 
 /*=======================================================
     EXTERNAL
@@ -260,7 +260,7 @@ PUBLIC void IDT_handlerException(Regs* regs) {
 
     if(handlers[regs->intNo] != NULL) {
 
-        (*handlers[regs->intNo]) ();
+        (*handlers[regs->intNo]) (regs);
 
     } else {
 
@@ -275,7 +275,7 @@ PUBLIC void IDT_handlerIRQ(Regs* regs) {
 
     if(handlers[regs->intNo] != NULL) {
 
-        (*handlers[regs->intNo]) ();
+        (*handlers[regs->intNo]) (regs);
 
     } else{
 

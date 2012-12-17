@@ -33,6 +33,7 @@
 #define MODULE_PMM     106
 #define MODULE_VMM     107
 #define MODULE_HEAP    108
+#define MODULE_PROCESS 109
 
 /*=======================================================
     STRUCT

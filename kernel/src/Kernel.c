@@ -26,6 +26,7 @@
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
 #include <Memory/HeapMemory.h>
+#include <Process/ProcessManager.h>
 
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
@@ -47,7 +48,8 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         PIT8253_getModule(),
         PhysicalMemory_getModule(mbInfo, &mbHead),
         VirtualMemory_getModule(),
-        HeapMemory_getModule()
+        HeapMemory_getModule(),
+        ProcessManager_getModule()
 
     };
 
@@ -56,7 +58,10 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
     asm volatile("sti");
 
-    while(1) Sys_haltCPU();
+    while(1) {
 
+        Console_clearScreen();
+        Sys_haltCPU();
+    }
 }
 
