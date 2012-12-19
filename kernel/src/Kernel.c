@@ -26,6 +26,7 @@
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
 #include <Memory/HeapMemory.h>
+#include <Process/Scheduler.h>
 #include <Process/ProcessManager.h>
 
 
@@ -49,6 +50,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         PhysicalMemory_getModule(mbInfo, &mbHead),
         VirtualMemory_getModule(),
         HeapMemory_getModule(),
+        Scheduler_getModule(),
         ProcessManager_getModule()
 
     };
@@ -60,7 +62,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
     while(1) {
 
-        Console_clearScreen();
+        Console_printString("Kernel process says hi!\n");
         Sys_haltCPU();
     }
 }

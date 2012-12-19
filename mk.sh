@@ -36,6 +36,8 @@ $C_Compiler $CFlags -o dl.o      -c   kernel/src/Memory/DougLea.c
 $C_Compiler $CFlags -o dumbH.o   -c   kernel/src/Memory/DumbHeapManager.c
 
 $C_Compiler $CFlags -o process.o -c   kernel/src/Process/Process.c
+$C_Compiler $CFlags -o sched.o   -c   kernel/src/Process/Scheduler.c
+$C_Compiler $CFlags -o rr.o      -c   kernel/src/Process/RoundRobin.c
 $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
@@ -65,6 +67,8 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         dumbH.o \
                                                                         linkl.o \
                                                                         process.o \
+                                                                        sched.o \
+                                                                        rr.o \
                                                                         pm.o \
 
 

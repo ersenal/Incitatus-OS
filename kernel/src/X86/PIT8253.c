@@ -111,7 +111,9 @@ PRIVATE u32int tick;
 PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
-    ProcessManager_schedule(regs);
+
+    if(tick % 5 == 0) /* context switch every 50ms */
+        ProcessManager_switch(regs);
 
 }
 
@@ -137,12 +139,12 @@ PRIVATE void PIT8253_init(void) {
 
 PUBLIC u32int PIT8253_measureRuntime(void* functionAddr) {
 
-  u32int beforeTick = tick;
+    u32int beforeTick = tick;
 
-  void (*function) (void) = functionAddr;
-  function();
+    void (*function) (void) = functionAddr;
+    function();
 
-  return tick - beforeTick;
+    return tick - beforeTick;
 
 }
 

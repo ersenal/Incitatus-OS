@@ -93,11 +93,17 @@ PUBLIC void LinkedList_add(LinkedList* self, void* data) {
 
 }
 
-PUBLIC void LinkedList_remove(LinkedList* self, void* data) {
+PUBLIC void* LinkedList_remove(LinkedList* self, void* data) {
 
     Debug_assert(data != NULL);
     Node* node = LinkedList_getNode(self, data);
-    LinkedList_removeNode(self, node);
+    return LinkedList_removeNode(self, node);
+
+}
+
+PUBLIC void* LinkedList_removeFromFront(LinkedList* self) {
+
+    return LinkedList_removeNode(self, self->first);
 
 }
 

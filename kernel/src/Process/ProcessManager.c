@@ -14,89 +14,77 @@
 
 
 #include <Process/ProcessManager.h>
-#include <Process/Process.h>
-#include <Lib/LinkedList.h>
+#include <Process/Scheduler.h>
 #include <Drivers/Console.h>
+#include <Memory.h>
 
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module pmModule;
-//PRIVATE LinkedList* processes;
-PRIVATE Process* processes[2];
-PRIVATE int currentProcessId;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-PRIVATE void test(void) {
+PRIVATE void Test1() {
 
-    int i = 0;
-    u16int* mem = (u16int*) 0xB8000;
+    while(TRUE)
+        Console_printString("Task 1 says hi!\n");
 
-    while(TRUE) {
-        *mem = (i << 8) + 'A';
-        i++;
-    }
 }
-#pragma GCC pop_options
+
+PRIVATE void Test2() {
+
+    while(TRUE)
+        Console_printString("Task 2 says hi!\n");
+
+}
+
+PRIVATE void Test3() {
+
+    while(TRUE)
+        Console_printString("Task 3 says hi!\n");
+
+}
+
+PRIVATE void Test4() {
+
+    while(TRUE)
+        Console_printString("Task 4 says hi!\n");
+
+}
 
 PRIVATE void ProcessManager_init(void) {
 
-    //processes = LinkedList_new();
-    //LinkedList_add(processes, initialProcess);
+    /* Create kernel process and add to scheduler */
     Process* initialProcess = Process_new(0, "Test", NULL);
-    currentProcessId = initialProcess->pid;
+    Scheduler_addProcess(initialProcess);
 
-    Process* initialProcess2 = Process_new(1, "Test2", test);
+    Process* test1 = Process_new(1, "Test", Test1);
+    Scheduler_addProcess(test1);
 
-    processes[0] = initialProcess;
-    processes[1] = initialProcess2;
+    Process* test2 = Process_new(2, "Test", Test2);
+    Scheduler_addProcess(test2);
 
+    Process* test3 = Process_new(3, "Test", Test3);
+    Scheduler_addProcess(test3);
 
-}
-
-PRIVATE void setRegs(Regs* from, Regs* to) {
-
-    to->cs = from->cs;
-    to->eflags = from->eflags;
-    to->eip = from->eip;
-    to->eax = from->eax;
-    to->ebx = from->ebx;
-    to->edi = from->edi;
-    to->esi = from->esi;
-    to->ebp = from->ebp;
-    to->esp = from->esp;
-    to->ecx = from->ecx;
-    to->edx = from->edx;
-    to->ds = from->ds;
-    to->es = from->es;
-    to->fs = from->fs;
-    to->intNo = from->intNo;
-    to->errCode = from->intNo;
-    to->esp0 = from->esp0;
-    to->ss0 = from->ss0;
+    Process* test4 = Process_new(4, "Test", Test4);
+    Scheduler_addProcess(test4);
 
 }
 
-PUBLIC void ProcessManager_schedule(Regs* context) {
+PUBLIC void ProcessManager_switch(Regs* context) {
 
-    setRegs(context, processes[currentProcessId]->kernelStackTop);
+    /* Save process state */
+    Process* currentProcess = Scheduler_getCurrentProcess();
+    Memory_copy(currentProcess->kernelStackTop, context, sizeof(Regs));
 
-    switch(currentProcessId)
-    {
-    case 0:
-      currentProcessId = 1;
-      break;
-    case 1:
-      currentProcessId = 0;
-      break;
-    }
+    /* Get next process from scheduler and do context switch */
+    Process* next = Scheduler_getNextProcess();
+    Memory_copy(context, next->kernelStackTop, sizeof(Regs));
 
-    setRegs(processes[currentProcessId]->kernelStackTop, context);
 }
 
 PUBLIC Module* ProcessManager_getModule(void) {
@@ -105,7 +93,7 @@ PUBLIC Module* ProcessManager_getModule(void) {
     pmModule.init = &ProcessManager_init;
     pmModule.moduleID = MODULE_PROCESS;
     pmModule.numberOfDependencies = 1;
-    pmModule.dependencies[0] = MODULE_HEAP;
+    pmModule.dependencies[0] = MODULE_SCHEDULER;
 
     return &pmModule;
 }

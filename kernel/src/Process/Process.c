@@ -19,7 +19,6 @@
 #include <Memory/PhysicalMemory.h>
 #include <X86/GDT.h>
 
-
 /*=======================================================
     FUNCTION
 =========================================================*/
@@ -61,6 +60,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry) {
 
 PUBLIC void Process_destroy(Process* self) {
 
+    HeapMemory_free(self->kernelStackTop);
     HeapMemory_free(self);
 
 }

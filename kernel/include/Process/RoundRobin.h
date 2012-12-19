@@ -4,7 +4,7 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| ProcessManager.h
+| RoundRobin.h
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:
@@ -13,14 +13,15 @@
 \------------------------------------------------------------------------*/
 
 
-#ifndef PROCESS_M_H
-#define PROCESS_M_H
+#ifndef ROUND_ROBIN_H
+#define ROUND_ROBIN_H
 
-#include <Module.h>
-#include <X86/IDT.h>
+#include <Process/Process.h>
 
-
-void  ProcessManager_switch(Regs* context);
-Module* ProcessManager_getModule(void);
+void RoundRobin_init(Process* firstProcess);
+void RoundRobin_addProcess(Process* process);
+void RoundRobin_removeProcess(Process* process);
+Process* RoundRobin_getNextProcess(void);
+Process* RoundRobin_getCurrentProcess(void);
 
 #endif

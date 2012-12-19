@@ -52,7 +52,8 @@ struct LinkedList {
     FUNCTION
 =========================================================*/
 void        LinkedList_add(LinkedList* self, void* data);
-void        LinkedList_remove(LinkedList* self, void* data);
+void*       LinkedList_remove(LinkedList* self, void* data);
+void*       LinkedList_removeFromFront(LinkedList* self);
 void        LinkedList_push(LinkedList* self, void* data);
 void*       LinkedList_pop(LinkedList* self);
 void*       LinkedList_peek(LinkedList* self);
