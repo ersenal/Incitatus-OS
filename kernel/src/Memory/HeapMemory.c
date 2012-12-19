@@ -71,7 +71,10 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
     for(u32int i = 0; i < pages; i++) {
 
         void* physicalAddress = PhysicalMemory_allocateFrame();
-        Debug_assert(physicalAddress != NULL);
+
+        if(physicalAddress == NULL) /* Are we out of physical memory? */
+            Sys_panic("Out of physical memory!");
+
         VirtualMemory_mapPage(heapTop, physicalAddress);
         //Memory_set(heapTop, 0, FRAME_SIZE); /* Let CALLOC handle this */
         heapTop += FRAME_SIZE;
@@ -91,7 +94,7 @@ PUBLIC void* HeapMemory_contract(u32int size) {
     for(u32int i = 0; i < pages; i++) {
 
         heapTop -= FRAME_SIZE;
-        Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR)
+        Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR);
 
         void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
         Debug_assert(physicalAddress != NULL);

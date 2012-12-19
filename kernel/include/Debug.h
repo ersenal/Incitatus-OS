@@ -54,6 +54,10 @@
 |
 | EXAMPLE:      Debug_assert(index <= lastIndex)
 \------------------------------------------------------------------------*/
-#define Debug_assert(C) if(!(C)) {Debug_logError(""); Sys_panic("Assert failure!");}
+#ifdef NO_DEBUG
+    #define Debug_assert(C) ((void) 0)
+#else
+    #define Debug_assert(C) if(!(C)) {Debug_logError(""); Sys_panic("Assert failure!");}
+#endif
 
 #endif

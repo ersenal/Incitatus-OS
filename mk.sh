@@ -4,7 +4,6 @@ C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
 CFlags="-nostdlib -fno-builtin -fno-stack-protector -O2 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/"
 
 nasm -f elf -o start.o   kernel/src/Start.s
-nasm -f elf -o gdtAsm.o  kernel/src/X86/GDT.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 
 $C_Compiler $CFlags -o kernel.o  -c   kernel/src/Kernel.c
@@ -48,7 +47,6 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         module.o \
                                                                         mem.o \
                                                                         gdt.o \
-                                                                        gdtAsm.o \
                                                                         pic.o \
                                                                         idt.o \
                                                                         idtAsm.o \

@@ -33,16 +33,10 @@ PUBLIC void Sys_restart(void) {
 
 }
 
-PUBLIC void Sys_haltCPU(void) {
-
-    asm volatile("hlt");
-
-}
-
 PUBLIC void Sys_panic(const char* str) {
 
     Console_setColor(CONSOLE_ERROR);
     Console_printf("%s%s", "[PANIC] ", str);
-    asm volatile("cli"); /* We don't want CPU to wake up */
-    asm volatile("hlt");
+    Sys_disableInterrupts(); /* We don't want CPU to wake up */
+    Sys_haltCPU();
 }

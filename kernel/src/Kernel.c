@@ -8,7 +8,7 @@
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:  Main C entry point for kernel, Kernel() function gets
-|               called by Start.s.
+|               called in Start.s.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -56,7 +56,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
         Module_load(modules[i]);
 
-    asm volatile("sti");
+    Sys_enableInterrupts();
 
     while(1) {
 

@@ -135,22 +135,24 @@ PRIVATE void GDT_flush(void) {
     asm volatile (
 
         /* Load GDT pointer */
-        "lgdt %0              \n"
+        "lgdt %1              \n"
 
         /* Set segment registers */
-        "mov  %1,  %%ds       \n"
-        "mov  %1,  %%es       \n"
-        "mov  %1,  %%fs       \n"
-        "mov  %1,  %%gs       \n"
-        "mov  %1,  %%ss       \n"
+        "mov  %2,  %%ds       \n"
+        "mov  %2,  %%es       \n"
+        "mov  %2,  %%fs       \n"
+        "mov  %2,  %%gs       \n"
+        "mov  %2,  %%ss       \n"
 
-        : : "m" (gdtPointer), "a" (KERNEL_DATA_SEGMENT) : "memory"
+        /* Far jump, set code segment register(CS) and instruction pointer register(EIP) */
+        "ljmp %0,  $dummy     \n"
+        "dummy:               \n"
+
+        : : "i" (KERNEL_CODE_SEGMENT),
+            "m" (gdtPointer),
+            "a" (KERNEL_DATA_SEGMENT) : "memory"
     );
 
-    extern void GDT_farJump(void); /* Defined in GDT.s */
-
-    /* Set code segment register(CS) and instruction pointer register(EIP) */
-    GDT_farJump();
 }
 
 PRIVATE void GDT_init(void) {

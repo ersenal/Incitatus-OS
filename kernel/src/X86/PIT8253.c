@@ -29,6 +29,7 @@
 #include <X86/IDT.h>
 #include <X86/PIC8259.h>
 #include <Process/ProcessManager.h>
+#include <Sys.h>
 
 /*=======================================================
     DEFINE
@@ -155,7 +156,7 @@ PUBLIC void PIT8253_sleep(u32int ms) {
     ms /= 10;
     u32int begin = tick;
     while(tick < (ms + begin))
-      asm volatile("hlt");
+      Sys_haltCPU();
 
 }
 #pragma GCC pop_options
