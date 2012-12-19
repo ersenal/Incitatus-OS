@@ -10,7 +10,6 @@ $C_Compiler $CFlags -o kernel.o  -c   kernel/src/Kernel.c
 $C_Compiler $CFlags -o io.o      -c   kernel/src/IO.c
 $C_Compiler $CFlags -o sys.o     -c   kernel/src/Sys.c
 $C_Compiler $CFlags -o module.o  -c   kernel/src/Module.c
-$C_Compiler $CFlags -o mem.o     -c   kernel/src/Memory.c
 
 $C_Compiler $CFlags -o vga.o     -c   kernel/src/Drivers/VGA.c
 $C_Compiler $CFlags -o console.o -c   kernel/src/Drivers/Console.c
@@ -47,7 +46,6 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         console.o \
                                                                         sys.o \
                                                                         module.o \
-                                                                        mem.o \
                                                                         gdt.o \
                                                                         pic.o \
                                                                         idt.o \
