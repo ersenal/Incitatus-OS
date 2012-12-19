@@ -4,7 +4,7 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| RoundRobin.c
+| RoundRobin.c (implements Scheduler)
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:
@@ -35,7 +35,7 @@ PUBLIC void RoundRobin_addProcess(Process* process) {
 
     if(processes == NULL) { /* RoundRobin initialisation */
 
-        processes = HeapMemory_alloc(sizeof(LinkedList));
+        processes = LinkedList_new();
         currentProcess = process;
 
     }

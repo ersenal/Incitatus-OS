@@ -110,10 +110,17 @@ IDT_irqHandlerCommon:
     pusha
 
     ; Save segment selectors
-    push ds
-    push es
-    push fs
-    push gs
+    mov eax, ds
+    push eax
+
+    mov eax, es
+    push eax
+
+    mov eax, fs
+    push eax
+
+    mov eax, gs
+    push eax
 
     ; Switch to kernel data segment
     mov ax, 0x10

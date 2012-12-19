@@ -58,52 +58,49 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
     Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
     Debug_assert((u32int) heapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
-    Debug_assert((u32int) heapTop + size < KERNEL_HEAP_TOP_VADDR); /* heap should not overflow */
-
-    if(size < 0)
-        return HeapMemory_contract(size * -1);
 
     /* The number of needed pages */
     u32int pages = size / FRAME_SIZE;
 
-    void* ret = heapTop;
+    if(size >= 0) { /* Expand heap */
 
-    for(u32int i = 0; i < pages; i++) {
+        Debug_assert((u32int) heapTop + size < KERNEL_HEAP_TOP_VADDR); /* heap should not overflow */
+        void* ret = heapTop;
 
-        void* physicalAddress = PhysicalMemory_allocateFrame();
+        for(u32int i = 0; i < pages; i++) {
 
-        if(physicalAddress == NULL) /* Are we out of physical memory? */
-            Sys_panic("Out of physical memory!");
+            void* physicalAddress = PhysicalMemory_allocateFrame();
 
-        VirtualMemory_mapPage(heapTop, physicalAddress);
-        //Memory_set(heapTop, 0, FRAME_SIZE); /* Let CALLOC handle this */
-        heapTop += FRAME_SIZE;
+            if(physicalAddress == NULL) /* Are we out of physical memory? */
+                Sys_panic("Out of physical memory!");
+
+            VirtualMemory_mapPage(heapTop, physicalAddress);
+            Memory_set(heapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
+            heapTop += FRAME_SIZE;
+
+        }
+
+        return ret;
+
+    } else { /* Contract heap */
+
+        Debug_assert((u32int) heapTop - size >= KERNEL_HEAP_BASE_VADDR); /* heap should not underflow */
+
+        for(u32int i = 0; i < pages * -1; i++) {
+
+            heapTop -= FRAME_SIZE;
+            Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR);
+
+            void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
+            Debug_assert(physicalAddress != NULL);
+            PhysicalMemory_freeFrame(physicalAddress);
+            VirtualMemory_unmapPage(heapTop);
+
+        }
+
+        return heapTop;
 
     }
-
-    return ret;
-}
-
-PUBLIC void* HeapMemory_contract(u32int size) {
-
-    Debug_assert(size % FRAME_SIZE == 0);
-
-    /* The number of needed pages */
-    u32int pages = size / FRAME_SIZE;
-
-    for(u32int i = 0; i < pages; i++) {
-
-        heapTop -= FRAME_SIZE;
-        Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR);
-
-        void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
-        Debug_assert(physicalAddress != NULL);
-        PhysicalMemory_freeFrame(physicalAddress);
-        VirtualMemory_unmapPage(heapTop);
-
-    }
-
-    return heapTop;
 
 }
 

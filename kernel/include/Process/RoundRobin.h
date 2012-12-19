@@ -4,7 +4,7 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| RoundRobin.h
+| RoundRobin.h (implements Scheduler)
 |--------------------------------------------------------------------------
 |
 | DESCRIPTION:

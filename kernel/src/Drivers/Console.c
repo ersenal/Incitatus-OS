@@ -146,6 +146,8 @@ PUBLIC void Console_printf(const char* template, ...) {
 
 PUBLIC void Console_printChar(u8int c) {
 
+    Mutex_lock();
+
     switch(c) {
 
         case '\n':
@@ -163,18 +165,16 @@ PUBLIC void Console_printChar(u8int c) {
 
     if(cursorY >= vgaHeight) Console_scrollDown();
     VGA_moveCursor(cursorY * vgaWidth + cursorX);
+
+    Mutex_unlock();
 }
 
 PUBLIC void Console_printString(const char* str) {
-
-    Mutex_lock();
 
     while(*str != '\0') {
         Console_printChar(*str);
         str++;
     }
-
-    Mutex_unlock();
 
 }
 
