@@ -111,9 +111,7 @@ PRIVATE u32int tick;
 PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
-
-    if(tick % 100 == 0)
-      ProcessManager_schedule(regs);
+    ProcessManager_schedule(regs);
 
 }
 
