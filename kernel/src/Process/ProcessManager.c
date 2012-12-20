@@ -80,13 +80,20 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
+    Debug_assert(currentProcess != NULL);
     currentProcess->kernelStack = context;
 
-    /* Get next process from scheduler and do context switch */
+    /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
+    Debug_assert(next != NULL);
+
+    if(currentProcess == next) /* No need for a context switch */
+        return;
+
+    /* Do context switch */
     VirtualMemory_switchPageDir(next->pageDir);
     Debug_assert(next->kernelStack != NULL);
-    asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack));
+    asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store new process ESP in DR0 register */
 
 }
 

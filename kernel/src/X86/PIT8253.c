@@ -112,9 +112,10 @@ PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
 
-    //if(tick % 100 == 0) /* context switch every 20ms */
-    ProcessManager_switch(regs);
-
+    if(tick % 2 == 0) /* context switch every 20ms */
+        ProcessManager_switch(regs);
+    else /* Set DR0 to NULL if we don't call the scheduler */
+        asm volatile("mov %0, %%DR0" : : "a" (0));
 }
 
 PRIVATE void PIT8253_init(void) {

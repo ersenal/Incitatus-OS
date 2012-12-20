@@ -276,6 +276,8 @@ PUBLIC void VirtualMemory_switchPageDir(PageDirectory* dir) {
 
 PUBLIC void VirtualMemory_mapKernel(Process* process) {
 
+    Debug_assert(process != NULL);
+
     PageDirectory* pageDir = (PageDirectory*) process->pageDir;
     pageDir = VirtualMemory_mapPage((void*) 0xF00000, pageDir); /* Map it so that we can access it */
     PageDirectory* kDir = VirtualMemory_mapPage((void*) 0xF01000, (void*) kernelDir); /* Map it so that we can access it */
@@ -287,12 +289,16 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     pde->inMemory = TRUE;
     pde->rwFlag = TRUE;
 
-    /* Map kernel heap, first 4MB */
-    pde = &pageDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)];
-    Memory_set(pde, 0, sizeof(PageDirectoryEntry));
-    pde->frameIndex = kDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)].frameIndex;
-    pde->inMemory = TRUE;
-    pde->rwFlag = TRUE;
+    /* Map kernel heap, first 32MB */
+    for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + 32; i++) {
+
+        pde = &pageDir->entries[i];
+        Memory_set(pde, 0, sizeof(PageDirectoryEntry));
+        pde->frameIndex = kDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)].frameIndex;
+        pde->inMemory = TRUE;
+        pde->rwFlag = TRUE;
+
+    }
 
     /* Unmap temporary mappings */
     VirtualMemory_unmapPage((void*) 0xF00000);
@@ -301,6 +307,8 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
 }
 
 PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
+
+    Debug_assert(process->pageDir == NULL);
 
     PageDirectory* dir = (PageDirectory*) PhysicalMemory_allocateFrame();
     process->pageDir = dir;
@@ -323,6 +331,8 @@ PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
 
 PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
 
+    Debug_assert(process->pageDir != NULL);
+
     /* Free every page table starting at 1GB(everything except kernel which is bottom 4MB + kernel heap) */
     for(int i = PDE_INDEX(KERNEL_HEAP_TOP_VADDR); i < 1024; i++) {
 
@@ -333,6 +343,7 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
         if(pde->inMemory) {
 
             PageTable* pageTable = (PageTable*) FRAME_INDEX_TO_ADDR(pde->frameIndex);
+            Debug_assert(pageTable != NULL);
             pageTable = VirtualMemory_mapPage(0, pageTable); /* Map page table so that we can access it */
 
             /* Free all page table entries*/

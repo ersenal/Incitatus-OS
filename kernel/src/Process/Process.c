@@ -23,9 +23,10 @@
 
 PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
 
+    UNUSED(name);
+
     Process* self = HeapMemory_calloc(1, sizeof(Process));
     Debug_assert(self != NULL);
-    Memory_copy(self->name, name, 32);
     self->pid = id;
 
     Regs registers;
@@ -33,6 +34,27 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
     if(mode == 1) { /* User process */
 
         self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
+        registers.eflags = 0x200; /* Interrupt enable flag */
+        registers.eip    = (u32int) entry; /* Initial code entry point */
+        registers.intNo  = IRQ0;
+        registers.cs     = KERNEL_CODE_SEGMENT;
+        registers.ds     = KERNEL_DATA_SEGMENT;
+        registers.es     = KERNEL_DATA_SEGMENT;
+        registers.fs     = KERNEL_DATA_SEGMENT;
+        registers.gs     = KERNEL_DATA_SEGMENT;
+
+        /* Set up initial user ss and esp */
+        registers.esp0   = 0;
+        registers.ss0    = 0;
+
+        /* Allocate kernel stack */
+        u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(stack != NULL);
+        self->kernelStackBase = stack;
+
+        stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
+        Memory_copy(stack, &registers, sizeof(Regs));
+        self->kernelStack = stack;
 
         /* Create a new page directory for process */
         VirtualMemory_createPageDirectory(self);
@@ -50,19 +72,6 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
 
         }
 
-        registers.eflags = 0x200; /* Interrupt enable flag */
-        registers.eip    = (u32int) entry; /* Initial code entry point */
-        registers.intNo  = IRQ0;
-        registers.cs     = KERNEL_CODE_SEGMENT;
-        registers.ds     = KERNEL_DATA_SEGMENT;
-        registers.es     = KERNEL_DATA_SEGMENT;
-        registers.fs     = KERNEL_DATA_SEGMENT;
-        registers.gs     = KERNEL_DATA_SEGMENT;
-
-        /* Set up initial user ss and esp */
-        registers.esp0   = 0;
-        registers.ss0    = 0;
-
     } else { /* Kernel process */
 
         self->pageDir = VirtualMemory_getKernelDir();
@@ -76,15 +85,6 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
         registers.gs     = KERNEL_DATA_SEGMENT;
 
     }
-
-    /* Allocate kernel stack */
-    u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
-    Debug_assert(stack != NULL);
-    self->kernelStackBase = stack;
-
-    stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
-    Memory_copy(stack, &registers, sizeof(Regs));
-    self->kernelStack = stack;
 
     return self;
 

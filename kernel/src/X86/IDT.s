@@ -140,8 +140,15 @@ IDT_irqHandlerCommon:
     call IDT_handlerIRQ  ; Call C-level common exception handler
     add esp, 4           ; Drop stack pointer
 
-    mov eax, DR0
-    mov esp, eax
+    mov eax, [esp + 48]  ; Get interrupt number
+    cmp eax, 32
+    jne NotScheduler     ; Jump if this is not a timer IRQ
+    mov eax, DR0         ; Get new process ESP
+    cmp eax, 0           ; Jump if ESP is NULL - ESP is set to NULL in Timer IRQ handler only if we don't call the scheduler
+    je NotScheduler
+    mov esp, eax         ; Switch process stacks if this is a timer IRQ and ESP is not NULL
+
+    NotScheduler:
 
     ; Restore the segment selectors
     pop gs

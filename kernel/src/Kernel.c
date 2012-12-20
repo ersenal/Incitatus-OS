@@ -64,6 +64,9 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
         Console_printString("Kernel process says hi!\n");
         Sys_haltCPU();
+
     }
+
+    Sys_panic("Should not reach here!");
 }
 
