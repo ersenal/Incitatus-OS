@@ -273,6 +273,11 @@ PUBLIC void IDT_handlerException(Regs* regs) {
 
 PUBLIC void IDT_handlerIRQ(Regs* regs) {
 
+    /* Handle spurious interrupts. Spurious interrupts are fake interrupts caused
+     * by an invalid EOI or line noise. This is a temporary solution. */
+    if(regs->intNo == IRQ7 || regs->intNo == IRQ15)
+        return;
+
     if(handlers[regs->intNo] != NULL) {
 
         (*handlers[regs->intNo]) (regs);
@@ -285,6 +290,7 @@ PUBLIC void IDT_handlerIRQ(Regs* regs) {
     }
 
     PIC8259_sendEOI(regs->intNo);
+
 }
 
 PUBLIC Module* IDT_getModule(void) {

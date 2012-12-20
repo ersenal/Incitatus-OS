@@ -361,6 +361,8 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
 
             }
 
+            PhysicalMemory_freeFrame(pageTable);
+
         }
 
     }
