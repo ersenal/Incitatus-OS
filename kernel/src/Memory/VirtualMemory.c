@@ -290,7 +290,7 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     pde->rwFlag = TRUE;
 
     /* Map kernel heap, first 32MB */
-    for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + 32; i++) {
+    for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + 8; i++) {
 
         pde = &pageDir->entries[i];
         Memory_set(pde, 0, sizeof(PageDirectoryEntry));
