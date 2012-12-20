@@ -140,6 +140,9 @@ IDT_irqHandlerCommon:
     call IDT_handlerIRQ  ; Call C-level common exception handler
     add esp, 4           ; Drop stack pointer
 
+    mov eax, DR0
+    mov esp, eax
+
     ; Restore the segment selectors
     pop gs
     pop fs

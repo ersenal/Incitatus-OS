@@ -80,12 +80,13 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
-    Memory_copy(&currentProcess->registers, context, sizeof(Regs));
+    currentProcess->kernelStack = context;
 
     /* Get next process from scheduler and do context switch */
     Process* next = Scheduler_getNextProcess();
     VirtualMemory_switchPageDir(next->pageDir);
-    Memory_copy(context, &next->registers, sizeof(Regs));
+    Debug_assert(next->kernelStack != NULL);
+    asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack));
 
 }
 

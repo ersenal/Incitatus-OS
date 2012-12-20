@@ -27,9 +27,10 @@ typedef struct Process Process;
 struct Process {
 
     u32int pid;
-    Regs   registers;
     char   name[32];
     void*  userHeapBase;
+    void*  kernelStack;
+    void*  kernelStackBase;
     void*  pageDir;
 
 };
