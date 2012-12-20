@@ -112,8 +112,8 @@ PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
 
-    if(tick % 5 == 0) /* context switch every 50ms */
-        ProcessManager_switch(regs);
+    //if(tick % 100 == 0) /* context switch every 20ms */
+    ProcessManager_switch(regs);
 
 }
 

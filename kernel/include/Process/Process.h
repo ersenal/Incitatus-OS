@@ -17,7 +17,6 @@
 #define PROCESS_H
 
 #include <Common.h>
-#include <Memory/VirtualMemory.h>
 #include <X86/IDT.h>
 
 /*=======================================================
@@ -28,16 +27,18 @@ typedef struct Process Process;
 struct Process {
 
     u32int pid;
-    Regs*  kernelStackTop;
-    char*  name;
-    void*  entry;
+    Regs   registers;
+    char   name[32];
+    void*  userHeapBase;
+    void*  pageDir;
 
 };
 
 /*=======================================================
     FUNCTION
 =========================================================*/
-Process* Process_new(u32int id, char* name, void* entry);
+Process* Process_new(u32int id, char* name, void* entry, bool mode);
+void Process_printRegisters(Process* process);
 void Process_destroy(Process* self);
 
 #endif

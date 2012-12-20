@@ -168,10 +168,14 @@ PUBLIC void Console_printChar(u8int c) {
 
 PUBLIC void Console_printString(const char* str) {
 
+    Mutex_lock();
+
     while(*str != '\0') {
         Console_printChar(*str);
         str++;
     }
+
+    Mutex_unlock();
 
 }
 

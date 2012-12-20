@@ -20,17 +20,6 @@
 #include <Module.h>
 #include <Common.h>
 
-/*=======================================================
-    DEFINE
-=========================================================*/
-
-/* Kernel heap, 512MB-1GB virtual address*/
-#define KERNEL_HEAP_BASE_VADDR 0x20000000
-#define KERNEL_HEAP_TOP_VADDR 0x40000000
-
-/* User heap, 2GB-4GB virtual address*/
-#define USER_HEAP_BASE_VADDR 0x80000000
-#define USER_HEAP_TOP_VADDR 0x100000000
 
 /*=======================================================
     INTERFACE

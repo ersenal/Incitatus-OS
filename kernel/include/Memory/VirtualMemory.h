@@ -17,6 +17,7 @@
 #define VMM_H
 
 #include <Module.h>
+#include <Process/Process.h>
 
 /*=======================================================
     TYPE
@@ -42,8 +43,10 @@ Module* VirtualMemory_getModule(void);
 |
 | PARAM:           "virtualAddr"   4KB aligned virtual address
 |                  "physicalAddr"  4KB aligned physical address
+|
+| RETURN:          Mapped virtual address
 \------------------------------------------------------------------------*/
-void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
+void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
 
 /*-------------------------------------------------------------------------
 | Unmap virtual address
@@ -64,4 +67,10 @@ void VirtualMemory_unmapPage(void* virtualAddr);
 |
 \------------------------------------------------------------------------*/
 void* VirtualMemory_getPhysicalAddress(void* virtualAddr);
+
+PageDirectory* VirtualMemory_getKernelDir(void);
+void VirtualMemory_switchPageDir(PageDirectory* dir);
+void VirtualMemory_mapKernel(Process* process);
+void VirtualMemory_createPageDirectory(Process* process);
+void VirtualMemory_destroyPageDirectory(Process* process);
 #endif

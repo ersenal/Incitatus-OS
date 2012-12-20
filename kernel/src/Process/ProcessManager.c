@@ -16,6 +16,7 @@
 #include <Process/ProcessManager.h>
 #include <Process/Scheduler.h>
 #include <Drivers/Console.h>
+#include <Memory/VirtualMemory.h>
 #include <Memory.h>
 
 /*=======================================================
@@ -58,19 +59,19 @@ PRIVATE void Test4() {
 PRIVATE void ProcessManager_init(void) {
 
     /* Create kernel process and add to scheduler */
-    Process* initialProcess = Process_new(0, "Test", NULL);
+    Process* initialProcess = Process_new(0, "Test", NULL, 0);
     Scheduler_addProcess(initialProcess);
 
-    Process* test1 = Process_new(1, "Test", Test1);
+    Process* test1 = Process_new(1, "Test1", Test1, 1);
     Scheduler_addProcess(test1);
 
-    Process* test2 = Process_new(2, "Test", Test2);
+    Process* test2 = Process_new(2, "Test2", Test2, 1);
     Scheduler_addProcess(test2);
 
-    Process* test3 = Process_new(3, "Test", Test3);
+    Process* test3 = Process_new(3, "Test3", Test3, 1);
     Scheduler_addProcess(test3);
 
-    Process* test4 = Process_new(4, "Test", Test4);
+    Process* test4 = Process_new(4, "Test4", Test4, 1);
     Scheduler_addProcess(test4);
 
 }
@@ -79,11 +80,12 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
-    Memory_copy(currentProcess->kernelStackTop, context, sizeof(Regs));
+    Memory_copy(&currentProcess->registers, context, sizeof(Regs));
 
     /* Get next process from scheduler and do context switch */
     Process* next = Scheduler_getNextProcess();
-    Memory_copy(context, next->kernelStackTop, sizeof(Regs));
+    VirtualMemory_switchPageDir(next->pageDir);
+    Memory_copy(context, &next->registers, sizeof(Regs));
 
 }
 

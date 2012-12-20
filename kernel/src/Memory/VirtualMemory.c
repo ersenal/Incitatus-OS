@@ -159,7 +159,7 @@ struct PageDirectory {
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module vmmModule;
-PRIVATE PageDirectory* currentDir;
+PRIVATE PageDirectory* kernelDir;
 
 /*=======================================================
     FUNCTION
@@ -197,22 +197,6 @@ PRIVATE void VirtualMemory_pageFaultHandler(void) {
 
 }
 
-PRIVATE void VirtualMemory_switchPageDir(PageDirectory* dir) {
-
-    Debug_assert(dir != NULL);
-
-    currentDir = dir;
-
-    /* Set page directory base register */
-    u32int cr3 = CPU_getCR(3);
-    CR3 reg = FORCE_CAST(cr3, CR3);
-    reg.PDBR = (u32int) &currentDir->entries / FRAME_SIZE;
-    CPU_setCR(3, FORCE_CAST(reg, u32int));
-
-    /* Flush all TLB entries */
-    VirtualMemory_invalidateTLB();
-}
-
 PRIVATE void VirtualMemory_setPDE(PageDirectoryEntry* pde, PageTable* pageTable) {
 
     Debug_assert(pde != NULL && pageTable != NULL);
@@ -241,6 +225,7 @@ PRIVATE void VirtualMemory_init(void) {
     PageDirectory* dir = PhysicalMemory_allocateFrame();
     Memory_set(dir, 0, sizeof(PageDirectory));
     VirtualMemory_switchPageDir(dir);
+    kernelDir = dir;
 
     /* Identity map first 4MB (except first 4096kb in order to catch NULLs) */
     //Console_printString("Allocating PDE: 0\n");
@@ -253,13 +238,13 @@ PRIVATE void VirtualMemory_init(void) {
 
     }
 
-    VirtualMemory_setPDE(&currentDir->entries[0], first4MB);
+    VirtualMemory_setPDE(&dir->entries[0], first4MB);
     /* End of identity map */
 
     /* Map directory to last virtual 4MB - recursive mapping, lets us manipulate the page directory after paging is enabled */
-    currentDir->entries[1023].frameIndex = ADDR_TO_FRAME_INDEX(currentDir);
-    currentDir->entries[1023].inMemory = TRUE;
-    currentDir->entries[1023].rwFlag = TRUE;
+    dir->entries[1023].frameIndex = ADDR_TO_FRAME_INDEX(dir);
+    dir->entries[1023].inMemory = TRUE;
+    dir->entries[1023].rwFlag = TRUE;
 
     /* Register page fault handler */
     IDT_registerHandler(&VirtualMemory_pageFaultHandler, 14);
@@ -269,12 +254,117 @@ PRIVATE void VirtualMemory_init(void) {
 
 }
 
-PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
+PUBLIC PageDirectory* VirtualMemory_getKernelDir(void) {
+
+    return kernelDir;
+
+}
+
+PUBLIC void VirtualMemory_switchPageDir(PageDirectory* dir) {
+
+    Debug_assert(dir != NULL);
+
+    /* Set page directory base register */
+    u32int cr3 = CPU_getCR(3);
+    CR3 reg = FORCE_CAST(cr3, CR3);
+    reg.PDBR = (u32int) &dir->entries / FRAME_SIZE;
+    CPU_setCR(3, FORCE_CAST(reg, u32int));
+
+    /* Flush all TLB entries */
+    VirtualMemory_invalidateTLB();
+}
+
+PUBLIC void VirtualMemory_mapKernel(Process* process) {
+
+    PageDirectory* pageDir = (PageDirectory*) process->pageDir;
+    pageDir = VirtualMemory_mapPage((void*) 0xF00000, pageDir); /* Map it so that we can access it */
+    PageDirectory* kDir = VirtualMemory_mapPage((void*) 0xF01000, (void*) kernelDir); /* Map it so that we can access it */
+
+    /* Map bottom 4MB */
+    PageDirectoryEntry* pde = &pageDir->entries[0];
+    Memory_set(pde, 0, sizeof(PageDirectoryEntry));
+    pde->frameIndex = kDir->entries[0].frameIndex;
+    pde->inMemory = TRUE;
+    pde->rwFlag = TRUE;
+
+    /* Map kernel heap, first 4MB */
+    pde = &pageDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)];
+    Memory_set(pde, 0, sizeof(PageDirectoryEntry));
+    pde->frameIndex = kDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)].frameIndex;
+    pde->inMemory = TRUE;
+    pde->rwFlag = TRUE;
+
+    /* Unmap temporary mappings */
+    VirtualMemory_unmapPage((void*) 0xF00000);
+    VirtualMemory_unmapPage((void*) 0xF01000);
+
+}
+
+PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
+
+    PageDirectory* dir = (PageDirectory*) PhysicalMemory_allocateFrame();
+    process->pageDir = dir;
+    dir = VirtualMemory_mapPage((void*) 0xF00000, dir); /* Map it so that we can access it */
+    Memory_set(dir, 0, sizeof(PageDirectory));
+
+    /* Map directory to last virtual 4MB - recursive mapping, lets us manipulate the page directory after paging is enabled */
+    dir->entries[1023].frameIndex = (ADDR_TO_FRAME_INDEX(process->pageDir));
+    dir->entries[1023].inMemory = TRUE;
+    dir->entries[1023].rwFlag = TRUE;
+    dir->entries[1023].mode = 1; /* User mode */
+
+    /* Set all other entries as user mode */
+    for(int i = 0; i < 1023; i++)
+        dir->entries[i].mode = 1;
+
+    VirtualMemory_unmapPage((void*) 0xF00000);
+
+}
+
+PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
+
+    /* Free every page table starting at 1GB(everything except kernel which is bottom 4MB + kernel heap) */
+    for(int i = PDE_INDEX(KERNEL_HEAP_TOP_VADDR); i < 1024; i++) {
+
+        /* Map page directory so that we can access it */
+        PageDirectory* dir = (PageDirectory*) VirtualMemory_mapPage(0, process->pageDir);
+        PageDirectoryEntry* pde = &dir->entries[i];
+
+        if(pde->inMemory) {
+
+            PageTable* pageTable = (PageTable*) FRAME_INDEX_TO_ADDR(pde->frameIndex);
+            pageTable = VirtualMemory_mapPage(0, pageTable); /* Map page table so that we can access it */
+
+            /* Free all page table entries*/
+            for(int y = 0; y < 1024; y++) {
+
+                PageTableEntry* pte = &pageTable->entries[y];
+
+                if(pte->inMemory) {
+
+                    void* phys = FRAME_INDEX_TO_ADDR(pte->frameIndex);
+                    Debug_assert(phys != NULL);
+                    PhysicalMemory_freeFrame(phys);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    VirtualMemory_unmapPage(0);
+    PhysicalMemory_freeFrame(process->pageDir);
+
+}
+
+PUBLIC void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
 
     /* Addresses should be page aligned */
     Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0 && (u32int) physicalAddr % FRAME_SIZE == 0);
 
-    PageDirectory* dir = (PageDirectory*) 0xFFFFF000;
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000; /* Get current process' page directory */
     PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
 
     if(!pde->inMemory) { /* Need to allocate a page table */
@@ -294,6 +384,8 @@ PUBLIC void VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr) {
     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
     VirtualMemory_setPTE(pte, physicalAddr);
     VirtualMemory_invalidateTLBEntry(virtualAddr);
+
+    return virtualAddr;
 
 }
 
