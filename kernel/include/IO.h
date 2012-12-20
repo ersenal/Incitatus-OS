@@ -45,9 +45,23 @@
 |                  outW     n = 2
 |                  outB     n = 1
 \------------------------------------------------------------------------*/
-void IO_outL(u16int port, u32int value);
-void IO_outW(u16int port, u16int value);
-void IO_outB(u16int port, u8int value);
+static inline void IO_outB(u16int port, u8int value) {
+
+    asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
+
+}
+
+static inline void IO_outW(u16int port, u16int value) {
+
+    asm volatile ("outw %1, %0" : : "dN" (port), "a" (value));
+
+}
+
+static inline void IO_outL(u16int port, u32int value) {
+
+    asm volatile ("outl %1, %0" : : "dN" (port), "a" (value));
+
+}
 
 /*-------------------------------------------------------------------------
 | I/O Read
@@ -62,7 +76,28 @@ void IO_outB(u16int port, u8int value);
 |                  inW     n = 2
 |                  inB     n = 1
 \------------------------------------------------------------------------*/
-u8int IO_inB(u16int port);
-u16int IO_inW(u16int port);
-u32int IO_inL(u16int port);
+static inline u8int IO_inB(u16int port) {
+
+    u8int ret;
+    asm volatile("inb %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
+
+}
+
+static inline u16int IO_inW(u16int port) {
+
+    u16int ret;
+    asm volatile("inw %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
+
+}
+
+static inline u32int IO_inL(u16int port) {
+
+    u32int ret;
+    asm volatile("inl %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
+
+}
+
 #endif

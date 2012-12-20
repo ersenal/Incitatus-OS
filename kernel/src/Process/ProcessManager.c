@@ -91,7 +91,7 @@ PUBLIC void ProcessManager_switch(Regs* context) {
         return;
 
     /* Do context switch */
-    VirtualMemory_switchPageDir(next->pageDir);
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     Debug_assert(next->kernelStack != NULL);
     asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store new process ESP in DR0 register */
 

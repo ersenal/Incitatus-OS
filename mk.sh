@@ -7,7 +7,6 @@ nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 
 $C_Compiler $CFlags -o kernel.o  -c   kernel/src/Kernel.c
-$C_Compiler $CFlags -o io.o      -c   kernel/src/IO.c
 $C_Compiler $CFlags -o sys.o     -c   kernel/src/Sys.c
 $C_Compiler $CFlags -o module.o  -c   kernel/src/Module.c
 
@@ -41,7 +40,6 @@ $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
-                                                                        io.o \
                                                                         vga.o \
                                                                         console.o \
                                                                         sys.o \
