@@ -190,10 +190,33 @@ PRIVATE void VirtualMemory_setPaging(bool state) {
     CPU_setCR(0, FORCE_CAST(reg, u32int));
 
 }
+#include <Process/Mutex.h>
+PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
 
-PRIVATE void VirtualMemory_pageFaultHandler(void) {
+    Process* process;
+    asm volatile("mov %%DR1, %0" : "=a" (process)); /* Retrieve current process pointer from DR1 register */
+    Debug_assert(process != NULL);
 
-    Sys_panic("Page fault!");
+    u32int faultAddr;
+    asm volatile("mov %%CR2, %0" : "=a" (faultAddr)); /* Retrieve the address that raised the page fault */
+
+    Console_setColor(CONSOLE_ERROR);
+    Console_printf("%s", "Process page fault!\n");
+    Console_printf("%s%d%c", "pid: ", process->pid, '\n');
+    Console_printf("%s%d%c%d%c", "cs-eip: ", regs->cs, ':' ,regs->eip, '\n');
+    Console_printf("%s%d%c", "address: ", faultAddr, '\n');
+
+    if(process->pid == KERNEL_PID) { /* Panic if it is the kernel process */
+
+        Sys_panic("Page fault!");
+
+    } else { /* User process, kill it */
+
+        bool processKilled = FALSE;
+        Debug_assert(processKilled);
+
+    }
+
 
 }
 

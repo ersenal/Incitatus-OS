@@ -5,4 +5,6 @@ qemu-system-i386        \
     -m 16              \
     -cdrom bin/image.iso\
     -monitor stdio      \
+    #-s                  \
+    #-S                  \
 

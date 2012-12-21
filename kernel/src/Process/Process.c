@@ -31,7 +31,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
 
     Regs registers;
 
-    if(mode == 1) { /* User process */
+    if(mode == USER_PROCESS) { /* User process */
 
         self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
         registers.eflags = 0x200; /* Interrupt enable flag */

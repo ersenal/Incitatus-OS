@@ -107,7 +107,7 @@ IDT_exceptionHandlerCommon:
 
     popa                     ; Restore register state, Pop EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX
     add esp, 8               ; Drop interrupt number and error code
-    iret                     ; Restore CS:IP and EFLAGS
+    iret                     ; Restore CS:EIP and EFLAGS
 
 ; Common IRQ handler
 ; Save processor state, set segments and call C-handler and then restore stack frame
@@ -158,7 +158,7 @@ IDT_irqHandlerCommon:
 
     popa                     ; Restore register state, Pop EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX
     add esp, 8               ; Drop interrupt number and error code
-    iret                     ; Restore CS:IP and EFLAGS
+    iret                     ; Restore CS:EIP and EFLAGS
 
 ; Only interrupts 8, 10-14 inclusive push error codes onto the stack
 ; For others use a dummy error code 0

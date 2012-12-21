@@ -59,19 +59,19 @@ PRIVATE void Test4() {
 PRIVATE void ProcessManager_init(void) {
 
     /* Create kernel process and add to scheduler */
-    Process* initialProcess = Process_new(0, "Test", NULL, 0);
+    Process* initialProcess = Process_new(KERNEL_PID, "Test", NULL, KERNEL_PROCESS);
     Scheduler_addProcess(initialProcess);
 
-    Process* test1 = Process_new(1, "Test1", Test1, 1);
+    Process* test1 = Process_new(1, "Test1", Test1, USER_PROCESS);
     Scheduler_addProcess(test1);
 
-    Process* test2 = Process_new(2, "Test2", Test2, 1);
+    Process* test2 = Process_new(2, "Test2", Test2, USER_PROCESS);
     Scheduler_addProcess(test2);
 
-    Process* test3 = Process_new(3, "Test3", Test3, 1);
+    Process* test3 = Process_new(3, "Test3", Test3, USER_PROCESS);
     Scheduler_addProcess(test3);
 
-    Process* test4 = Process_new(4, "Test4", Test4, 1);
+    Process* test4 = Process_new(4, "Test4", Test4, USER_PROCESS);
     Scheduler_addProcess(test4);
 
 }
@@ -94,6 +94,7 @@ PUBLIC void ProcessManager_switch(Regs* context) {
     VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     Debug_assert(next->kernelStack != NULL);
     asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store new process ESP in DR0 register */
+    asm volatile("mov %0, %%DR1" : : "r" (next)); /* Store process pointer in DR1 register */
 
 }
 
