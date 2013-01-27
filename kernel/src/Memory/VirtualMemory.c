@@ -28,6 +28,7 @@
 #define PTE_INDEX(x) ((u32int) x >> 12  & 0x03FF)
 #define ADDR_TO_FRAME_INDEX(addr) ((u32int) addr / FRAME_SIZE)
 #define FRAME_INDEX_TO_ADDR(index) ((void*) (index * FRAME_SIZE))
+#define TEMPORARY_MAP_VADDR 0xF00000
 
 /*=======================================================
     STRUCT
@@ -190,7 +191,7 @@ PRIVATE void VirtualMemory_setPaging(bool state) {
     CPU_setCR(0, FORCE_CAST(reg, u32int));
 
 }
-#include <Process/Mutex.h>
+
 PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
 
     Process* process;
@@ -302,8 +303,8 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     Debug_assert(process != NULL);
 
     PageDirectory* pageDir = (PageDirectory*) process->pageDir;
-    pageDir = VirtualMemory_mapPage((void*) 0xF00000, pageDir); /* Map it so that we can access it */
-    PageDirectory* kDir = VirtualMemory_mapPage((void*) 0xF01000, (void*) kernelDir); /* Map it so that we can access it */
+    pageDir = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, pageDir); /* Map it so that we can access it */
+    PageDirectory* kDir = VirtualMemory_mapPage((void*) (TEMPORARY_MAP_VADDR + 0x1000), (void*) kernelDir); /* Map it so that we can access it */
 
     /* Map bottom 4MB */
     PageDirectoryEntry* pde = &pageDir->entries[0];
@@ -324,8 +325,8 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     }
 
     /* Unmap temporary mappings */
-    VirtualMemory_unmapPage((void*) 0xF00000);
-    VirtualMemory_unmapPage((void*) 0xF01000);
+    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
+    VirtualMemory_unmapPage((void*) (TEMPORARY_MAP_VADDR + 0x1000));
 
 }
 
@@ -335,7 +336,7 @@ PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
 
     PageDirectory* dir = (PageDirectory*) PhysicalMemory_allocateFrame();
     process->pageDir = dir;
-    dir = VirtualMemory_mapPage((void*) 0xF00000, dir); /* Map it so that we can access it */
+    dir = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, dir); /* Map it so that we can access it */
     Memory_set(dir, 0, sizeof(PageDirectory));
 
     /* Map directory to last virtual 4MB - recursive mapping, lets us manipulate the page directory after paging is enabled */
@@ -348,7 +349,7 @@ PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
     for(int i = 0; i < 1023; i++)
         dir->entries[i].mode = 1;
 
-    VirtualMemory_unmapPage((void*) 0xF00000);
+    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
 
 }
 
@@ -360,14 +361,14 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
     for(int i = PDE_INDEX(KERNEL_HEAP_TOP_VADDR); i < 1024; i++) {
 
         /* Map page directory so that we can access it */
-        PageDirectory* dir = (PageDirectory*) VirtualMemory_mapPage(0, process->pageDir);
+        PageDirectory* dir = (PageDirectory*) VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, process->pageDir);
         PageDirectoryEntry* pde = &dir->entries[i];
 
         if(pde->inMemory) {
 
             PageTable* pageTable = (PageTable*) FRAME_INDEX_TO_ADDR(pde->frameIndex);
             Debug_assert(pageTable != NULL);
-            pageTable = VirtualMemory_mapPage(0, pageTable); /* Map page table so that we can access it */
+            pageTable = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, pageTable); /* Map page table so that we can access it */
 
             /* Free all page table entries*/
             for(int y = 0; y < 1024; y++) {
@@ -390,7 +391,7 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
 
     }
 
-    VirtualMemory_unmapPage(0);
+    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
     PhysicalMemory_freeFrame(process->pageDir);
 
 }

@@ -34,6 +34,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
     if(mode == USER_PROCESS) { /* User process */
 
         self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
+
         registers.eflags = 0x200; /* Interrupt enable flag */
         registers.eip    = (u32int) entry; /* Initial code entry point */
         registers.intNo  = IRQ0;
@@ -47,7 +48,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
         registers.esp0   = 0;
         registers.ss0    = 0;
 
-        /* Allocate kernel stack */
+        /* Allocate kernel stack - 4KB */
         u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
         Debug_assert(stack != NULL);
         self->kernelStackBase = stack;
@@ -62,7 +63,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
         /* Map kernel bottom 4MB + kernel heap */
         VirtualMemory_mapKernel(self);
 
-        /* Allocate and map user stack */
+        /* Allocate and map user stack - Currently 4KB */
         Debug_assert(USER_STACK_SIZE % FRAME_SIZE == 0);
         for(int i = 0; i < USER_STACK_SIZE / FRAME_SIZE; i++) {
 

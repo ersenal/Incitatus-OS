@@ -46,7 +46,6 @@ struct Process {
     FUNCTION
 =========================================================*/
 Process* Process_new(u32int id, char* name, void* entry, bool mode);
-void Process_printRegisters(Process* process);
 void Process_destroy(Process* self);
 
 #endif
