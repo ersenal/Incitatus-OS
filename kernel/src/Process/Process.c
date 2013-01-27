@@ -29,14 +29,14 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
     Debug_assert(self != NULL);
     self->pid = id;
 
-    Regs registers;
-    Memory_set(&registers, 0, sizeof(Regs));
-
     if(mode == USER_PROCESS) { /* User process */
+
+        Regs registers;
+        Memory_set(&registers, 0, sizeof(Regs));
 
         self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
 
-        registers.eflags = 0x200; /* Interrupt enable flag */
+        registers.eflags = 0x202; /* Interrupt enable flag */
         registers.eip    = (u32int) entry; /* Initial code entry point */
         registers.intNo  = IRQ0;
         registers.cs     = KERNEL_CODE_SEGMENT;
@@ -77,14 +77,6 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
     } else { /* Kernel process */
 
         self->pageDir = VirtualMemory_getKernelDir();
-
-        registers.eflags = 0x200; /* Interrupt enable flag */
-        registers.intNo  = IRQ0;
-        registers.cs     = KERNEL_CODE_SEGMENT;
-        registers.ds     = KERNEL_DATA_SEGMENT;
-        registers.es     = KERNEL_DATA_SEGMENT;
-        registers.fs     = KERNEL_DATA_SEGMENT;
-        registers.gs     = KERNEL_DATA_SEGMENT;
 
     }
 
