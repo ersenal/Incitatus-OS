@@ -82,9 +82,11 @@ PUBLIC void ProcessManager_switch(Regs* context) {
     Process* currentProcess = Scheduler_getCurrentProcess();
     Debug_assert(currentProcess != NULL);
     currentProcess->kernelStack = context;
+    currentProcess->status = PROCESS_WAITING;
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
+    next->status = PROCESS_RUNNING;
     Debug_assert(next != NULL);
 
     if(currentProcess == next) /* No need for a context switch */

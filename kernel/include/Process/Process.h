@@ -22,9 +22,20 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-#define KERNEL_PID     0
+
+/* Kernel process id */
+#define KERNEL_PID 0
+
+/* Process Type */
 #define KERNEL_PROCESS 0
 #define USER_PROCESS   1
+
+/* Process State */
+#define PROCESS_CREATED     1
+#define PROCESS_WAITING     2
+#define PROCESS_RUNNING     3
+#define PROCESS_BLOCKED     4
+#define PROCESS_TERMINATED  5
 
 /*=======================================================
     STRUCT
@@ -34,7 +45,8 @@ typedef struct Process Process;
 struct Process {
 
     u32int pid;
-    char   name[32];
+    u8int  status;
+    char   name[64];
     void*  userHeapBase;
     void*  kernelStack;
     void*  kernelStackBase;

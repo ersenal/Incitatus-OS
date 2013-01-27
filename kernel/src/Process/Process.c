@@ -30,6 +30,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
     self->pid = id;
 
     Regs registers;
+    Memory_set(&registers, 0, sizeof(Regs));
 
     if(mode == USER_PROCESS) { /* User process */
 
@@ -87,6 +88,7 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
 
     }
 
+    self->status = PROCESS_CREATED;
     return self;
 
 }

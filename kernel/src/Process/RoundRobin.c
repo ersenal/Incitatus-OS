@@ -40,6 +40,7 @@ PUBLIC void RoundRobin_addProcess(Process* process) {
 
     }
 
+    process->status = PROCESS_WAITING;
     LinkedList_push(processes, process);
 
 }
@@ -49,6 +50,7 @@ PUBLIC void RoundRobin_removeProcess(Process* process) {
     Debug_assert(process != NULL && processes != NULL);
 
     LinkedList_remove(processes, process);
+    process->status = PROCESS_TERMINATED;
     Process_destroy(process);
 
 }
@@ -57,6 +59,9 @@ PUBLIC Process* RoundRobin_getNextProcess(void) {
 
     /* Remove process from head of queue and add as the last element */
     Process* p = LinkedList_removeFromFront(processes);
+
+    Debug_assert(p->status == PROCESS_WAITING);
+
     LinkedList_push(processes, p);
     currentProcess = p;
     return p;
