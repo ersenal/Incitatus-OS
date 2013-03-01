@@ -14,7 +14,6 @@
 
 
 #include <Drivers/Keyboard.h>
-#include <Common.h>
 #include <Drivers/PS2Controller.h>
 #include <Debug.h>
 #include <X86/IDT.h>
@@ -57,6 +56,19 @@
 #define KB_M_SCAN_ENABLE_0  "Keyboard scan could not be enabled"
 
 /*=======================================================
+    STRUCT
+=========================================================*/
+typedef struct LedStatusByte LedStatusByte;
+
+struct LedStatusByte {
+
+    bool  scrollLock  : 1; /* Is scroll lock on? */
+    bool  numberLock  : 1; /* Is number lock on? */
+    bool  capsLock    : 1; /* Is caps lock on? */
+    u8int             : 5;
+};
+
+/*=======================================================
     FUNCTION
 =========================================================*/
 
@@ -84,6 +96,15 @@ PRIVATE void Keyboard_callback(void) {
 
     u8int scanCode = PS2Controller_receive(PS2_DATA); /* get the pressed scan code */
     Console_printChar(scanCode);
+
+}
+
+PUBLIC void Keyboard_setLeds (bool numLock, bool capsLock, bool scrollLock) {
+
+    LedStatusByte byte = {scrollLock, numLock, capsLock};
+
+    Keyboard_sendCommand(KB_C_SET_LED);
+    Keyboard_sendCommand(FORCE_CAST(byte, u8int));
 
 }
 
@@ -120,4 +141,6 @@ PUBLIC void Keyboard_init(void) {
     /* Unmask IRQ1 */
     PIC8259_setMask(1, CLEAR_MASK);
 
+    /* Set leds to default state */
+    Keyboard_setLeds(FALSE, FALSE, FALSE);
 }

@@ -16,6 +16,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include <Common.h>
+
 /*-------------------------------------------------------------------------
 | Keyboard driver installation
 |--------------------------------------------------------------------------
@@ -25,4 +27,15 @@
 |
 \------------------------------------------------------------------------*/
 void Keyboard_init(void);
+
+/*-------------------------------------------------------------------------
+| Keyboard set leds
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Sets the keyboard led status.
+|
+| PARAMS:          'numLock'    -\
+|                  'capsLock'   -=> TRUE = Turn on, FALSE = Turn off.
+|                  'scrollLock' -/
+\------------------------------------------------------------------------*/
+void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock);
 #endif
