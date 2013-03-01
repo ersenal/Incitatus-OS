@@ -129,6 +129,7 @@ PRIVATE void Mouse_callback(void) {
         if(packet.byte0.xOverflow || packet.byte0.yOverflow) break;
 
         /* mouse packet ready to use */
+        // Console_printf("%d%c%d", packet.byte1.xMovement, ',', packet.byte2.yMovement);
         break;
 
     }
@@ -167,5 +168,8 @@ PUBLIC void Mouse_init(void) {
 
     /* Unmask IRQ12 */
     PIC8259_setMask(12, CLEAR_MASK);
+
+    /* Also unmask IRQ2 - cascade IRQ(enables access to slave IRQs ranging 8 - 15) */
+    PIC8259_setMask(2, CLEAR_MASK);
 
 }

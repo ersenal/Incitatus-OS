@@ -128,15 +128,6 @@ PRIVATE void PS2Controller_writeConfigByte(void) {
 
 }
 
-/*-------------------------------------------------------------------------
-| Initialise PS/2
-|--------------------------------------------------------------------------
-| DESCRIPTION:     Sets up PS/2 devices(mouse and keyboard) and PS/2
-|                  controller.
-|
-| NOTES:           PS/2 keyboard and mouse input will not be processed
-|                  unless this function is called first.
-\------------------------------------------------------------------------*/
 PRIVATE void PS2Controller_init(void) {
 
     /* disable both PS/2 ports */
