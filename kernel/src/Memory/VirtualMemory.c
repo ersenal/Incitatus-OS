@@ -30,6 +30,8 @@
 #define FRAME_INDEX_TO_ADDR(index) ((void*) (index * FRAME_SIZE))
 #define TEMPORARY_MAP_VADDR 0xF00000
 
+#define KERNEL_HEAP_MAP_SIZE_MB  32
+
 /*=======================================================
     STRUCT
 =========================================================*/
@@ -313,8 +315,8 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     pde->inMemory = TRUE;
     pde->rwFlag = TRUE;
 
-    /* Map kernel heap, first 32MB */
-    for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + 8; i++) {
+    /* Map kernel heap, starting from  (KERNEL_HEAP_BASE_VADDR) to (KERNEL_HEAP_BASE_VADDR + KERNEL_HEAP_MAP_SIZE_MB) */
+    for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + KERNEL_HEAP_MAP_SIZE_MB / 4; i++) {
 
         pde = &pageDir->entries[i];
         Memory_set(pde, 0, sizeof(PageDirectoryEntry));

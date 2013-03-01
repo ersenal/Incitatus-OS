@@ -35,6 +35,7 @@
 #define MODULE_HEAP         108
 #define MODULE_SCHEDULER    109
 #define MODULE_PROCESS      110
+#define MODULE_PS2          111
 
 /*=======================================================
     STRUCT

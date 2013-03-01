@@ -28,6 +28,7 @@
 #include <Memory/HeapMemory.h>
 #include <Process/Scheduler.h>
 #include <Process/ProcessManager.h>
+#include <Drivers/PS2Controller.h>
 
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
@@ -50,8 +51,9 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         PhysicalMemory_getModule(mbInfo, &mbHead),
         VirtualMemory_getModule(),
         HeapMemory_getModule(),
+        PS2Controller_getModule(),
         Scheduler_getModule(),
-        ProcessManager_getModule()
+        ProcessManager_getModule(),
 
     };
 
@@ -60,12 +62,8 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
     Sys_enableInterrupts();
 
-    while(1) {
-
-        Console_printString("Kernel process says hi!\n");
+    while(1)
         Sys_haltCPU();
-
-    }
 
     Sys_panic("Should not reach here!");
 }

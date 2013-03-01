@@ -4,21 +4,17 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| PIC8259.h
+| PS2Controller.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Provides an interface for Intel 8259 programmable interrupt
-|               controller.
+| DESCRIPTION:  PS/2 Controller driver.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
-|
-|               TYPE comments source:
-|                   http://stanislavs.org/helppc/8259.html
 \------------------------------------------------------------------------*/
 
 
-#ifndef PIC_H
-#define PIC_H
+#ifndef PS2_H
+#define PS2_H
 
 #include <Common.h>
 #include <Module.h>
@@ -26,38 +22,42 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-#define CLEAR_MASK 0
-#define SET_MASK   1
+
+/* PS/2 IO ports */
+#define PS2_DATA     0x60 /* used for reading/writing data from PS/2 device or PS/2 controller */
+#define PS2_PORTB    0x61 /* used for controlling various parts of the chipset */
+#define PS2_STATE    0x64 /* used for retrieving/changing the state of PS/2 controller */
 
 /*=======================================================
     FUNCTION
 =========================================================*/
 
 /*-------------------------------------------------------------------------
-| Set IRQ mask
+| Send PS/2 command
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Masks a given IRQ.
+| DESCRIPTION:  Sends a command byte to specified PS/2 port.
 |
-| PARAM:           "irqNo"   the irq to mask
-|                  "state"   0 = unmasked, 1 = masked
+| PARAM:        "port"      ps/2 port to send command to
+|               "command"   command byte
 \------------------------------------------------------------------------*/
-void PIC8259_setMask(u8int irqNo, bool state);
+void PS2Controller_send(u8int port, u8int command);
 
 /*-------------------------------------------------------------------------
-| End of interrupt
+| Receive PS/2 data
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Sends an end of interrupt command to appropriate PIC
-|                  (or PICs if the request originated from slave)
+| DESCRIPTION:  Retrieves a data byte from "port".
 |
-| PARAM:           "interruptNo"  the interrupt number of IRQ
+| PARAM:        "port"  port to receive data from
+|
+| RETURN:       u8int   retrieved data byte
 \------------------------------------------------------------------------*/
-void PIC8259_sendEOI(u8int interruptNo);
+u8int PS2Controller_receive(u8int port);
 
 /*-------------------------------------------------------------------------
-| Get PIC module
+| Get PS/2 controller module
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Returns the PIC module.
+| DESCRIPTION:    Returns the PS/2 controller module.
+|
 \------------------------------------------------------------------------*/
-Module* PIC8259_getModule(void);
-
+Module* PS2Controller_getModule(void);
 #endif

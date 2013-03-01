@@ -199,7 +199,7 @@ PUBLIC void PIC8259_setMask(u8int irqNo, bool state) {
 
     }
 
-    if(state == 0) /* Clear mask */
+    if(state == CLEAR_MASK) /* Clear mask */
         ocw1 = IO_inB(port) & ~(1 << irqNo);
     else /* Set mask */
         ocw1 = IO_inB(port) | (1 << irqNo);

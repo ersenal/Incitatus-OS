@@ -12,6 +12,9 @@ $C_Compiler $CFlags -o module.o  -c   kernel/src/Module.c
 
 $C_Compiler $CFlags -o vga.o     -c   kernel/src/Drivers/VGA.c
 $C_Compiler $CFlags -o console.o -c   kernel/src/Drivers/Console.c
+$C_Compiler $CFlags -o ps2.o     -c   kernel/src/Drivers/PS2Controller.c
+$C_Compiler $CFlags -o kbd.o     -c   kernel/src/Drivers/Keyboard.c
+$C_Compiler $CFlags -o mouse.o   -c   kernel/src/Drivers/Mouse.c
 
 $C_Compiler $CFlags -o gdt.o     -c   kernel/src/X86/GDT.c
 $C_Compiler $CFlags -o pic.o     -c   kernel/src/X86/PIC8259.c
@@ -66,7 +69,9 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         sched.o \
                                                                         rr.o \
                                                                         pm.o \
-
+                                                                        kbd.o \
+                                                                        mouse.o \
+                                                                        ps2.o
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
 
