@@ -466,12 +466,16 @@ PUBLIC void* VirtualMemory_getPhysicalAddress(void* virtualAddr) {
 
 PUBLIC Module* VirtualMemory_getModule(void) {
 
-    vmmModule.moduleName = "Virtual Memory Manager";
-    vmmModule.moduleID = MODULE_VMM;
-    vmmModule.init = &VirtualMemory_init;
-    vmmModule.numberOfDependencies = 2;
-    vmmModule.dependencies[0] = MODULE_IDT;
-    vmmModule.dependencies[1] = MODULE_PMM;
+    if(!vmmModule.isLoaded) {
+
+        vmmModule.moduleName = "Virtual Memory Manager";
+        vmmModule.moduleID = MODULE_VMM;
+        vmmModule.init = &VirtualMemory_init;
+        vmmModule.numberOfDependencies = 2;
+        vmmModule.dependencies[0] = MODULE_IDT;
+        vmmModule.dependencies[1] = MODULE_PMM;
+
+    }
 
     return &vmmModule;
 

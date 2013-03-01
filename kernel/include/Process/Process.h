@@ -7,7 +7,7 @@
 | Process.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Handles process creation, destruction.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/

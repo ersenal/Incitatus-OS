@@ -106,11 +106,15 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
 PUBLIC Module* HeapMemory_getModule(void) {
 
-    heapModule.moduleName = "Kernel Heap Manager";
-    heapModule.init = &HeapMemory_init;
-    heapModule.moduleID = MODULE_HEAP;
-    heapModule.numberOfDependencies = 1;
-    heapModule.dependencies[0] = MODULE_VMM;
+    if(!heapModule.isLoaded) {
+
+        heapModule.moduleName = "Kernel Heap Manager";
+        heapModule.init = &HeapMemory_init;
+        heapModule.moduleID = MODULE_HEAP;
+        heapModule.numberOfDependencies = 1;
+        heapModule.dependencies[0] = MODULE_VMM;
+
+    }
 
     return &heapModule;
 }

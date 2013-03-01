@@ -237,9 +237,13 @@ PRIVATE void GDT_init(void) {
 
 PUBLIC Module* GDT_getModule(void) {
 
-    gdtModule.init = &GDT_init;
-    gdtModule.moduleName = "Global Descriptor Table";
-    gdtModule.moduleID = MODULE_GDT;
+    if(!gdtModule.isLoaded) {
+
+        gdtModule.init = &GDT_init;
+        gdtModule.moduleName = "Global Descriptor Table";
+        gdtModule.moduleID = MODULE_GDT;
+
+    }
 
     return &gdtModule;
 }

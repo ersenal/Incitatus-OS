@@ -7,7 +7,7 @@
 | ProcessManager.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Handles context switch.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/

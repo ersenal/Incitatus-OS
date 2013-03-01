@@ -295,12 +295,16 @@ PUBLIC void IDT_handlerIRQ(Regs* regs) {
 
 PUBLIC Module* IDT_getModule(void) {
 
-    idtModule.init = &IDT_init;
-    idtModule.moduleName = "Interrupt Descriptor Table";
-    idtModule.moduleID = MODULE_IDT;
-    idtModule.numberOfDependencies = 2;
-    idtModule.dependencies[0] = MODULE_GDT;
-    idtModule.dependencies[1] = MODULE_PIC8259;
+    if(!idtModule.isLoaded) {
+
+        idtModule.init = &IDT_init;
+        idtModule.moduleName = "Interrupt Descriptor Table";
+        idtModule.moduleID = MODULE_IDT;
+        idtModule.numberOfDependencies = 2;
+        idtModule.dependencies[0] = MODULE_GDT;
+        idtModule.dependencies[1] = MODULE_PIC8259;
+
+    }
 
     return &idtModule;
 }

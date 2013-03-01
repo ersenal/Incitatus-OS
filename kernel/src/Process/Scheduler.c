@@ -7,7 +7,7 @@
 | Scheduler.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Process scheduler interface.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -47,11 +47,15 @@ PRIVATE void Scheduler_init(void) {
 
 PUBLIC Module* Scheduler_getModule(void) {
 
-    schedulerModule.moduleName = "Process Scheduler";
-    schedulerModule.moduleID = MODULE_SCHEDULER;
-    schedulerModule.init = &Scheduler_init;
-    schedulerModule.numberOfDependencies = 1;
-    schedulerModule.dependencies[0] = MODULE_HEAP;
+    if(!schedulerModule.isLoaded) {
+
+        schedulerModule.moduleName = "Process Scheduler";
+        schedulerModule.moduleID = MODULE_SCHEDULER;
+        schedulerModule.init = &Scheduler_init;
+        schedulerModule.numberOfDependencies = 1;
+        schedulerModule.dependencies[0] = MODULE_HEAP;
+
+    }
 
     return &schedulerModule;
 

@@ -7,7 +7,7 @@
 | Scheduler.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Process scheduler interface.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/

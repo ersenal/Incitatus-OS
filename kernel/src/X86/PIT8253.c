@@ -112,10 +112,16 @@ PRIVATE void PIT8253_timerHandler(Regs* regs) {
 
     tick++;
 
-    if(tick % 2 == 0) /* context switch every 20ms */
-        ProcessManager_switch(regs);
-    else /* Set DR0(stores process ESP) to NULL if we don't call the scheduler */
-        asm volatile("mov %0, %%DR0" : : "a" (0));
+     /* Do context switch only if the process management module is loaded */
+    if(ProcessManager_getModule()->isLoaded) {
+
+      if(tick % 2 == 0) /* context switch every 20ms */
+          ProcessManager_switch(regs);
+      else /* Set DR0(stores process ESP) to NULL if we don't call the scheduler */
+          asm volatile("mov %0, %%DR0" : : "a" (0));
+
+    }
+
 }
 
 PRIVATE void PIT8253_init(void) {
@@ -164,11 +170,15 @@ PUBLIC void PIT8253_sleep(u32int ms) {
 
 PUBLIC Module* PIT8253_getModule(void) {
 
-    pitModule.moduleName = "8253 PIT";
-    pitModule.moduleID = MODULE_PIT8253;
-    pitModule.init = &PIT8253_init;
-    pitModule.numberOfDependencies = 1;
-    pitModule.dependencies[0] = MODULE_IDT;
+    if(!pitModule.isLoaded) {
+
+      pitModule.moduleName = "8253 PIT";
+      pitModule.moduleID = MODULE_PIT8253;
+      pitModule.init = &PIT8253_init;
+      pitModule.numberOfDependencies = 1;
+      pitModule.dependencies[0] = MODULE_IDT;
+
+    }
 
     return &pitModule;
 }

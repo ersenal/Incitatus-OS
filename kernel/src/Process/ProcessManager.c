@@ -7,7 +7,7 @@
 | ProcessManager.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Handles context switch.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -86,8 +86,8 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
-    next->status = PROCESS_RUNNING;
     Debug_assert(next != NULL);
+    next->status = PROCESS_RUNNING;
 
     if(currentProcess == next) /* No need for a context switch */
         return;
@@ -102,11 +102,15 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
 PUBLIC Module* ProcessManager_getModule(void) {
 
-    pmModule.moduleName = "Process Manager";
-    pmModule.init = &ProcessManager_init;
-    pmModule.moduleID = MODULE_PROCESS;
-    pmModule.numberOfDependencies = 1;
-    pmModule.dependencies[0] = MODULE_SCHEDULER;
+    if(!pmModule.isLoaded) {
+
+        pmModule.moduleName = "Process Manager";
+        pmModule.init = &ProcessManager_init;
+        pmModule.moduleID = MODULE_PROCESS;
+        pmModule.numberOfDependencies = 1;
+        pmModule.dependencies[0] = MODULE_SCHEDULER;
+
+    }
 
     return &pmModule;
 }

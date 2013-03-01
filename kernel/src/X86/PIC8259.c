@@ -218,9 +218,13 @@ PUBLIC void PIC8259_sendEOI(u8int interruptNo) {
 
 PUBLIC Module* PIC8259_getModule(void) {
 
-    picModule.moduleName = "8259A PIC";
-    picModule.init = &PIC8259_init;
-    picModule.moduleID = MODULE_PIC8259;
+    if(!picModule.isLoaded) {
+
+        picModule.moduleName = "8259A PIC";
+        picModule.init = &PIC8259_init;
+        picModule.moduleID = MODULE_PIC8259;
+
+    }
 
     return &picModule;
 }

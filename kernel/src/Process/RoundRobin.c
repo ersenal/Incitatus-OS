@@ -7,7 +7,7 @@
 | RoundRobin.c (implements Scheduler)
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:
+| DESCRIPTION:  Round robin process scheduler implementation.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
