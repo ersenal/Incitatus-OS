@@ -17,12 +17,12 @@
 #include <Drivers/Console.h>
 #include <Common.h>
 #include <IO.h>
+#include <Drivers/PS2Controller.h>
 
 /*=======================================================
     DEFINE
 =========================================================*/
 #define SYS_C_RESET 0xFE
-#define PS2_STATE   0x64
 
 /*=======================================================
     FUNCTION

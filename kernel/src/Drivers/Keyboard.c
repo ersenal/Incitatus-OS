@@ -25,6 +25,28 @@
 
 #define KB_INT  33 /* PS/2 keyboard interrupt number(IRQ 1) */
 
+/* Special keys */
+#define KB_K_LCTRL      0x1D
+#define KB_K_LALT       0x38
+#define KB_K_LSHIFT     0x2A
+#define KB_K_LSHIFT_OFF 0xAA
+#define KB_K_RSHIFT     0x36
+#define KB_K_F1         0x3B
+#define KB_K_F2         0x3C
+#define KB_K_F3         0x3D
+#define KB_K_F4         0x3E
+#define KB_K_F5         0x3F
+#define KB_K_F6         0x40
+#define KB_K_F7         0x41
+#define KB_K_F8         0x42
+#define KB_K_F9         0x43
+#define KB_K_F10        0x44
+#define KB_K_F11        0x57
+#define KB_K_F12        0x58
+#define KB_K_CAPS       0x3A
+#define KB_K_NUM        0x45
+#define KB_K_SCROLL     0x46
+
 /** Command Bytes - sent from PS/2 controller to keyboard */
 #define KB_C_SET_LED        0xED /* accompanied by a data byte (SL, NL, CL) */
 #define KB_C_ECHO           0xEE /* keyboard echoes back 0xEE */
@@ -58,7 +80,17 @@
 /*=======================================================
     STRUCT
 =========================================================*/
+typedef struct KeyState KeyState;
 typedef struct LedStatusByte LedStatusByte;
+
+struct KeyState {
+
+    bool  scrollLock; /* Is scroll lock on? */
+    bool  numberLock; /* Is number lock on? */
+    bool  capsLock;   /* Is caps lock on? */
+    bool  shift;      /* Is shift pressed? */
+
+};
 
 struct LedStatusByte {
 
@@ -66,6 +98,49 @@ struct LedStatusByte {
     bool  numberLock  : 1; /* Is number lock on? */
     bool  capsLock    : 1; /* Is caps lock on? */
     u8int             : 5;
+};
+
+/*=======================================================
+    PRIVATE DATA
+=========================================================*/
+PRIVATE KeyState keyState;
+
+/* Scan code set 1 - shift or caps */
+PRIVATE const u8int upperMap[256] = {
+
+    0,  27, '!', '"', 0,  '$', '%', '^',  '&', '*', '(', ')', '_', '+', '\b', '\t', 'Q', 'W',  'E', 'R',
+    'T', 'Y', 'U', 'I',  'O',  'P', '{', '}', '\n',   0, 'A', 'S', 'D', 'F',  'G',  'H', 'J', 'K',  'L', ':',
+    '@', '~',  0, '~',  'Z',  'X', 'C', 'V',  'B', 'N', 'M', '<', '>', '?',   0,   '*',   0, ' ',    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0, '-',     0,   0,   0,  '+',   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0
+
+};
+
+/* Scan code set 1 - normal */
+PRIVATE const u8int lowerMap[256] = {
+
+    0,  27, '1', '2',  '3',  '4', '5', '6',  '7', '8', '9', '0', '-', '=', '\b', '\t', 'q', 'w',  'e', 'r',
+    't', 'y', 'u', 'i',  'o',  'p', '[', ']', '\n',   0, 'a', 's', 'd', 'f',  'g',  'h', 'j', 'k',  'l', ';',
+    '\'', '`',  0, '#',  'z',  'x', 'c', 'v',  'b', 'n', 'm', ',', '.', '/',   0,   '*',   0, ' ',    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0, '-',     0,   0,   0,  '+',   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0,   0,   0,    0,   0,
+    0,   0,   0,   0,   0,     0,   0,   0,    0,   0,   0,   0,   0,   0,   0,     0
+
 };
 
 /*=======================================================
@@ -95,7 +170,56 @@ PRIVATE bool Keyboard_sendCommand(u8int command) {
 PRIVATE void Keyboard_callback(void) {
 
     u8int scanCode = PS2Controller_receive(PS2_DATA); /* get the pressed scan code */
-    Console_printChar(scanCode);
+
+    switch(scanCode) {
+
+        case KB_K_LSHIFT:
+            keyState.shift = TRUE;
+            break;
+
+        case KB_K_RSHIFT:
+            keyState.shift = TRUE;
+            break;
+
+        case KB_K_CAPS:
+            keyState.capsLock = keyState.capsLock ? FALSE : TRUE;
+            Keyboard_setLeds(keyState.numberLock, keyState.capsLock, keyState.scrollLock);
+            break;
+
+        case KB_K_NUM:
+            keyState.numberLock = keyState.numberLock ? FALSE : TRUE;
+            Keyboard_setLeds(keyState.numberLock, keyState.capsLock, keyState.scrollLock);
+            break;
+
+        case KB_K_SCROLL:
+            keyState.scrollLock = keyState.scrollLock ? FALSE : TRUE;
+            Keyboard_setLeds(keyState.numberLock, keyState.capsLock, keyState.scrollLock);
+            break;
+
+        case KB_K_LSHIFT_OFF:
+            keyState.shift = FALSE;
+            break;
+
+        default:
+            /* Check the top bit of scan code to see if a key has been released.
+             * Process only if this is not a 'release' event */
+            if(!(scanCode & 0x80)) {
+
+                u8int b;
+
+                if(keyState.shift || (keyState.capsLock && !keyState.shift))
+                    b = upperMap[scanCode];
+                else
+                    b = lowerMap[scanCode];
+
+                if(b)
+                    Console_printChar(b);
+
+            }
+
+            break;
+
+    }
 
 }
 
@@ -106,6 +230,9 @@ PUBLIC void Keyboard_setLeds (bool numLock, bool capsLock, bool scrollLock) {
     Keyboard_sendCommand(KB_C_SET_LED);
     Keyboard_sendCommand(FORCE_CAST(byte, u8int));
 
+    keyState.numberLock = numLock;
+    keyState.capsLock = capsLock;
+    keyState.scrollLock = scrollLock;
 }
 
 PUBLIC void Keyboard_init(void) {
@@ -136,6 +263,11 @@ PUBLIC void Keyboard_init(void) {
         Debug_logError("%s", KB_M_SCAN_ENABLE_0);
     }
 
+    /* set scan code set 1 */
+    Keyboard_sendCommand(KB_C_SCAN_SET);
+    Keyboard_sendCommand(1);
+
+    /* Register keyboard IRQ handler */
     IDT_registerHandler(&Keyboard_callback, KB_INT);
 
     /* Unmask IRQ1 */
