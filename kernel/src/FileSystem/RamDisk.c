@@ -224,8 +224,10 @@ PRIVATE void RamDisk_init(void) {
     tarHeaders = ArrayList_new(32);
     Tar_parseArchive((TarEntryHeader*) firstHeader);
 
+    Debug_logInfo("%s", "Testing ramdisk...");
     char * s = Tar_getFileContents((TarEntryHeader*) ArrayList_get(tarHeaders, 0));
-    Console_printString(s);
+    Debug_logInfo("%s", s);
+    HeapMemory_free(s);
 
 }
 
