@@ -53,6 +53,11 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
     Debug_assert(mbH->magic == MULTIBOOT_HEADER_MAGIC);
 
     MultibootMemEntry* entry = (MultibootMemEntry*) mbI->mmapAddr;
+    u32int initrdEnd = *(u32int*)(mbI->modsAddr + 4);
+    u32int kernelEnd = mbH->bssEndAddr;
+
+    if(initrdEnd != 0)
+        kernelEnd = initrdEnd;
 
     /* calculate total physical memory */
     while((u32int) entry <  mbI->mmapAddr + mbI->mmapLength) {
@@ -63,7 +68,7 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
     }
 
     totalFrames = totalPhysicalMemory / FRAME_SIZE; /* total number of frames = physical memory / 4kB */
-    Stack_init(&stack, (char*) mbH->bssEndAddr, totalFrames * sizeof(void *));
+    Stack_init(&stack, (char*) kernelEnd, totalFrames * sizeof(void *));
     entry = (MultibootMemEntry*) mbI->mmapAddr;
 
     /* Push usable frames to stack */
@@ -78,7 +83,7 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
                 void* frameAddr = (void*) (u32int) entry->addr + (i * FRAME_SIZE);
 
                 /* Frame 0(Starting at address 0) + Kernel + PMM stack is reserved */
-                if(frameAddr != NULL && (frameAddr < (void*) mbH->loadAddr || frameAddr > (void*) mbH->bssEndAddr + totalFrames * sizeof(void *)))
+                if(frameAddr != NULL && (frameAddr < (void*) mbH->loadAddr || frameAddr > (void*) kernelEnd + totalFrames * sizeof(void *)))
                     StackPMM_freeFrame(frameAddr);
 
             }

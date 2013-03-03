@@ -108,6 +108,11 @@ PUBLIC void BitmapPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
     Debug_assert(mbH->magic == MULTIBOOT_HEADER_MAGIC);
 
     MultibootMemEntry* entry = (MultibootMemEntry*) mbI->mmapAddr;
+    u32int initrdEnd = *(u32int*)(mbI->modsAddr + 4);
+    u32int kernelEnd = mbH->bssEndAddr;
+
+    if(initrdEnd != 0)
+        kernelEnd = initrdEnd;
 
     /* calculate total physical memory */
     while((u32int) entry <  mbI->mmapAddr + mbI->mmapLength) {
@@ -118,7 +123,7 @@ PUBLIC void BitmapPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
     }
 
     totalFrames = totalPhysicalMemory / FRAME_SIZE; /* total number of frames = physical memory / 4kB */
-    frames = (char*) mbH->bssEndAddr; /* put frames array at the end of kernel */
+    frames = (char*) kernelEnd; /* put frames array at the end of kernel */
     usedFrames = totalFrames;
     Memory_set(frames, 1, (totalFrames / 8) + 1);/* initially set all frames as used */
     Bitmap_init(&bitmap, frames, (totalFrames / 8) + 1);
@@ -135,7 +140,7 @@ PUBLIC void BitmapPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
     }
 
     /* set kernel + frames array + 1 frame(to be safe) as reserved/used */
-    u32int reserved = (mbH->bssEndAddr - mbH->loadAddr) + ((totalFrames / 8) + 1) + FRAME_SIZE;
+    u32int reserved = (kernelEnd - mbH->loadAddr) + ((totalFrames / 8) + 1) + FRAME_SIZE;
     BitmapPMM_setRegion((void*) mbH->loadAddr, reserved);
 
     BitmapPMM_allocateFrame(); /* reserve frame starting at address 0(NULL) */

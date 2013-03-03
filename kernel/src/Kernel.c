@@ -39,7 +39,6 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     Debug_assert(mbHead.magic == MULTIBOOT_HEADER_MAGIC);
     Debug_assert(mbInfo->modsCount > 0); /* Make sure initrd(ram disk) is in memory */
     u32int initrd_location = *((u32int*) mbInfo->modsAddr);
-    // u32int initrd_end = *(u32int*)(mbInfo->modsAddr + 4);
 
     Module_load(VGA_getModule());
     Module_load(Console_getModule());

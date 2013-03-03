@@ -82,7 +82,7 @@ PRIVATE ArrayList* tarHeaders;
 =========================================================*/
 
 /* Note: Allocates buffer in kernel heap */
-PUBLIC char* Tar_getFileContents(const TarEntryHeader* header) {
+PRIVATE char* Tar_getFileContents(const TarEntryHeader* header) {
 
     Debug_assert(header != NULL);
 
