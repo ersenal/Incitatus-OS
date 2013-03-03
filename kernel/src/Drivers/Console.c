@@ -20,6 +20,7 @@
 #include <Debug.h>
 #include <Memory.h>
 #include <Process/Mutex.h>
+#include <Lib/String.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -67,39 +68,9 @@ PRIVATE void Console_scrollDown(void) {
 
 }
 
-PRIVATE char* Console_intToString(int val, u8int base) {
-
-     static char buf[32] = {0};
-
-     if(val == 0) {
-        buf[0] = '0';
-        buf[1] = '\0';
-        return buf;
-     }
-
-     bool isNegative = val < 0;
-     if(isNegative) val = val * -1;
-     int i = 30;
-
-     while(val && i) {
-
-        buf[i] = "0123456789abcdef"[val % base];
-        i--;
-        val /= base;
-
-     }
-
-     if(isNegative) {
-        buf[i] = '-';
-        return &buf[i];
-     }
-
-     return &buf[i+1];
-}
-
 PRIVATE void Console_printInt(int integer) {
 
-    char* s = Console_intToString(integer, 10);
+    char* s = String_numberToString(integer, 10);
     Console_printString(s);
 
 }
@@ -168,14 +139,10 @@ PUBLIC void Console_printChar(u8int c) {
 
 PUBLIC void Console_printString(const char* str) {
 
-    Mutex_lock();
-
     while(*str != '\0') {
         Console_printChar(*str);
         str++;
     }
-
-    Mutex_unlock();
 
 }
 

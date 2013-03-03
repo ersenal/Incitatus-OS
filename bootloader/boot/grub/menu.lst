@@ -2,6 +2,7 @@ timeout 0
 
 title	Incitatus OS(Text-Mode)
 	kernel /kernel
+        module /initrd.tar
 	boot
 
 title	Incitatus OS(VESA)

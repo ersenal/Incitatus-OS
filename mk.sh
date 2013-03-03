@@ -27,6 +27,7 @@ $C_Compiler $CFlags -o stack.o   -c   kernel/src/Lib/Stack.c
 $C_Compiler $CFlags -o math.o    -c   kernel/src/Lib/Math.c
 $C_Compiler $CFlags -o arrlist.o -c   kernel/src/Lib/ArrayList.c
 $C_Compiler $CFlags -o linkl.o   -c   kernel/src/Lib/LinkedList.c
+$C_Compiler $CFlags -o string.o  -c   kernel/src/Lib/String.c
 
 $C_Compiler $CFlags -o pmm.o     -c   kernel/src/Memory/PhysicalMemory.c
 $C_Compiler $CFlags -o smm.o     -c   kernel/src/Memory/StackPMM.c
@@ -40,6 +41,8 @@ $C_Compiler $CFlags -o process.o -c   kernel/src/Process/Process.c
 $C_Compiler $CFlags -o sched.o   -c   kernel/src/Process/Scheduler.c
 $C_Compiler $CFlags -o rr.o      -c   kernel/src/Process/RoundRobin.c
 $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
+
+$C_Compiler $CFlags -o ramdisk.o -c   kernel/src/FileSystem/RamDisk.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
@@ -65,13 +68,15 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         arrlist.o \
                                                                         dumbH.o \
                                                                         linkl.o \
+                                                                        string.o \
                                                                         process.o \
                                                                         sched.o \
                                                                         rr.o \
                                                                         pm.o \
                                                                         kbd.o \
                                                                         mouse.o \
-                                                                        ps2.o
+                                                                        ps2.o \
+                                                                        ramdisk.o
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
 
