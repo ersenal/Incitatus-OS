@@ -126,14 +126,18 @@ PRIVATE VFSNode* RamDisk_readDir(VFSNode* self, u32int index) {
 
 }
 
-/* Find child file by name in a directory */
-//TODO: Implement
+/* Find child file by absolute path in a directory */
 PRIVATE VFSNode* RamDisk_findDir(VFSNode* self, const char* path) {
 
     UNUSED(self);
-    UNUSED(path);
+    Debug_assert(self != NULL);
+    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
 
-    return 0;
+    for(u32int i = 0; i < numberOfFiles; i++)
+        if(String_compare(fileNodes[i].fileName, path) == 0)
+            return &fileNodes[i];
+
+    return NULL;
 
 }
 
