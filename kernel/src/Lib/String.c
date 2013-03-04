@@ -130,3 +130,12 @@ PUBLIC int String_compare(const char* left, const char* right) {
     return *(unsigned char *)left - *(unsigned char *)right;
 
 }
+
+PUBLIC u32int String_countChar(const char* s, char c) {
+
+    u32int i;
+
+    for (i = 0; s[i];  s[i] == c ? i++ : (u32int) s++);
+
+    return i;
+}

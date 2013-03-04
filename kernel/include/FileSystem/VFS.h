@@ -39,7 +39,6 @@
 
 typedef struct VFS VFS;
 typedef struct VFSNode VFSNode;
-typedef struct DirEntry DirEntry;
 
 struct VFS {
 
@@ -49,7 +48,7 @@ struct VFS {
     void       (*close)     (VFSNode* self);
     u32int     (*read)      (VFSNode* self, u32int offset, u32int count, char* buffer);
     u32int     (*write)     (VFSNode* self, u32int offset, u32int count, char* buffer);
-    DirEntry*  (*readDir)   (VFSNode* self, u32int index);
+    VFSNode*   (*readDir)   (VFSNode* self, u32int index);
     VFSNode*   (*findDir)   (VFSNode* self, const char* path);
 
 };
@@ -65,13 +64,6 @@ struct VFSNode {
     u32int    fileSize;                     /* Size of the file in bytes */
     VFS*      vfs;                          /* File system this node belongs to */
     VFSNode*  ptr;                          /* Used by mountpoints and symlinks */
-
-};
-
-struct DirEntry {
-
-    char   fileName[VFS_FILE_NAME_SIZE];
-    u32int index;
 
 };
 

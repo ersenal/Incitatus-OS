@@ -52,7 +52,16 @@ PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
         fileNodes[i].gid = 0;
         fileNodes[i].fileSize = String_stringToInt(firstHeader->fileSize, 8) ;
         fileNodes[i].index = i;
-        fileNodes[i].fileType = FILETYPE_NORMAL; //TODO decide according to TAR filetype
+
+        //TODO Also add other filetypes
+        if(firstHeader->fileType[0] == TAR_FILETYPE_NORMAL)
+            fileNodes[i].fileType = FILETYPE_NORMAL;
+        else if(firstHeader->fileType[0] == TAR_FILETYPE_DIRECTORY)
+            fileNodes[i].fileType = FILETYPE_DIRECTORY;
+        else {
+            Debug_logWarning("%s", "Unknown Tar filetype");
+        }
+
         fileNodes[i].vfs = &ramdisk;
         fileNodes[i].ptr = 0;
 
@@ -63,18 +72,6 @@ PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
             break;
 
     }
-
-}
-
-PRIVATE void RamDisk_open(VFSNode* self) {
-
-    UNUSED(self);
-
-}
-
-PRIVATE void RamDisk_close(VFSNode* self) {
-
-    UNUSED(self);
 
 }
 
@@ -98,27 +95,38 @@ PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* bu
 
 }
 
-//TODO: Implement
-PRIVATE u32int RamDisk_write(VFSNode* self, u32int offset, u32int count, char* buffer) {
+/* Return nth child of a directory */
+PRIVATE VFSNode* RamDisk_readDir(VFSNode* self, u32int index) {
 
-    UNUSED(self);
-    UNUSED(offset);
-    UNUSED(count);
-    UNUSED(buffer);
-    return 0;
+    Debug_assert(self != NULL);
+    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
+    Debug_assert(index < numberOfFiles);
+    Debug_assert(self->fileType == FILETYPE_DIRECTORY);
+
+    u32int nthChild = -1;
+
+    /* For every file in ramdisk */
+    for(u32int i = 0; i < numberOfFiles; i++) {
+
+        /* Find out the depth of the child file and parent folder */
+        u32int childDepth = String_countChar(fileNodes[i].fileName, '/');
+        u32int dirDepth = String_countChar(self->fileName, '/');
+
+        if(String_startsWith(fileNodes[i].fileName, self->fileName) && childDepth == dirDepth && fileNodes[i].index != self->index) /* Non-directory file */
+            nthChild++;
+        else if(String_startsWith(fileNodes[i].fileName, self->fileName) && childDepth == dirDepth + 1 && String_endsWith(fileNodes[i].fileName, "/")) /* Directory file */
+            nthChild++;
+
+        if(nthChild == index)
+            return &fileNodes[i];
+
+    }
+
+    return NULL;
 
 }
 
-//TODO: Implement
-PRIVATE DirEntry* RamDisk_readDir(VFSNode* self, u32int index) {
-
-    UNUSED(self);
-    UNUSED(index);
-
-    return 0;
-
-}
-
+/* Find child file by name in a directory */
 //TODO: Implement
 PRIVATE VFSNode* RamDisk_findDir(VFSNode* self, const char* path) {
 
@@ -145,26 +153,15 @@ PRIVATE void RamDisk_init(void) {
     numberOfFiles = Tar_getNumberOfFiles((TarEntryHeader*) firstHeaderAddress);
     fileNodes = HeapMemory_calloc(numberOfFiles, sizeof(VFSNode));
 
-    /* Insert root node */
-    String_copy(fileNodes[0].fileName, "initrd");
-    fileNodes[0].permission = 0;
-    fileNodes[0].uid = 0;
-    fileNodes[0].gid = 0;
-    fileNodes[0].index = 0; /* First file index */
-    fileNodes[0].fileSize = 0;
-    fileNodes[0].ptr = 0;
-    fileNodes[0].fileType = FILETYPE_DIRECTORY;
-    fileNodes[0].vfs = &ramdisk;
-
     /* Set ramdisk */
     ramdisk.rootNode = &fileNodes[0];
     ramdisk.deviceID = RAMDISK_DEVICE_ID;
-    ramdisk.open = RamDisk_open;
-    ramdisk.close = RamDisk_close;
-    ramdisk.read = RamDisk_read;
-    ramdisk.write = RamDisk_write;
     ramdisk.readDir = RamDisk_readDir;
     ramdisk.findDir = RamDisk_findDir;
+    ramdisk.read = RamDisk_read;
+    ramdisk.write = NULL; /* our ramdisk does not support 'write' */
+    ramdisk.open = NULL; /* our ramdisk does not need 'open' */
+    ramdisk.close = NULL; /* our ramdisk does not need 'close' */
 
     /* Parse tar archive and test ramdisk */
     RamDisk_parseArchive((TarEntryHeader*) firstHeaderAddress);
