@@ -68,6 +68,6 @@ struct TarEntryHeader {
 
 //TODO: comments
 TarEntryHeader* Tar_nextHeader(const TarEntryHeader* header);
+TarEntryHeader* Tar_getHeader(const TarEntryHeader* firstHeader, u32int index);
 u32int Tar_getNumberOfFiles(const TarEntryHeader* firstHeader);
-
 #endif

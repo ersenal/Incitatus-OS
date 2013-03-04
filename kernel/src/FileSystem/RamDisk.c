@@ -78,14 +78,23 @@ PRIVATE void RamDisk_close(VFSNode* self) {
 
 }
 
-//TODO: Implement
 PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* buffer) {
 
-    UNUSED(self);
-    UNUSED(offset);
-    UNUSED(count);
-    UNUSED(buffer);
-    return 0;
+    Debug_assert(self != NULL);
+    Debug_assert(buffer != NULL);
+    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
+    Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
+    Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
+
+    /* Get nth tar header */
+    TarEntryHeader* header = Tar_getHeader((TarEntryHeader*) firstHeaderAddress, self->index);
+    Debug_assert(header != NULL);
+
+    char* loc = ((char*) header) + TAR_BLOCK_SIZE + offset;
+    Memory_copy(buffer, loc, count);
+    buffer[count] = '\0'; /* Null terminate our file */
+
+    return count;
 
 }
 
