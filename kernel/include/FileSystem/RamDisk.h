@@ -9,12 +9,6 @@
 |
 | DESCRIPTION:  Tar-based ramdisk(RAM as disk drive) implementation.
 |
-|               For more info on Tar:
-|                   http://en.wikipedia.org/wiki/Tar_file_format
-|
-|               With thanks to Brendan Long:
-|                   http://stackoverflow.com/questions/2505042/how-to-parse-a-tar-file-in-c
-|
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
@@ -23,6 +17,15 @@
 #define RAMDISK_H
 
 #include <Module.h>
+
+/*=======================================================
+    DEFINE
+=========================================================*/
+#define RAMDISK_DEVICE_ID 0xBEEF
+
+/*=======================================================
+    FUNCTION
+=========================================================*/
 
 /*-------------------------------------------------------------------------
 | Get ram disk module

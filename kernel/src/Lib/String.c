@@ -112,3 +112,21 @@ PUBLIC char* String_numberToString(int val, int base) {
 
      return &buf[i+1];
 }
+
+/* Borrowed from: http://git.musl-libc.org/cgit/musl/tree/src/string/strcpy.c */
+PUBLIC char* String_copy(char* restrict dest, const char* restrict src) {
+
+    const u8int* s = (u8int*) src;
+    u8int* d = (u8int*) dest;
+    while ((*d++ = *s++));
+    return dest;
+
+}
+
+/* Borrowed from: http://git.musl-libc.org/cgit/musl/tree/src/string/strcmp.c */
+PUBLIC int String_compare(const char* left, const char* right) {
+
+    for (; *left==*right && *left && *right; left++, right++);
+    return *(unsigned char *)left - *(unsigned char *)right;
+
+}

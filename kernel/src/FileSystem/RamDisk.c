@@ -9,178 +9,79 @@
 |
 | DESCRIPTION:  Tar-based ramdisk(RAM as disk drive) implementation.
 |
-|               For more info on Tar:
-|                   http://en.wikipedia.org/wiki/Tar_file_format
-|
-|               With thanks to Brendan Long:
-|                   http://stackoverflow.com/questions/2505042/how-to-parse-a-tar-file-in-c
-|
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
 #include <FileSystem/RamDisk.h>
 #include <FileSystem/VFS.h>
+#include <FileSystem/Tar.h>
 #include <Memory.h>
 #include <Lib/String.h>
-#include <Lib/ArrayList.h>
 #include <Memory/HeapMemory.h>
-
-/*=======================================================
-    DEFINE
-=========================================================*/
-
-#define TAR_BLOCK_SIZE                  512
-
-#define TAR_FILE_NAME_SIZE              100
-#define TAR_FILE_MODE_SIZE              8
-#define TAR_UID_SIZE                    8
-#define TAR_GID_SIZE                    8
-#define TAR_FILE_SIZE_SIZE              12
-#define TAR_LAST_MODIFIED_SIZE          12
-#define TAR_CHECKSUM_SIZE               8
-#define TAR_TYPEFLAG_SIZE               1
-#define TAR_LINKNAME_SIZE               100
-
-#define TAR_FILETYPE_NORMAL             '0'
-#define TAR_FILETYPE_HARD_LINK          '1'
-#define TAR_FILETYPE_SYM_LINK           '2'
-#define TAR_FILETYPE_DEVICE             '3'
-#define TAR_FILETYPE_BLOCK_DEVICE       '4'
-#define TAR_FILETYPE_DIRECTORY          '5'
-#define TAR_FILETYPE_NAMED_PIPE         '6'
-
-/*=======================================================
-    STRUCT
-=========================================================*/
-typedef struct TarEntryHeader TarEntryHeader;
-
-struct TarEntryHeader {
-
-    char fileName       [TAR_FILE_NAME_SIZE];
-    char fileMode       [TAR_FILE_MODE_SIZE];
-    char userID         [TAR_UID_SIZE];
-    char groupID        [TAR_GID_SIZE];
-    char fileSize       [TAR_FILE_SIZE_SIZE];
-    char lastModified   [TAR_LAST_MODIFIED_SIZE];
-    char checksum       [TAR_CHECKSUM_SIZE];
-    char fileType       [TAR_TYPEFLAG_SIZE];
-    char linkName       [TAR_LINKNAME_SIZE];
-
-};
 
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE u32int firstHeader;
 PRIVATE Module ramdiskModule;
+
+PRIVATE u32int firstHeaderAddress;
+PRIVATE u32int numberOfFiles;
 PRIVATE VFS ramdisk;
-PRIVATE ArrayList* tarHeaders;
+PRIVATE VFSNode* fileNodes;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
 
-/* Note: Allocates buffer in kernel heap */
-PRIVATE char* Tar_getFileContents(const TarEntryHeader* header) {
-
-    Debug_assert(header != NULL);
-
-    char* loc = ((char*) header) + TAR_BLOCK_SIZE;
-    int fileSize = String_stringToInt(header->fileSize, 8);
-
-    char* fileContents = HeapMemory_calloc(1, fileSize + 1); /* Adding 1 since we need space for one null char */
-    Memory_copy(fileContents, loc, fileSize);
-    fileContents[fileSize] = '\0'; /* Null terminate our file */
-
-    return fileContents;
-
-}
-
-PRIVATE u32int Tar_validateEntry(const TarEntryHeader* header) {
-
-    Debug_assert(header != NULL);
-
-    u8int* address = (u8int*) header;
-    u32int checksum = String_stringToInt(header->checksum, 8);
-
-    for (u32int i = 0; i < TAR_BLOCK_SIZE; i++)
-        checksum -= (i >= 148 && i < 156) ? 32 : address[i];
-
-    return !checksum;
-
-}
-
-PRIVATE TarEntryHeader* Tar_nextHeader(const TarEntryHeader* header) {
-
-    Debug_assert(header != NULL);
-
-    u32int fileSize = String_stringToInt(header->fileSize, 8);
-    u32int address = (u32int) header + (((fileSize / 512) + 1) * 512);
-
-    if (fileSize % 512)
-        address += 512;
-
-    header = (TarEntryHeader*) address;
-
-    if(Tar_validateEntry(header))
-        return (TarEntryHeader*) header;
-
-    return NULL;
-
-}
-
-/* Returns the number of files in the TAR archive */
-PRIVATE u32int Tar_parseArchive(const TarEntryHeader* firstHeader) {
+PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
 
     Debug_assert(firstHeader != NULL);
+    u32int i = 0;
 
-    u32int fileCount = 0;
-
+    /* For every file in archive */
     while(TRUE) {
 
         if (firstHeader->fileName[0] == '\0')
             break;
 
-        ArrayList_add(tarHeaders, (void*) firstHeader);
+        /* Add tar file as a virtual file */
+        String_copy(fileNodes[i].fileName, firstHeader->fileName);
+        fileNodes[i].permission = 0;
+        fileNodes[i].uid = 0;
+        fileNodes[i].gid = 0;
+        fileNodes[i].fileSize = String_stringToInt(firstHeader->fileSize, 8) ;
+        fileNodes[i].index = i;
+        fileNodes[i].fileType = FILETYPE_NORMAL; //TODO decide according to TAR filetype
+        fileNodes[i].vfs = &ramdisk;
+        fileNodes[i].ptr = 0;
+
         firstHeader = Tar_nextHeader(firstHeader);
-        fileCount++;
+        i++;
 
         if(firstHeader == NULL)
             break;
 
     }
 
-    return fileCount;
+}
+
+PRIVATE void RamDisk_open(VFSNode* self) {
+
+    UNUSED(self);
 
 }
 
-PRIVATE u32int RamDisk_getPhysicalAddr(VFS *self, u32int id) {
+PRIVATE void RamDisk_close(VFSNode* self) {
 
     UNUSED(self);
-    return id + TAR_BLOCK_SIZE;
-
-}
-
-PRIVATE u32int RamDisk_open(VFS *self, u32int id) {
-
-    UNUSED(self);
-    return id;
-
-}
-
-PRIVATE u32int RamDisk_close(VFS *self, u32int id) {
-
-    UNUSED(self);
-    return id;
 
 }
 
 //TODO: Implement
-PRIVATE u32int RamDisk_read(VFS* self, u32int id, u32int offset, u32int count, void* buffer) {
+PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* buffer) {
 
     UNUSED(self);
-    UNUSED(id);
     UNUSED(offset);
     UNUSED(count);
     UNUSED(buffer);
@@ -189,10 +90,9 @@ PRIVATE u32int RamDisk_read(VFS* self, u32int id, u32int offset, u32int count, v
 }
 
 //TODO: Implement
-PRIVATE u32int RamDisk_write(VFS* self, u32int id, u32int offset, u32int count, void* buffer) {
+PRIVATE u32int RamDisk_write(VFSNode* self, u32int offset, u32int count, char* buffer) {
 
     UNUSED(self);
-    UNUSED(id);
     UNUSED(offset);
     UNUSED(count);
     UNUSED(buffer);
@@ -201,33 +101,65 @@ PRIVATE u32int RamDisk_write(VFS* self, u32int id, u32int offset, u32int count, 
 }
 
 //TODO: Implement
-PRIVATE u32int RamDisk_walk(VFS* self, u32int id, u32int count, const char* path) {
+PRIVATE DirEntry* RamDisk_readDir(VFSNode* self, u32int index) {
 
     UNUSED(self);
-    UNUSED(id);
-    UNUSED(count);
+    UNUSED(index);
+
+    return 0;
+
+}
+
+//TODO: Implement
+PRIVATE VFSNode* RamDisk_findDir(VFSNode* self, const char* path) {
+
+    UNUSED(self);
     UNUSED(path);
+
     return 0;
+
+}
+
+PRIVATE void RamDisk_test(void) {
+
+    Debug_logInfo("%s", "Testing ramdisk...");
+
+    for(u32int i = 0; i < numberOfFiles; i++) {
+        Debug_logInfo("%s%s%c%d%s", "Found: ", fileNodes[i].fileName, ',', fileNodes[i].fileSize, "Bytes");
+    }
 
 }
 
 PRIVATE void RamDisk_init(void) {
 
-    ramdisk.rootID = (u32int) firstHeader;
-    ramdisk.close = RamDisk_close;
+    /* Reserve space in heap for virtual file nodes */
+    numberOfFiles = Tar_getNumberOfFiles((TarEntryHeader*) firstHeaderAddress);
+    fileNodes = HeapMemory_calloc(numberOfFiles, sizeof(VFSNode));
+
+    /* Insert root node */
+    String_copy(fileNodes[0].fileName, "initrd");
+    fileNodes[0].permission = 0;
+    fileNodes[0].uid = 0;
+    fileNodes[0].gid = 0;
+    fileNodes[0].index = 0; /* First file index */
+    fileNodes[0].fileSize = 0;
+    fileNodes[0].ptr = 0;
+    fileNodes[0].fileType = FILETYPE_DIRECTORY;
+    fileNodes[0].vfs = &ramdisk;
+
+    /* Set ramdisk */
+    ramdisk.rootNode = &fileNodes[0];
+    ramdisk.deviceID = RAMDISK_DEVICE_ID;
     ramdisk.open = RamDisk_open;
-    ramdisk.getPhysicalAddr = RamDisk_getPhysicalAddr;
+    ramdisk.close = RamDisk_close;
     ramdisk.read = RamDisk_read;
     ramdisk.write = RamDisk_write;
-    ramdisk.walk = RamDisk_walk;
+    ramdisk.readDir = RamDisk_readDir;
+    ramdisk.findDir = RamDisk_findDir;
 
-    tarHeaders = ArrayList_new(32);
-    Tar_parseArchive((TarEntryHeader*) firstHeader);
-
-    Debug_logInfo("%s", "Testing ramdisk...");
-    char * s = Tar_getFileContents((TarEntryHeader*) ArrayList_get(tarHeaders, 0));
-    Debug_logInfo("%s", s);
-    HeapMemory_free(s);
+    /* Parse tar archive and test ramdisk */
+    RamDisk_parseArchive((TarEntryHeader*) firstHeaderAddress);
+    RamDisk_test();
 
 }
 
@@ -241,7 +173,7 @@ PUBLIC Module* RamDisk_getModule(u32int firstHeaderAddr) {
         ramdiskModule.numberOfDependencies = 1;
         ramdiskModule.dependencies[0] = MODULE_HEAP;
 
-        firstHeader = firstHeaderAddr;
+        firstHeaderAddress = firstHeaderAddr;
 
     }
 

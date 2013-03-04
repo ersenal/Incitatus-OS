@@ -43,6 +43,7 @@ $C_Compiler $CFlags -o rr.o      -c   kernel/src/Process/RoundRobin.c
 $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
 
 $C_Compiler $CFlags -o ramdisk.o -c   kernel/src/FileSystem/RamDisk.c
+$C_Compiler $CFlags -o tar.o     -c   kernel/src/FileSystem/Tar.c
 
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
@@ -76,7 +77,9 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         kbd.o \
                                                                         mouse.o \
                                                                         ps2.o \
-                                                                        ramdisk.o
+                                                                        ramdisk.o \
+                                                                        tar.o
+
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
 

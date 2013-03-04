@@ -216,6 +216,7 @@ PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
     } else { /* User process, kill it */
 
         bool processKilled = FALSE;
+        //TODO: kill process
         Debug_assert(processKilled);
 
     }
