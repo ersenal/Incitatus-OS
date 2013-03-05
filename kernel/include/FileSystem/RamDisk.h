@@ -16,24 +16,12 @@
 #ifndef RAMDISK_H
 #define RAMDISK_H
 
-#include <Module.h>
-
-/*=======================================================
-    DEFINE
-=========================================================*/
-#define RAMDISK_DEVICE_ID 0xBEEF
-
-/*=======================================================
-    FUNCTION
-=========================================================*/
-
 /*-------------------------------------------------------------------------
-| Get ram disk module
+| Init ram disk
 |--------------------------------------------------------------------------
-| DESCRIPTION:    Returns the ram disk module.
+| DESCRIPTION:    Parse initrd tar archive and initialise the ram disk.
 |
-| PARAM:          'firstHeader' - Address of the first tar header
 \------------------------------------------------------------------------*/
-Module* RamDisk_getModule(u32int firstHeader);
+void RamDisk_init(void);
 
 #endif

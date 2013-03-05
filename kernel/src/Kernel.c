@@ -29,16 +29,18 @@
 #include <Process/Scheduler.h>
 #include <Process/ProcessManager.h>
 #include <Drivers/PS2Controller.h>
-#include <FileSystem/RamDisk.h>
+#include <FileSystem/VFS.h>
+
+PUBLIC MultibootInfo* multibootInfo;
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
     extern MultibootHeader mbHead;
+    multibootInfo = mbInfo;
 
     Debug_assert(mbMagic == MULTIBOOT_BOOTLOADER_MAGIC);
     Debug_assert(mbHead.magic == MULTIBOOT_HEADER_MAGIC);
     Debug_assert(mbInfo->modsCount > 0); /* Make sure initrd(ram disk) is in memory */
-    u32int initrd_location = *((u32int*) mbInfo->modsAddr);
 
     Module_load(VGA_getModule());
     Module_load(Console_getModule());
@@ -54,7 +56,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         VirtualMemory_getModule(),
         HeapMemory_getModule(),
         PS2Controller_getModule(),
-        RamDisk_getModule(initrd_location),
+        VFS_getModule(),
         // Scheduler_getModule(),
         // ProcessManager_getModule(),
 

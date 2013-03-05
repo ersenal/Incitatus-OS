@@ -36,7 +36,7 @@
 #define MODULE_SCHEDULER    109
 #define MODULE_PROCESS      110
 #define MODULE_PS2          111
-#define MODULE_RAM_DISK     112
+#define MODULE_VFS          112
 
 /*=======================================================
     STRUCT

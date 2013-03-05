@@ -19,15 +19,21 @@
 #include <Memory.h>
 #include <Lib/String.h>
 #include <Memory/HeapMemory.h>
+#include <Multiboot.h>
+
+/*=======================================================
+    DEFINE
+=========================================================*/
+#define ROOT_INDEX  -1
+#define RAMDISK_DEVICE_ID 0xBEEF
 
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE Module ramdiskModule;
-
 PRIVATE u32int firstHeaderAddress;
 PRIVATE u32int numberOfFiles;
 PRIVATE VFS ramdisk;
+PRIVATE VFSNode  root;
 PRIVATE VFSNode* fileNodes;
 
 /*=======================================================
@@ -53,7 +59,7 @@ PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
         fileNodes[i].fileSize = String_stringToInt(firstHeader->fileSize, 8) ;
         fileNodes[i].index = i;
 
-        //TODO Also add other filetypes
+        //TODO: Also add other filetypes
         if(firstHeader->fileType[0] == TAR_FILETYPE_NORMAL)
             fileNodes[i].fileType = FILETYPE_NORMAL;
         else if(firstHeader->fileType[0] == TAR_FILETYPE_DIRECTORY)
@@ -100,7 +106,6 @@ PRIVATE VFSNode* RamDisk_readDir(VFSNode* self, u32int index) {
 
     Debug_assert(self != NULL);
     Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
-    Debug_assert(index < numberOfFiles);
     Debug_assert(self->fileType == FILETYPE_DIRECTORY);
 
     u32int nthChild = -1;
@@ -151,14 +156,28 @@ PRIVATE void RamDisk_test(void) {
 
 }
 
-PRIVATE void RamDisk_init(void) {
+PUBLIC void RamDisk_init(void) {
+
+    /* Get initrd tar module address */
+    extern MultibootInfo* multibootInfo;
+    firstHeaderAddress = *((u32int*) multibootInfo->modsAddr);
 
     /* Reserve space in heap for virtual file nodes */
     numberOfFiles = Tar_getNumberOfFiles((TarEntryHeader*) firstHeaderAddress);
     fileNodes = HeapMemory_calloc(numberOfFiles, sizeof(VFSNode));
 
+    /* Create root */
+    root.permission = 0;
+    root.uid = 0;
+    root.gid = 0;
+    root.fileSize = 0;
+    root.index = ROOT_INDEX;
+    root.fileType = FILETYPE_DIRECTORY;
+    root.vfs = &ramdisk;
+    root.ptr = 0;
+
     /* Set ramdisk */
-    ramdisk.rootNode = &fileNodes[0];
+    ramdisk.rootNode = &root;
     ramdisk.deviceID = RAMDISK_DEVICE_ID;
     ramdisk.readDir = RamDisk_readDir;
     ramdisk.findDir = RamDisk_findDir;
@@ -170,23 +189,5 @@ PRIVATE void RamDisk_init(void) {
     /* Parse tar archive and test ramdisk */
     RamDisk_parseArchive((TarEntryHeader*) firstHeaderAddress);
     RamDisk_test();
-
-}
-
-PUBLIC Module* RamDisk_getModule(u32int firstHeaderAddr) {
-
-    if(!ramdiskModule.isLoaded) {
-
-        ramdiskModule.moduleName = "Ram Disk";
-        ramdiskModule.moduleID = MODULE_RAM_DISK;
-        ramdiskModule.init = RamDisk_init;
-        ramdiskModule.numberOfDependencies = 1;
-        ramdiskModule.dependencies[0] = MODULE_HEAP;
-
-        firstHeaderAddress = firstHeaderAddr;
-
-    }
-
-    return &ramdiskModule;
 
 }

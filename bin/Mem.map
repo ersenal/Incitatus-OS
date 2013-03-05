@@ -11,6 +11,7 @@ Scheduler_getNextProcess
                     0x4               sched.o
 errno               0x4               heap.o
 HeapMemory_free     0x4               heap.o
+multibootInfo       0x4               kernel.o
 PhysicalMemory_getInfo
                     0x4               pmm.o
 HeapMemory_calloc   0x4               heap.o
@@ -279,17 +280,20 @@ Linker script and memory map
                 0x0000000000109b60                PS2Controller_receive
                 0x0000000000109ba0                PS2Controller_getModule
  *fill*         0x0000000000109be1        0xf 
- .text          0x0000000000109bf0      0xc0a ramdisk.o
-                0x000000000010a7b0                RamDisk_getModule
- *fill*         0x000000000010a7fa        0x6 
- .text          0x000000000010a800      0x24a tar.o
-                0x000000000010a800                Tar_nextHeader
-                0x000000000010a980                Tar_getHeader
-                0x000000000010a9b0                Tar_getNumberOfFiles
+ .text          0x0000000000109bf0      0xc12 ramdisk.o
+                0x000000000010a450                RamDisk_init
+ *fill*         0x000000000010a802        0xe 
+ .text          0x000000000010a810      0x24a tar.o
+                0x000000000010a810                Tar_nextHeader
+                0x000000000010a990                Tar_getHeader
+                0x000000000010a9c0                Tar_getNumberOfFiles
+ *fill*         0x000000000010aa5a        0x6 
+ .text          0x000000000010aa60       0x51 vfs.o
+                0x000000000010aa70                VFS_getModule
                 0x000000000010b000                . = ALIGN (0x1000)
- *fill*         0x000000000010aa4a      0x5b6 
+ *fill*         0x000000000010aab1      0x54f 
 
-.rodata.str1.1  0x000000000010b000      0x552
+.rodata.str1.1  0x000000000010b000      0x55d
  .rodata.str1.1
                 0x000000000010b000       0x32 kernel.o
                                          0x3d (size before relaxing)
@@ -363,159 +367,164 @@ Linker script and memory map
                 0x000000000010b3e3       0xf5 ps2.o
                                         0x118 (size before relaxing)
  .rodata.str1.1
-                0x000000000010b4d8       0x5e ramdisk.o
-                                         0xb4 (size before relaxing)
+                0x000000000010b4d8       0x55 ramdisk.o
+                                         0xab (size before relaxing)
  .rodata.str1.1
-                0x000000000010b536       0x1c tar.o
+                0x000000000010b52d       0x1c tar.o
                                          0x45 (size before relaxing)
+ .rodata.str1.1
+                0x000000000010b549       0x14 vfs.o
 
-.eh_frame       0x000000000010b554     0x190c
- .eh_frame      0x000000000010b554       0x3c kernel.o
- .eh_frame      0x000000000010b590       0x28 vga.o
+.eh_frame       0x000000000010b560     0x1954
+ .eh_frame      0x000000000010b560       0x3c kernel.o
+ .eh_frame      0x000000000010b59c       0x28 vga.o
                                          0x40 (size before relaxing)
- .eh_frame      0x000000000010b5b8      0x128 console.o
+ .eh_frame      0x000000000010b5c4      0x128 console.o
                                         0x140 (size before relaxing)
- .eh_frame      0x000000000010b6e0       0x2c sys.o
+ .eh_frame      0x000000000010b6ec       0x2c sys.o
                                          0x44 (size before relaxing)
- .eh_frame      0x000000000010b70c       0x68 module.o
+ .eh_frame      0x000000000010b718       0x68 module.o
                                          0x80 (size before relaxing)
- .eh_frame      0x000000000010b774       0x28 gdt.o
+ .eh_frame      0x000000000010b780       0x28 gdt.o
                                          0x40 (size before relaxing)
- .eh_frame      0x000000000010b79c       0x5c pic.o
+ .eh_frame      0x000000000010b7a8       0x5c pic.o
                                          0x74 (size before relaxing)
- .eh_frame      0x000000000010b7f8       0xa8 idt.o
+ .eh_frame      0x000000000010b804       0xa8 idt.o
                                          0xc0 (size before relaxing)
- .eh_frame      0x000000000010b8a0       0xb8 pit.o
+ .eh_frame      0x000000000010b8ac       0xb8 pit.o
                                          0xd0 (size before relaxing)
- .eh_frame      0x000000000010b958       0x28 cpu.o
+ .eh_frame      0x000000000010b964       0x28 cpu.o
                                          0x40 (size before relaxing)
- .eh_frame      0x000000000010b980       0xd4 bitmap.o
+ .eh_frame      0x000000000010b98c       0xd4 bitmap.o
                                          0xec (size before relaxing)
- .eh_frame      0x000000000010ba54       0x70 stack.o
+ .eh_frame      0x000000000010ba60       0x70 stack.o
                                          0x88 (size before relaxing)
- .eh_frame      0x000000000010bac4       0x64 math.o
+ .eh_frame      0x000000000010bad0       0x64 math.o
                                          0x7c (size before relaxing)
- .eh_frame      0x000000000010bb28       0x2c pmm.o
+ .eh_frame      0x000000000010bb34       0x2c pmm.o
                                          0x44 (size before relaxing)
- .eh_frame      0x000000000010bb54       0x90 smm.o
+ .eh_frame      0x000000000010bb60       0x90 smm.o
                                          0xa8 (size before relaxing)
- .eh_frame      0x000000000010bbe4       0xb0 bmm.o
+ .eh_frame      0x000000000010bbf0       0xb0 bmm.o
                                          0xc8 (size before relaxing)
- .eh_frame      0x000000000010bc94      0x248 vmm.o
+ .eh_frame      0x000000000010bca0      0x248 vmm.o
                                         0x260 (size before relaxing)
- .eh_frame      0x000000000010bedc       0x68 heap.o
+ .eh_frame      0x000000000010bee8       0x68 heap.o
                                          0x80 (size before relaxing)
- .eh_frame      0x000000000010bf44      0x598 dl.o
+ .eh_frame      0x000000000010bf50      0x598 dl.o
                                         0x5b0 (size before relaxing)
- .eh_frame      0x000000000010c4dc      0x174 arrlist.o
+ .eh_frame      0x000000000010c4e8      0x174 arrlist.o
                                         0x18c (size before relaxing)
- .eh_frame      0x000000000010c650       0x6c dumbH.o
+ .eh_frame      0x000000000010c65c       0x6c dumbH.o
                                          0x84 (size before relaxing)
- .eh_frame      0x000000000010c6bc      0x130 linkl.o
+ .eh_frame      0x000000000010c6c8      0x130 linkl.o
                                         0x148 (size before relaxing)
- .eh_frame      0x000000000010c7ec      0x18c string.o
+ .eh_frame      0x000000000010c7f8      0x18c string.o
                                         0x1a4 (size before relaxing)
- .eh_frame      0x000000000010c978       0x60 process.o
+ .eh_frame      0x000000000010c984       0x60 process.o
                                          0x78 (size before relaxing)
- .eh_frame      0x000000000010c9d8       0x28 sched.o
+ .eh_frame      0x000000000010c9e4       0x28 sched.o
                                          0x40 (size before relaxing)
- .eh_frame      0x000000000010ca00       0x80 rr.o
+ .eh_frame      0x000000000010ca0c       0x80 rr.o
                                          0x98 (size before relaxing)
- .eh_frame      0x000000000010ca80       0xac pm.o
+ .eh_frame      0x000000000010ca8c       0xac pm.o
                                          0xc4 (size before relaxing)
- .eh_frame      0x000000000010cb2c       0xa4 kbd.o
+ .eh_frame      0x000000000010cb38       0xa4 kbd.o
                                          0xbc (size before relaxing)
- .eh_frame      0x000000000010cbd0       0x60 mouse.o
+ .eh_frame      0x000000000010cbdc       0x60 mouse.o
                                          0x78 (size before relaxing)
- .eh_frame      0x000000000010cc30       0x88 ps2.o
+ .eh_frame      0x000000000010cc3c       0x88 ps2.o
                                          0xa0 (size before relaxing)
- .eh_frame      0x000000000010ccb8      0x134 ramdisk.o
-                                        0x14c (size before relaxing)
- .eh_frame      0x000000000010cdec       0x74 tar.o
+ .eh_frame      0x000000000010ccc4      0x154 ramdisk.o
+                                        0x16c (size before relaxing)
+ .eh_frame      0x000000000010ce18       0x74 tar.o
                                          0x8c (size before relaxing)
+ .eh_frame      0x000000000010ce8c       0x28 vfs.o
+                                         0x40 (size before relaxing)
 
-.rodata.str1.4  0x000000000010ce60      0x1c8
+.rodata.str1.4  0x000000000010ceb4      0x1c8
  .rodata.str1.4
-                0x000000000010ce60       0x1f idt.o
- *fill*         0x000000000010ce7f        0x1 
+                0x000000000010ceb4       0x1f idt.o
+ *fill*         0x000000000010ced3        0x1 
  .rodata.str1.4
-                0x000000000010ce80       0x22 vmm.o
- *fill*         0x000000000010cea2        0x2 
+                0x000000000010ced4       0x22 vmm.o
+ *fill*         0x000000000010cef6        0x2 
  .rodata.str1.4
-                0x000000000010cea4       0x1f heap.o
- *fill*         0x000000000010cec3        0x1 
+                0x000000000010cef8       0x1f heap.o
+ *fill*         0x000000000010cf17        0x1 
  .rodata.str1.4
-                0x000000000010cec4       0x24 dumbH.o
+                0x000000000010cf18       0x24 dumbH.o
  .rodata.str1.4
-                0x000000000010cee8       0x20 rr.o
+                0x000000000010cf3c       0x20 rr.o
  .rodata.str1.4
-                0x000000000010cf08       0x24 pm.o
+                0x000000000010cf5c       0x24 pm.o
  .rodata.str1.4
-                0x000000000010cf2c       0x47 kbd.o
- *fill*         0x000000000010cf73        0x1 
+                0x000000000010cf80       0x47 kbd.o
+ *fill*         0x000000000010cfc7        0x1 
  .rodata.str1.4
-                0x000000000010cf74       0x70 mouse.o
+                0x000000000010cfc8       0x70 mouse.o
  .rodata.str1.4
-                0x000000000010cfe4       0x23 ps2.o
- *fill*         0x000000000010d007        0x1 
+                0x000000000010d038       0x23 ps2.o
+ *fill*         0x000000000010d05b        0x1 
  .rodata.str1.4
-                0x000000000010d008       0x20 ramdisk.o
+                0x000000000010d05c       0x20 ramdisk.o
 
-.iplt           0x000000000010d030        0x0
+.iplt           0x000000000010d080        0x0
  .iplt          0x0000000000000000        0x0 start.o
 
-.rel.dyn        0x000000000010d028        0x0
+.rel.dyn        0x000000000010d07c        0x0
  .rel.iplt      0x0000000000000000        0x0 start.o
  .rel.text      0x0000000000000000        0x0 start.o
 
-.data           0x000000000010d040      0xfc0
-                0x000000000010d040                data = .
-                0x000000000010d040                _data = .
-                0x000000000010d040                __data = .
+.data           0x000000000010d080      0xf80
+                0x000000000010d080                data = .
+                0x000000000010d080                _data = .
+                0x000000000010d080                __data = .
  *(.data)
- .data          0x000000000010d040        0x0 kernel.o
- .data          0x000000000010d040        0x0 vga.o
- .data          0x000000000010d040        0x0 console.o
- .data          0x000000000010d040        0x0 sys.o
- .data          0x000000000010d040        0x0 module.o
- .data          0x000000000010d040        0x0 gdt.o
- .data          0x000000000010d040        0x0 pic.o
- .data          0x000000000010d040        0x0 idt.o
- .data          0x000000000010d040        0x0 pit.o
- .data          0x000000000010d040        0x0 cpu.o
- .data          0x000000000010d040        0x0 bitmap.o
- .data          0x000000000010d040        0x0 stack.o
- .data          0x000000000010d040        0x0 math.o
- .data          0x000000000010d040        0x0 pmm.o
- .data          0x000000000010d040        0x0 smm.o
- .data          0x000000000010d040        0x0 bmm.o
- .data          0x000000000010d040        0x0 vmm.o
- .data          0x000000000010d040        0x0 heap.o
- .data          0x000000000010d040        0x0 dl.o
- .data          0x000000000010d040        0x0 arrlist.o
- .data          0x000000000010d040        0x4 dumbH.o
- .data          0x000000000010d044        0x0 linkl.o
- .data          0x000000000010d044        0x0 string.o
- .data          0x000000000010d044        0x0 process.o
- .data          0x000000000010d044        0x0 sched.o
- .data          0x000000000010d044        0x0 rr.o
- .data          0x000000000010d044        0x0 pm.o
- .data          0x000000000010d044        0x0 kbd.o
- .data          0x000000000010d044        0x0 mouse.o
- .data          0x000000000010d044        0x0 ps2.o
- .data          0x000000000010d044        0x0 ramdisk.o
- .data          0x000000000010d044        0x0 tar.o
+ .data          0x000000000010d080        0x0 kernel.o
+ .data          0x000000000010d080        0x0 vga.o
+ .data          0x000000000010d080        0x0 console.o
+ .data          0x000000000010d080        0x0 sys.o
+ .data          0x000000000010d080        0x0 module.o
+ .data          0x000000000010d080        0x0 gdt.o
+ .data          0x000000000010d080        0x0 pic.o
+ .data          0x000000000010d080        0x0 idt.o
+ .data          0x000000000010d080        0x0 pit.o
+ .data          0x000000000010d080        0x0 cpu.o
+ .data          0x000000000010d080        0x0 bitmap.o
+ .data          0x000000000010d080        0x0 stack.o
+ .data          0x000000000010d080        0x0 math.o
+ .data          0x000000000010d080        0x0 pmm.o
+ .data          0x000000000010d080        0x0 smm.o
+ .data          0x000000000010d080        0x0 bmm.o
+ .data          0x000000000010d080        0x0 vmm.o
+ .data          0x000000000010d080        0x0 heap.o
+ .data          0x000000000010d080        0x0 dl.o
+ .data          0x000000000010d080        0x0 arrlist.o
+ .data          0x000000000010d080        0x4 dumbH.o
+ .data          0x000000000010d084        0x0 linkl.o
+ .data          0x000000000010d084        0x0 string.o
+ .data          0x000000000010d084        0x0 process.o
+ .data          0x000000000010d084        0x0 sched.o
+ .data          0x000000000010d084        0x0 rr.o
+ .data          0x000000000010d084        0x0 pm.o
+ .data          0x000000000010d084        0x0 kbd.o
+ .data          0x000000000010d084        0x0 mouse.o
+ .data          0x000000000010d084        0x0 ps2.o
+ .data          0x000000000010d084        0x0 ramdisk.o
+ .data          0x000000000010d084        0x0 tar.o
+ .data          0x000000000010d084        0x0 vfs.o
  *(.rodata)
- .rodata        0x000000000010d044       0x28 cpu.o
- *fill*         0x000000000010d06c       0x14 
- .rodata        0x000000000010d080      0x200 kbd.o
+ .rodata        0x000000000010d084       0x28 cpu.o
+ *fill*         0x000000000010d0ac       0x14 
+ .rodata        0x000000000010d0c0      0x200 kbd.o
                 0x000000000010e000                . = ALIGN (0x1000)
- *fill*         0x000000000010d280      0xd80 
+ *fill*         0x000000000010d2c0      0xd40 
 
 .igot.plt       0x000000000010e000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o
 
-.bss            0x000000000010e000    0x12038
+.bss            0x000000000010e000    0x1203c
                 0x000000000010e000                bss = .
                 0x000000000010e000                _bss = .
                 0x000000000010e000                __bss = .
@@ -563,33 +572,36 @@ Linker script and memory map
  *fill*         0x000000000011f17c        0x4 
  .bss           0x000000000011f180       0x35 ps2.o
  *fill*         0x000000000011f1b5        0xb 
- .bss           0x000000000011f1c0       0x60 ramdisk.o
- .bss           0x000000000011f220        0x0 tar.o
+ .bss           0x000000000011f1c0       0xe0 ramdisk.o
+ .bss           0x000000000011f2a0        0x0 tar.o
+ .bss           0x000000000011f2a0       0x34 vfs.o
                 0x0000000000120000                . = ALIGN (0x1000)
- *fill*         0x000000000011f220      0xde0 
- COMMON         0x0000000000120000        0x6 vga.o
-                0x0000000000120000                vgaRam
-                0x0000000000120004                vgaHeight
-                0x0000000000120005                vgaWidth
- *fill*         0x0000000000120006        0x2 
- COMMON         0x0000000000120008        0xc pmm.o
-                0x0000000000120008                PhysicalMemory_getInfo
-                0x000000000012000c                PhysicalMemory_allocateFrame
-                0x0000000000120010                PhysicalMemory_freeFrame
- COMMON         0x0000000000120014       0x14 heap.o
-                0x0000000000120014                HeapMemory_realloc
-                0x0000000000120018                errno
-                0x000000000012001c                HeapMemory_free
-                0x0000000000120020                HeapMemory_calloc
-                0x0000000000120024                HeapMemory_alloc
- COMMON         0x0000000000120028       0x10 sched.o
-                0x0000000000120028                Scheduler_removeProcess
-                0x000000000012002c                Scheduler_addProcess
-                0x0000000000120030                Scheduler_getNextProcess
-                0x0000000000120034                Scheduler_getCurrentProcess
-                0x0000000000120038                end = .
-                0x0000000000120038                _end = .
-                0x0000000000120038                __end = .
+ *fill*         0x000000000011f2d4      0xd2c 
+ COMMON         0x0000000000120000        0x4 kernel.o
+                0x0000000000120000                multibootInfo
+ COMMON         0x0000000000120004        0x6 vga.o
+                0x0000000000120004                vgaRam
+                0x0000000000120008                vgaHeight
+                0x0000000000120009                vgaWidth
+ *fill*         0x000000000012000a        0x2 
+ COMMON         0x000000000012000c        0xc pmm.o
+                0x000000000012000c                PhysicalMemory_getInfo
+                0x0000000000120010                PhysicalMemory_allocateFrame
+                0x0000000000120014                PhysicalMemory_freeFrame
+ COMMON         0x0000000000120018       0x14 heap.o
+                0x0000000000120018                HeapMemory_realloc
+                0x000000000012001c                errno
+                0x0000000000120020                HeapMemory_free
+                0x0000000000120024                HeapMemory_calloc
+                0x0000000000120028                HeapMemory_alloc
+ COMMON         0x000000000012002c       0x10 sched.o
+                0x000000000012002c                Scheduler_removeProcess
+                0x0000000000120030                Scheduler_addProcess
+                0x0000000000120034                Scheduler_getNextProcess
+                0x0000000000120038                Scheduler_getCurrentProcess
+                0x000000000012003c                end = .
+                0x000000000012003c                _end = .
+                0x000000000012003c                __end = .
 LOAD start.o
 LOAD kernel.o
 LOAD vga.o
@@ -624,6 +636,7 @@ LOAD mouse.o
 LOAD ps2.o
 LOAD ramdisk.o
 LOAD tar.o
+LOAD vfs.o
 OUTPUT(bootloader/kernel elf32-i386)
 
 .comment        0x0000000000000000       0x11
@@ -660,3 +673,4 @@ OUTPUT(bootloader/kernel elf32-i386)
  .comment       0x0000000000000000       0x12 ps2.o
  .comment       0x0000000000000000       0x12 ramdisk.o
  .comment       0x0000000000000000       0x12 tar.o
+ .comment       0x0000000000000000       0x12 vfs.o
