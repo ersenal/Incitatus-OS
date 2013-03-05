@@ -16,12 +16,14 @@
 #ifndef RAMDISK_H
 #define RAMDISK_H
 
+#include <FileSystem/VFS.h>
+
 /*-------------------------------------------------------------------------
 | Init ram disk
 |--------------------------------------------------------------------------
 | DESCRIPTION:    Parse initrd tar archive and initialise the ram disk.
 |
 \------------------------------------------------------------------------*/
-void RamDisk_init(void);
+VFS* RamDisk_init(void);
 
 #endif

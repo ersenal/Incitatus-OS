@@ -14,7 +14,6 @@
 
 
 #include <FileSystem/RamDisk.h>
-#include <FileSystem/VFS.h>
 #include <FileSystem/Tar.h>
 #include <Memory.h>
 #include <Lib/String.h>
@@ -156,7 +155,7 @@ PRIVATE void RamDisk_test(void) {
 
 }
 
-PUBLIC void RamDisk_init(void) {
+PUBLIC VFS* RamDisk_init(void) {
 
     /* Get initrd tar module address */
     extern MultibootInfo* multibootInfo;
@@ -189,5 +188,7 @@ PUBLIC void RamDisk_init(void) {
     /* Parse tar archive and test ramdisk */
     RamDisk_parseArchive((TarEntryHeader*) firstHeaderAddress);
     RamDisk_test();
+
+    return &ramdisk;
 
 }

@@ -57,8 +57,8 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         HeapMemory_getModule(),
         PS2Controller_getModule(),
         VFS_getModule(),
-        // Scheduler_getModule(),
-        // ProcessManager_getModule(),
+        Scheduler_getModule(),
+        ProcessManager_getModule(),
 
     };
 
