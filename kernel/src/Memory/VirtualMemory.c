@@ -232,6 +232,7 @@ PRIVATE void VirtualMemory_setPDE(PageDirectoryEntry* pde, PageTable* pageTable)
     pde->frameIndex = ADDR_TO_FRAME_INDEX(pageTable);
     pde->inMemory = TRUE;
     pde->rwFlag = TRUE;
+    pde->mode = 1; //TODO: remove
 
 }
 
@@ -243,6 +244,7 @@ PRIVATE void VirtualMemory_setPTE(PageTableEntry* pte, void* physicalAddr) {
     pte->frameIndex = ADDR_TO_FRAME_INDEX(physicalAddr);
     pte->inMemory = TRUE;
     pte->rwFlag = TRUE;
+    pte->mode = 1; //TODO: remove
 
 }
 
@@ -272,6 +274,7 @@ PRIVATE void VirtualMemory_init(void) {
     dir->entries[1023].frameIndex = ADDR_TO_FRAME_INDEX(dir);
     dir->entries[1023].inMemory = TRUE;
     dir->entries[1023].rwFlag = TRUE;
+    dir->entries[1023].mode = TRUE; //TODO: remove
 
     /* Register page fault handler */
     IDT_registerHandler(&VirtualMemory_pageFaultHandler, 14);
@@ -315,6 +318,7 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
     pde->frameIndex = kDir->entries[0].frameIndex;
     pde->inMemory = TRUE;
     pde->rwFlag = TRUE;
+    pde->mode = 1; //TODO: remove
 
     /* Map kernel heap, starting from  (KERNEL_HEAP_BASE_VADDR) to (KERNEL_HEAP_BASE_VADDR + KERNEL_HEAP_MAP_SIZE_MB) */
     for(u32int i = PDE_INDEX(KERNEL_HEAP_BASE_VADDR); i < PDE_INDEX(KERNEL_HEAP_BASE_VADDR) + KERNEL_HEAP_MAP_SIZE_MB / 4; i++) {
@@ -324,6 +328,7 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
         pde->frameIndex = kDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)].frameIndex;
         pde->inMemory = TRUE;
         pde->rwFlag = TRUE;
+        pde->mode = 1; //TODO: remove
 
     }
 

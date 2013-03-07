@@ -50,6 +50,7 @@ struct Process {
     void*  userHeapBase;
     void*  kernelStack;
     void*  kernelStackBase;
+    void*  userStack;
     void*  pageDir;
 
 };
@@ -57,7 +58,7 @@ struct Process {
 /*=======================================================
     FUNCTION
 =========================================================*/
-Process* Process_new(u32int id, char* name, void* entry, bool mode);
+Process* Process_new(void* entry, bool mode);
 void Process_destroy(Process* self);
 
 #endif

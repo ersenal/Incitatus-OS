@@ -18,6 +18,9 @@
 #include <Drivers/Console.h>
 #include <Memory/VirtualMemory.h>
 #include <Memory.h>
+#include <Lib/String.h>
+#include <X86/GDT.h>
+#include <Drivers/VGA.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -28,51 +31,30 @@ PRIVATE Module pmModule;
     FUNCTION
 =========================================================*/
 
-PRIVATE void Test1() {
-
-    while(TRUE)
-        Console_printString("Task 1 says hi!\n");
-
-}
-
 PRIVATE void Test2() {
 
-    while(TRUE)
-        Console_printString("Task 2 says hi!\n");
+    u32int i = 0;
 
-}
+    while(1) {
 
-PRIVATE void Test3() {
+        VGA_put(1, i);
+        i++;
 
-    while(TRUE)
-        Console_printString("Task 3 says hi!\n");
-
-}
-
-PRIVATE void Test4() {
-
-    while(TRUE)
-        Console_printString("Task 4 says hi!\n");
+    }
 
 }
 
 PRIVATE void ProcessManager_init(void) {
 
-    /* Create kernel process and add to scheduler */
-    Process* initialProcess = Process_new(KERNEL_PID, "Test", NULL, KERNEL_PROCESS);
-    Scheduler_addProcess(initialProcess);
-
-    Process* test1 = Process_new(1, "Test1", Test1, USER_PROCESS);
+    Process* test1 = Process_new(NULL, USER_PROCESS);
     Scheduler_addProcess(test1);
+    String_copy(test1->name, "Test1");
 
-    Process* test2 = Process_new(2, "Test2", Test2, USER_PROCESS);
+    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) test1->kernelStack);
+
+    Process* test2 = Process_new(Test2, USER_PROCESS);
+    String_copy(test2->name, "Test2");
     Scheduler_addProcess(test2);
-
-    Process* test3 = Process_new(3, "Test3", Test3, USER_PROCESS);
-    Scheduler_addProcess(test3);
-
-    Process* test4 = Process_new(4, "Test4", Test4, USER_PROCESS);
-    Scheduler_addProcess(test4);
 
 }
 
@@ -81,7 +63,7 @@ PUBLIC void ProcessManager_switch(Regs* context) {
     /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
     Debug_assert(currentProcess != NULL);
-    currentProcess->kernelStack = context;
+    currentProcess->userStack = context;
     currentProcess->status = PROCESS_WAITING;
 
     /* Get next process from scheduler */
@@ -93,9 +75,11 @@ PUBLIC void ProcessManager_switch(Regs* context) {
         return;
 
     /* Do context switch */
-    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     Debug_assert(next->kernelStack != NULL);
-    asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store new process ESP in DR0 register */
+    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
+
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
+    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
     asm volatile("mov %0, %%DR1" : : "r" (next)); /* Store process pointer in DR1 register */
 
 }

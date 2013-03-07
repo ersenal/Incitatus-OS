@@ -30,8 +30,22 @@
 #include <Process/ProcessManager.h>
 #include <Drivers/PS2Controller.h>
 #include <FileSystem/VFS.h>
+#include <X86/Usermode.h>
 
 PUBLIC MultibootInfo* multibootInfo;
+
+PRIVATE void test(void) {
+
+    u32int i = 0;
+
+    while(1) {
+
+        VGA_put(0, i);
+        i++;
+
+    }
+
+}
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
@@ -59,6 +73,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         VFS_getModule(),
         Scheduler_getModule(),
         ProcessManager_getModule(),
+        Usermode_getModule(test),
 
     };
 

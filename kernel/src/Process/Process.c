@@ -21,13 +21,20 @@
 #include <Debug.h>
 #include <Memory.h>
 
-PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
+/*=======================================================
+    PRIVATE DATA
+=========================================================*/
+PRIVATE u32int pid = 0;
 
-    UNUSED(name);
+/*=======================================================
+    FUNCTION
+=========================================================*/
+
+PUBLIC Process* Process_new(void* entry, bool mode) {
 
     Process* self = HeapMemory_calloc(1, sizeof(Process));
     Debug_assert(self != NULL);
-    self->pid = id;
+    self->pid = pid;
 
     if(mode == USER_PROCESS) { /* User process */
 
@@ -39,21 +46,31 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
         registers.eflags = 0x202; /* Interrupt enable flag */
         registers.eip    = (u32int) entry; /* Initial code entry point */
         registers.intNo  = IRQ0;
-        registers.cs     = KERNEL_CODE_SEGMENT;
-        registers.ds     = KERNEL_DATA_SEGMENT;
-        registers.es     = KERNEL_DATA_SEGMENT;
-        registers.fs     = KERNEL_DATA_SEGMENT;
-        registers.gs     = KERNEL_DATA_SEGMENT;
 
-        /* Set up initial user ss and esp */
-        registers.esp0   = 0;
-        registers.ss0    = 0;
+        /* Add 3 so that they have an RPL of 3 (User ring) */
+        registers.cs     = USER_CODE_SEGMENT | 3;
+        registers.ds     = USER_DATA_SEGMENT | 3;
+        registers.es     = USER_DATA_SEGMENT | 3;
+        registers.fs     = USER_DATA_SEGMENT | 3;
+        registers.gs     = USER_DATA_SEGMENT | 3;
 
         /* Allocate kernel stack - 4KB */
         u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
         Debug_assert(stack != NULL);
         self->kernelStackBase = stack;
 
+        /* Allocate and map user stack - Currently 4KB */
+        Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
+        u32int* ustack = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(ustack != NULL);
+        self->userStack = (void*) ((char*) ustack + FRAME_SIZE - sizeof(Regs));
+
+        /* Set up initial user ss and esp */
+        registers.esp0   = (u32int) self->userStack;;
+        registers.ss0    = USER_DATA_SEGMENT | 3;;
+        Memory_copy(self->userStack, &registers, sizeof(Regs));
+
+        /* Setup kernel stack */
         stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
         Memory_copy(stack, &registers, sizeof(Regs));
         self->kernelStack = stack;
@@ -64,22 +81,13 @@ PUBLIC Process* Process_new(u32int id, char* name, void* entry, bool mode) {
         /* Map kernel bottom 4MB + kernel heap */
         VirtualMemory_mapKernel(self);
 
-        /* Allocate and map user stack - Currently 4KB */
-        Debug_assert(USER_STACK_SIZE % FRAME_SIZE == 0);
-        for(int i = 0; i < USER_STACK_SIZE / FRAME_SIZE; i++) {
-
-            void* frame = PhysicalMemory_allocateFrame();
-            Debug_assert(frame != NULL);
-            VirtualMemory_mapPage((void*) (USER_STACK_BASE_VADDR + (i * FRAME_SIZE)), frame);
-
-        }
-
     } else { /* Kernel process */
 
         self->pageDir = VirtualMemory_getKernelDir();
 
     }
 
+    pid++;
     self->status = PROCESS_CREATED;
     return self;
 

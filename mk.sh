@@ -1,7 +1,7 @@
 #!/bin/sh
 Linker="/usr/local/cross/bin/i586-elf-ld"
 C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
-CFlags="-nostdlib -fno-builtin -fno-stack-protector -O2 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/"
+CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/"
 
 nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
@@ -21,6 +21,7 @@ $C_Compiler $CFlags -o pic.o     -c   kernel/src/X86/PIC8259.c
 $C_Compiler $CFlags -o idt.o     -c   kernel/src/X86/IDT.c
 $C_Compiler $CFlags -o pit.o     -c   kernel/src/X86/PIT8253.c
 $C_Compiler $CFlags -o cpu.o     -c   kernel/src/X86/CPU.c
+$C_Compiler $CFlags -o user.o    -c   kernel/src/X86/Usermode.c
 
 $C_Compiler $CFlags -o bitmap.o  -c   kernel/src/Lib/Bitmap.c
 $C_Compiler $CFlags -o stack.o   -c   kernel/src/Lib/Stack.c
@@ -80,7 +81,8 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         ps2.o \
                                                                         ramdisk.o \
                                                                         tar.o \
-                                                                        vfs.o
+                                                                        vfs.o \
+                                                                        user.o
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/

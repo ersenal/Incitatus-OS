@@ -37,6 +37,7 @@
 #define MODULE_PROCESS      110
 #define MODULE_PS2          111
 #define MODULE_VFS          112
+#define MODULE_USERMODE     113
 
 /*=======================================================
     STRUCT

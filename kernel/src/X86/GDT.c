@@ -20,7 +20,7 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-#define NUMBER_OF_ENTRIES 5
+#define NUMBER_OF_ENTRIES 6
 
 /* GDT segment executable types */
 #define CODE_SEGMENT 1
@@ -31,6 +31,7 @@
 =========================================================*/
 typedef struct GDTPointer  GDTPointer;
 typedef struct GDTEntry    GDTEntry;
+typedef struct TSSEntry   TSSEntry;
 
 /* 8-bytes long GDT entry */
 struct GDTEntry {
@@ -119,16 +120,80 @@ struct GDTPointer {
 
 } __attribute__((packed));
 
+/* Task state segment */
+struct TSSEntry {
+
+    u32int      : 32;
+    u32int esp0 : 32;
+    u32int ss0  : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+    u32int      : 32;
+
+} __attribute__((packed));
+
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module     gdtModule;
 PRIVATE GDTEntry   gdtEntries[NUMBER_OF_ENTRIES];
 PRIVATE GDTPointer gdtPointer;
+PRIVATE TSSEntry   tss;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+PRIVATE void GDT_flushTSS(void) {
+
+    asm volatile("ltr %w0" : : "r" (TSS_SEGMENT | 3)); /* Add 3 so that it has an RPL of 3 (User ring) */
+
+}
+
+PRIVATE void GDT_setTSSEntry(u32int base, u32int limit, u8int access, u8int granularity) {
+
+    struct GDTENTRY {
+
+        u16int limitLow;
+        u16int baseLow;
+        u8int baseMiddle;
+        u8int access;
+        u8int granularity;
+        u8int base_high;
+
+    } __attribute__((packed));
+
+    struct GDTENTRY* ent = (struct GDTENTRY*) &gdtEntries[5];
+
+    ent->baseLow     = (base & 0xFFFF);
+    ent->baseMiddle  = (base >> 16) & 0xFF;
+    ent->base_high    = (base >> 24) & 0xFF;
+    ent->limitLow    = (limit & 0xFFFF);
+    ent->granularity  = ( (limit >> 16) & 0x0F );
+    ent->granularity  |= (granularity & 0xF0);
+    ent->access       = access;
+}
 
 PRIVATE void GDT_flush(void) {
 
@@ -229,10 +294,22 @@ PRIVATE void GDT_init(void) {
     gdtEntries[4].granularity      = 1;
     gdtEntries[4].reserved         = 0;
 
+    /* Set TSS */
+    GDT_setTSSEntry((u32int)&tss, (u32int) &tss + 64, 0x89, 0x00);
+    GDT_setTSS(KERNEL_DATA_SEGMENT, 0);
+
     /* Let CPU know about these entries */
     gdtPointer.limit = (sizeof(GDTEntry) * NUMBER_OF_ENTRIES) - 1;
     gdtPointer.firstEntry  = (GDTEntry*) &gdtEntries;
     GDT_flush();
+    GDT_flushTSS();
+}
+
+PUBLIC void GDT_setTSS(u32int dataSegment, u32int esp0) {
+
+    tss.ss0 = dataSegment;
+    tss.esp0 = esp0;
+
 }
 
 PUBLIC Module* GDT_getModule(void) {

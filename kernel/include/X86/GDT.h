@@ -29,6 +29,7 @@
 #define KERNEL_DATA_SEGMENT 0x10 /* Base 0, Limit 4GB, Privilege 0 */
 #define USER_CODE_SEGMENT   0x18 /* Base 0, Limit 4GB, Privilege 3 */
 #define USER_DATA_SEGMENT   0x20 /* Base 0, Limit 4GB, Privilege 3 */
+#define TSS_SEGMENT         0x28 /* Task state segment selector */
 
  /* Privilege levels */
 #define KERNEL_MODE  0
@@ -37,6 +38,14 @@
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+/*-------------------------------------------------------------------------
+| Set TSS
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Sets the task state segment to specified values.
+| //TODO: add param info
+\------------------------------------------------------------------------*/
+void GDT_setTSS(u32int dataSegment, u32int esp0);
 
 /*-------------------------------------------------------------------------
 | Get GDT module
