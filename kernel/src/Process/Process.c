@@ -61,9 +61,9 @@ PUBLIC Process* Process_new(void* entry, bool mode) {
 
         /* Allocate and map user stack - Currently 4KB */
         Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
-        u32int* ustack = HeapMemory_calloc(1, FRAME_SIZE);
-        Debug_assert(ustack != NULL);
-        self->userStack = (void*) ((char*) ustack + FRAME_SIZE - sizeof(Regs));
+        self->userStackBase = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(self->userStackBase != NULL);
+        self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
 
         /* Set up initial user ss and esp */
         registers.esp0   = (u32int) self->userStack;;
@@ -97,6 +97,7 @@ PUBLIC void Process_destroy(Process* self) {
 
     VirtualMemory_destroyPageDirectory(self);
     HeapMemory_free(self->kernelStackBase);
+    HeapMemory_free(self->userStackBase);
     HeapMemory_free(self);
 
 }

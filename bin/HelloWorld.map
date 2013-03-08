@@ -1,0 +1,45 @@
+Archive member included because of file (symbol)
+
+bin/libIncitatus.a(incit.o)   helloworld.o (puts)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000000300000      0x198 load address 0x0000000000000000
+ *(.text)
+ .text          0x0000000000300000       0x1f helloworld.o
+                0x0000000000300000                main
+ *fill*         0x000000000030001f        0x1 
+ .text          0x0000000000300020       0xb4 bin/libIncitatus.a(incit.o)
+                0x0000000000300057                puts
+                0x0000000000300092                putc
+                0x00000000003000d4                . = ALIGN (0x4)
+ *(.eh_frame)
+ .eh_frame      0x00000000003000d4       0x34 helloworld.o
+ .eh_frame      0x0000000000300108       0x84 bin/libIncitatus.a(incit.o)
+                0x000000000030018c                . = ALIGN (0x4)
+ *(.data)
+ .data          0x000000000030018c        0x0 helloworld.o
+ .data          0x000000000030018c        0x0 bin/libIncitatus.a(incit.o)
+                0x000000000030018c                . = ALIGN (0x4)
+ *(.rodata)
+ .rodata        0x000000000030018c        0xc helloworld.o
+                0x0000000000300198                . = ALIGN (0x4)
+ *(.bss)
+ .bss           0x0000000000300198        0x0 helloworld.o
+ .bss           0x0000000000300198        0x0 bin/libIncitatus.a(incit.o)
+                0x0000000000300198                . = ALIGN (0x4)
+ *(.COMMON)
+                0x0000000000300198                . = ALIGN (0x4)
+LOAD helloworld.o
+LOAD bin/libIncitatus.a
+OUTPUT(bin/HelloWorld binary)
+
+.comment        0x0000000000000000       0x24
+ .comment       0x0000000000000000       0x12 helloworld.o
+ .comment       0x0000000000000012       0x12 bin/libIncitatus.a(incit.o)

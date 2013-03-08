@@ -31,23 +31,10 @@
 #include <Drivers/PS2Controller.h>
 #include <FileSystem/VFS.h>
 #include <X86/Usermode.h>
-#include <Incitatus.h>
+#include <Memory.h>
 
 PUBLIC MultibootInfo* multibootInfo;
 
-
-
-PRIVATE void test(void) {
-
-
-    while(1) {
-
-        char* h = "User test!";
-        puts(h);
-
-    }
-
-}
 
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
@@ -75,12 +62,19 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         VFS_getModule(),
         Scheduler_getModule(),
         ProcessManager_getModule(),
-        Usermode_getModule(test),
 
     };
 
     for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
         Module_load(modules[i]);
+
+    //Load HelloWorld and pass
+    VFSNode* p = VFS_openFile("/HelloWorld");
+    char* buff = HeapMemory_calloc(1, p->fileSize + 1);
+    p->vfs->read(p, 0, p->fileSize, buff);
+    Memory_copy((void*) 0x300000, buff, p->fileSize + 1);
+    HeapMemory_free(buff);
+    Module_load(Usermode_getModule((void*) 0x300000));
 
     Sys_enableInterrupts();
 

@@ -51,6 +51,7 @@ struct Process {
     void*  kernelStack;
     void*  kernelStackBase;
     void*  userStack;
+    void*  userStackBase;
     void*  pageDir;
 
 };
