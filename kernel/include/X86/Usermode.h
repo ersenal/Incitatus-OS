@@ -7,7 +7,7 @@
 | Usermode.h
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Handles ring0 to ring3 switch.
+| DESCRIPTION:  Handles ring0 to ring3 switch and syscalls.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/

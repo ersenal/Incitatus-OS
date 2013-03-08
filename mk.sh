@@ -1,7 +1,7 @@
 #!/bin/sh
 Linker="/usr/local/cross/bin/i586-elf-ld"
 C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
-CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/"
+CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/ -I lib/include"
 
 nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
@@ -47,6 +47,8 @@ $C_Compiler $CFlags -o ramdisk.o -c   kernel/src/FileSystem/RamDisk.c
 $C_Compiler $CFlags -o tar.o     -c   kernel/src/FileSystem/Tar.c
 $C_Compiler $CFlags -o vfs.o     -c   kernel/src/FileSystem/VFS.c
 
+$C_Compiler $CFlags -o incit.o   -c   lib/src/Incitatus.c
+
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
                                                                         vga.o \
@@ -82,7 +84,8 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         ramdisk.o \
                                                                         tar.o \
                                                                         vfs.o \
-                                                                        user.o
+                                                                        user.o \
+                                                                        incit.o
 
 
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/

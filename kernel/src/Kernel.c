@@ -31,17 +31,19 @@
 #include <Drivers/PS2Controller.h>
 #include <FileSystem/VFS.h>
 #include <X86/Usermode.h>
+#include <Incitatus.h>
 
 PUBLIC MultibootInfo* multibootInfo;
 
+
+
 PRIVATE void test(void) {
 
-    u32int i = 0;
 
     while(1) {
 
-        VGA_put(0, i);
-        i++;
+        char* h = "User test!";
+        puts(h);
 
     }
 

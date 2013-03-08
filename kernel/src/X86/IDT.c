@@ -142,6 +142,7 @@ extern void IDT_handler28(void);
 extern void IDT_handler29(void);
 extern void IDT_handler30(void);
 extern void IDT_handler31(void);
+extern void IDT_handler128(void);
 /* 32 to 255 - Free for software use */
 /* 32 to 47 - IRQ */
 extern void IDT_request0(void);
@@ -211,6 +212,7 @@ PRIVATE void IDT_initExceptionHandlers(void) {
     IDT_setEntry(29, (u32int) IDT_handler29, KERNEL_CODE_SEGMENT, GATE_INTERRUPT, KERNEL_MODE, 1);
     IDT_setEntry(30, (u32int) IDT_handler30, KERNEL_CODE_SEGMENT, GATE_INTERRUPT, KERNEL_MODE, 1);
     IDT_setEntry(31, (u32int) IDT_handler31, KERNEL_CODE_SEGMENT, GATE_INTERRUPT, KERNEL_MODE, 1);
+    IDT_setEntry(128, (u32int) IDT_handler128, KERNEL_CODE_SEGMENT, GATE_INTERRUPT, USER_MODE, 1);
 
 }
 

@@ -49,6 +49,7 @@
 [GLOBAL IDT_handler29]
 [GLOBAL IDT_handler30]
 [GLOBAL IDT_handler31]
+[GLOBAL IDT_handler128] ; Sys call handler
 
 ;IRQs
 [GLOBAL IDT_request0]
@@ -379,6 +380,13 @@ IDT_handler31:
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 31 ; Push interrupt number
+    jmp IDT_exceptionHandlerCommon ; Go to common handler
+
+IDT_handler128:
+
+    cli ; Disable interrupts
+    push byte 0 ; Push a dummy error code
+    push 128 ; Push interrupt number
     jmp IDT_exceptionHandlerCommon ; Go to common handler
 
 IDT_request0:
