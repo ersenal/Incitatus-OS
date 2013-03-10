@@ -17,12 +17,13 @@
 #include <Common.h>
 #include <Debug.h>
 #include <X86/IDT.h>
+#include <Process/ProcessManager.h>
 
 /*=======================================================
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS        2
+#define NUMBER_OF_CALLS        3
 
 /*=======================================================
     PRIVATE DATA
@@ -34,6 +35,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
 
     &Console_printString,
     &Console_printChar,
+    &ProcessManager_killProcess,
 
 };
 

@@ -100,6 +100,15 @@ IDT_exceptionHandlerCommon:
     call IDT_handlerException  ; Call C-level common exception handler
     add esp, 4                 ; Drop stack pointer
 
+    ;TODO: fix this hack
+    mov eax, DR1
+    cmp eax, 0xDEADBEEF
+    jne NotSwitch        ; Jump if this is not a exit() syscall
+    mov eax, DR0         ; Get new process ESP
+    mov esp, eax         ; Switch process stacks
+
+    NotSwitch:
+
     ; Restore the segment selectors
     pop gs
     pop fs

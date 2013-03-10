@@ -8,7 +8,10 @@ $C_Compiler $CFlags -o incit.o   -c   user/src/Lib/Incitatus.c
 ar rcs bin/libIncitatus.a incit.o
 
 $C_Compiler $CFlags -o helloworld.o -c user/src/Apps/HelloWorld.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o bin/HelloWorld helloworld.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o HelloWorld helloworld.o bin/libIncitatus.a
+
+tar cvf bootloader/initrd.tar HelloWorld
+rm HelloWorld
 #!
 
 nasm -f elf -o start.o   kernel/src/Start.s
@@ -46,7 +49,6 @@ $C_Compiler $CFlags -o heap.o    -c   kernel/src/Memory/HeapMemory.c
 $C_Compiler $CFlags -o dl.o      -c   kernel/src/Memory/DougLea.c
 $C_Compiler $CFlags -o dumbH.o   -c   kernel/src/Memory/DumbHeapManager.c
 
-$C_Compiler $CFlags -o process.o -c   kernel/src/Process/Process.c
 $C_Compiler $CFlags -o sched.o   -c   kernel/src/Process/Scheduler.c
 $C_Compiler $CFlags -o rr.o      -c   kernel/src/Process/RoundRobin.c
 $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
@@ -80,7 +82,6 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         dumbH.o \
                                                                         linkl.o \
                                                                         string.o \
-                                                                        process.o \
                                                                         sched.o \
                                                                         rr.o \
                                                                         pm.o \

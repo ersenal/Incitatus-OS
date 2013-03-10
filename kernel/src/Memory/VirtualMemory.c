@@ -216,7 +216,7 @@ PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
 
     } else { /* User process, kill it */
 
-        ProcessManager_killProcess(process);
+        ProcessManager_killProcess(-1);
 
     }
 

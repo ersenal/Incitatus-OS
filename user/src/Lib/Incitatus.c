@@ -35,3 +35,9 @@ void putc(char c) {
     syscall(SYSCALL_PUTC, c, 0, 0, 0, 0);
 
 }
+
+void exit(int exitCode) {
+
+    syscall(SYSCALL_EXIT, exitCode, 0, 0, 0, 0);
+
+}

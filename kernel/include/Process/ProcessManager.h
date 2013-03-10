@@ -66,7 +66,7 @@ struct Process {
 =========================================================*/
 void  ProcessManager_switch(Regs* context);
 Module* ProcessManager_getModule(void);
-void ProcessManager_killProcess(Process* process);
+void ProcessManager_killProcess(int exitCode);
 Process* ProcessManager_newProcess(void* entry, bool mode);
 
 #endif

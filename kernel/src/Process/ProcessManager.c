@@ -23,6 +23,7 @@
 #include <Lib/String.h>
 #include <X86/GDT.h>
 #include <Drivers/VGA.h>
+#include <Process/Mutex.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -47,6 +48,19 @@ PRIVATE void Test2() {
 
 }
 
+PRIVATE void Test3() {
+
+    u32int i = 0;
+
+    while(1) {
+
+        VGA_put(0, i);
+        i++;
+
+    }
+
+}
+
 PRIVATE void ProcessManager_init(void) {
 
     Process* test1 = ProcessManager_newProcess(NULL, USER_PROCESS);
@@ -59,36 +73,14 @@ PRIVATE void ProcessManager_init(void) {
     String_copy(test2->name, "Test2");
     Scheduler_addProcess(test2);
 
-}
-
-PUBLIC void ProcessManager_switch(Regs* context) {
-
-    /* Save process state */
-    Process* currentProcess = Scheduler_getCurrentProcess();
-    Debug_assert(currentProcess != NULL);
-    currentProcess->userStack = context;
-    currentProcess->status = PROCESS_WAITING;
-
-    /* Get next process from scheduler */
-    Process* next = Scheduler_getNextProcess();
-    Debug_assert(next != NULL);
-    next->status = PROCESS_RUNNING;
-
-    if(currentProcess == next) /* No need for a context switch */
-        return;
-
-    /* Do context switch */
-    Debug_assert(next->kernelStack != NULL);
-    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
-
-    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
-    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+    Process* test3 = ProcessManager_newProcess(Test3, USER_PROCESS);
+    String_copy(test3->name, "Test3");
+    Scheduler_addProcess(test3);
 
 }
 
-PUBLIC void ProcessManager_killProcess(Process* process) {
+PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
-    Scheduler_removeProcess(process);
     HeapMemory_free(process->kernelStackBase);
     HeapMemory_free(process->userStackBase);
 
@@ -109,11 +101,22 @@ PUBLIC void ProcessManager_killProcess(Process* process) {
     HeapMemory_free(process);
     VirtualMemory_destroyPageDirectory(process);
 
+}
+
+PUBLIC void ProcessManager_switch(Regs* context) {
+
+    /* Save process state */
+    Process* currentProcess = Scheduler_getCurrentProcess();
+    Debug_assert(currentProcess != NULL);
+    currentProcess->userStack = context;
+    currentProcess->status = PROCESS_WAITING;
+
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
     Debug_assert(next != NULL);
-    Debug_assert(next != process);
     next->status = PROCESS_RUNNING;
+    if(currentProcess == next) /* No need for a context switch */
+        return;
 
     /* Do context switch */
     Debug_assert(next->kernelStack != NULL);
@@ -188,6 +191,30 @@ PUBLIC Process* ProcessManager_newProcess(void* entry, bool mode) {
     pid++;
     self->status = PROCESS_CREATED;
     return self;
+
+}
+
+PUBLIC void ProcessManager_killProcess(int exitCode) {
+
+    Debug_assert(exitCode == 0); /* Normal termination */
+    Process* current = Scheduler_getCurrentProcess();
+    current->status = PROCESS_TERMINATED;
+    Scheduler_removeProcess(current);
+    ProcessManager_destroyProcess(current);
+
+    /* Get next process from scheduler */
+    Process* next = Scheduler_getNextProcess();
+    Debug_assert(next != NULL);
+    Debug_assert(next != current);
+    next->status = PROCESS_RUNNING;
+
+    /* Do context switch */
+    Debug_assert(next->kernelStack != NULL);
+    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
+
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
+    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+    asm volatile("mov %0, %%DR1" : : "r" (0xDEADBEEF)); /* Store 1 at DR1 in order to distinguish the procedure */
 
 }
 
