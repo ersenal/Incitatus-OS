@@ -43,7 +43,9 @@
 | Set TSS
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Sets the task state segment to specified values.
-| //TODO: add param info
+|
+| PARAM:           'dataSegment' kernel data segment
+|                  'esp0'        the kernel stack
 \------------------------------------------------------------------------*/
 void GDT_setTSS(u32int dataSegment, u32int esp0);
 

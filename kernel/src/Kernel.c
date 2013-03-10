@@ -35,7 +35,6 @@
 
 PUBLIC MultibootInfo* multibootInfo;
 
-
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
     extern MultibootHeader mbHead;
@@ -69,7 +68,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         Module_load(modules[i]);
 
     //Load HelloWorld and pass
-    VFSNode* p = VFS_openFile("/HelloWorld");
+    VFSNode* p = VFS_openFile("/HelloWorld", "r");
     char* buff = HeapMemory_calloc(1, p->fileSize + 1);
     p->vfs->read(p, 0, p->fileSize, buff);
     Memory_copy((void*) 0x300000, buff, p->fileSize + 1);

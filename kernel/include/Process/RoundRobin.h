@@ -16,7 +16,7 @@
 #ifndef ROUND_ROBIN_H
 #define ROUND_ROBIN_H
 
-#include <Process/Process.h>
+#include <Process/ProcessManager.h>
 
 void RoundRobin_init(Process* firstProcess);
 void RoundRobin_addProcess(Process* process);

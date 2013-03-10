@@ -7,7 +7,7 @@
 | ProcessManager.c
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Handles context switch.
+| DESCRIPTION:  Handles process creation, destruction, switch.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
@@ -17,6 +17,8 @@
 #include <Process/Scheduler.h>
 #include <Drivers/Console.h>
 #include <Memory/VirtualMemory.h>
+#include <Memory/HeapMemory.h>
+#include <Memory/PhysicalMemory.h>
 #include <Memory.h>
 #include <Lib/String.h>
 #include <X86/GDT.h>
@@ -26,6 +28,7 @@
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module pmModule;
+PRIVATE u32int pid = 0;
 
 /*=======================================================
     FUNCTION
@@ -46,13 +49,13 @@ PRIVATE void Test2() {
 
 PRIVATE void ProcessManager_init(void) {
 
-    Process* test1 = Process_new(NULL, USER_PROCESS);
+    Process* test1 = ProcessManager_newProcess(NULL, USER_PROCESS);
     Scheduler_addProcess(test1);
     String_copy(test1->name, "Test1");
 
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) test1->kernelStack);
 
-    Process* test2 = Process_new(Test2, USER_PROCESS);
+    Process* test2 = ProcessManager_newProcess(Test2, USER_PROCESS);
     String_copy(test2->name, "Test2");
     Scheduler_addProcess(test2);
 
@@ -80,7 +83,111 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
-    asm volatile("mov %0, %%DR1" : : "r" (next)); /* Store process pointer in DR1 register */
+
+}
+
+PUBLIC void ProcessManager_killProcess(Process* process) {
+
+    Scheduler_removeProcess(process);
+    HeapMemory_free(process->kernelStackBase);
+    HeapMemory_free(process->userStackBase);
+
+    if(process->fileNodes != NULL) {
+
+        /* close all opened files */
+        for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
+
+            VFSNode* file = ArrayList_get(process->fileNodes, i);
+            VFS_closeFile(file);
+
+        }
+
+        ArrayList_destroy(process->fileNodes);
+
+    }
+
+    HeapMemory_free(process);
+    VirtualMemory_destroyPageDirectory(process);
+
+    /* Get next process from scheduler */
+    Process* next = Scheduler_getNextProcess();
+    Debug_assert(next != NULL);
+    Debug_assert(next != process);
+    next->status = PROCESS_RUNNING;
+
+    /* Do context switch */
+    Debug_assert(next->kernelStack != NULL);
+    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
+
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
+    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+
+}
+
+PUBLIC Process* ProcessManager_newProcess(void* entry, bool mode) {
+
+    Process* self = HeapMemory_calloc(1, sizeof(Process));
+    Debug_assert(self != NULL);
+
+    self->pid = pid;
+    self->workingDirectory = NULL; //TODO: implement
+
+    if(mode == USER_PROCESS) { /* User process */
+
+        Regs registers;
+        Memory_set(&registers, 0, sizeof(Regs));
+
+        self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
+
+        registers.eflags = 0x202; /* Interrupt enable flag */
+        registers.eip    = (u32int) entry; /* Initial code entry point */
+        registers.intNo  = IRQ0;
+
+        /* Add 3 so that they have an RPL of 3 (User ring) */
+        registers.cs     = USER_CODE_SEGMENT | 3;
+        registers.ds     = USER_DATA_SEGMENT | 3;
+        registers.es     = USER_DATA_SEGMENT | 3;
+        registers.fs     = USER_DATA_SEGMENT | 3;
+        registers.gs     = USER_DATA_SEGMENT | 3;
+
+        /* Allocate kernel stack - 4KB */
+        u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(stack != NULL);
+        self->kernelStackBase = stack;
+
+        /* Allocate and map user stack - Currently 4KB */
+        Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
+        self->userStackBase = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(self->userStackBase != NULL);
+        self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
+
+        /* Set up initial user ss and esp */
+        registers.esp0   = (u32int) self->userStack;;
+        registers.ss0    = USER_DATA_SEGMENT | 3;;
+        Memory_copy(self->userStack, &registers, sizeof(Regs));
+
+        /* Setup kernel stack */
+        stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
+        Memory_copy(stack, &registers, sizeof(Regs));
+        self->kernelStack = stack;
+
+        /* Create a new page directory for process */
+        VirtualMemory_createPageDirectory(self);
+
+        /* Map kernel bottom 4MB + kernel heap */
+        VirtualMemory_mapKernel(self);
+
+        self->fileNodes = ArrayList_new(1);
+
+    } else { /* Kernel process */
+
+        self->pageDir = VirtualMemory_getKernelDir();
+
+    }
+
+    pid++;
+    self->status = PROCESS_CREATED;
+    return self;
 
 }
 

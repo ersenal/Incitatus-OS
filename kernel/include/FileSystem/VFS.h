@@ -22,6 +22,10 @@
 /*=======================================================
     DEFINE
 =========================================================*/
+#define FILE_MODE_NOT_OPEN  0
+#define FILE_MODE_READ      1
+#define FILE_MODE_WRITE     2
+
 #define VFS_FILE_NAME_SIZE  128
 
 #define FILETYPE_NORMAL             0x01
@@ -58,6 +62,7 @@ struct VFSNode {
     char      fileName[VFS_FILE_NAME_SIZE]; /* The file name */
     u32int    index;                        /* Index of the node in a specific device*/
     u32int    permission;                   /* rwx Permission mask similar to Unix systems (for example 644, 777, etc.) */
+    u32int    mode;                         /* 0 = file is not open, 1 = read mode, 2 = write mode */
     u32int    uid;                          /* Owner id */
     u32int    gid;                          /* Group id */
     u32int    fileType;                     /* Directory, normal, link, etc. */
@@ -71,16 +76,35 @@ struct VFSNode {
     FUNCTION
 =========================================================*/
 
+//TODO: fseek, fwrite, fread
+
 /*-------------------------------------------------------------------------
 | Open file
 |--------------------------------------------------------------------------
-| DESCRIPTION:    Returns the virtual file system module.
+| DESCRIPTION:  Opens a file and returns a file descriptor(node pointer).
 |
-| PARAM:          'filename' name of the file to be opened
+| PARAM:    'filename' name of the file to be opened
 |
-| RETURN:         'VFSNode*' file node
+|           'mode'     'r' Open file for input operations. The file must exist.
+|
+|                      'w' Create an empty file for output operations.
+|                          If a file with the same name already exists, its
+|                          contents are discarded and the file is treated as a new empty file.
+|
+| RETURN:  'VFSNode*' the file node
 \------------------------------------------------------------------------*/
-VFSNode* VFS_openFile(const char* filename);
+VFSNode* VFS_openFile(const char* filename, const char* mode);
+
+/*-------------------------------------------------------------------------
+| Close file
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Closes an opened file.
+|
+| PARAM:        'file' - descriptor(pointer) of the file node to be closed
+|
+| RETURN:       'bool' - 0 if file closed successfully
+\------------------------------------------------------------------------*/
+bool VFS_closeFile(VFSNode* file);
 
 /*-------------------------------------------------------------------------
 | Get VFS module

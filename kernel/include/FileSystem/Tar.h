@@ -38,7 +38,7 @@
 #define TAR_FILETYPE_NORMAL             '0'
 #define TAR_FILETYPE_HARD_LINK          '1'
 #define TAR_FILETYPE_SYM_LINK           '2'
-#define TAR_FILETYPE_DEVICE             '3'
+#define TAR_FILETYPE_CHAR_DEVICE        '3'
 #define TAR_FILETYPE_BLOCK_DEVICE       '4'
 #define TAR_FILETYPE_DIRECTORY          '5'
 #define TAR_FILETYPE_NAMED_PIPE         '6'
@@ -66,8 +66,37 @@ struct TarEntryHeader {
     FUNCTION
 =========================================================*/
 
-//TODO: comments
+/*-------------------------------------------------------------------------
+| Get next tar header
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the next tar header.
+|
+| PARAM:        'header' current header
+|
+| RETURN        'TarEntryHeader*' the next header
+\------------------------------------------------------------------------*/
 TarEntryHeader* Tar_nextHeader(const TarEntryHeader* header);
+
+/*-------------------------------------------------------------------------
+| Get tar header
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the nth tar header.
+|
+| PARAM:        'firstHeader' the first tar header
+|               'index'       index of tar header to be returned
+|
+| RETURN        'TarEntryHeader*' nth tar header
+\------------------------------------------------------------------------*/
 TarEntryHeader* Tar_getHeader(const TarEntryHeader* firstHeader, u32int index);
+
+/*-------------------------------------------------------------------------
+| Get number of tar files
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the number of tar files.
+|
+| PARAM:        'firstHeader' the first tar header
+|
+| RETURN        'u32int' the number of tar files
+\------------------------------------------------------------------------*/
 u32int Tar_getNumberOfFiles(const TarEntryHeader* firstHeader);
 #endif

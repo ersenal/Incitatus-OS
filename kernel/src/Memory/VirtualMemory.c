@@ -19,6 +19,8 @@
 #include <X86/IDT.h>
 #include <Debug.h>
 #include <Memory.h>
+#include <Process/Scheduler.h>
+#include <Process/ProcessManager.h>
 #pragma GCC diagnostic ignored "-Wstrict-aliasing" /* ignore FORCE_CAST compiler warning */
 
 /*=======================================================
@@ -196,8 +198,7 @@ PRIVATE void VirtualMemory_setPaging(bool state) {
 
 PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
 
-    Process* process;
-    asm volatile("mov %%DR1, %0" : "=a" (process)); /* Retrieve current process pointer from DR1 register */
+    Process* process = Scheduler_getCurrentProcess();
     Debug_assert(process != NULL);
 
     u32int faultAddr;
@@ -215,9 +216,7 @@ PRIVATE void VirtualMemory_pageFaultHandler(Regs* regs) {
 
     } else { /* User process, kill it */
 
-        bool processKilled = FALSE;
-        //TODO: kill process
-        Debug_assert(processKilled);
+        ProcessManager_killProcess(process);
 
     }
 

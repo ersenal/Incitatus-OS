@@ -16,6 +16,9 @@
 #include <FileSystem/VFS.h>
 #include <FileSystem/RamDisk.h>
 #include <Lib/String.h>
+#include <Debug.h>
+#include <Process/Scheduler.h>
+#include <Process/ProcessManager.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -35,6 +38,8 @@ PRIVATE void VFS_init(void) {
 
 PRIVATE VFSNode* VFS_searchForFile(VFSNode* node, const char* filename) {
 
+    Debug_assert(node != NULL);
+
     VFSNode* n;
     u32int i = 0;
 
@@ -53,16 +58,46 @@ PRIVATE VFSNode* VFS_searchForFile(VFSNode* node, const char* filename) {
 
 }
 
-//TODO: add flags parameter for read/write modes
+//TODO: append mode, 'a' and 'a+', 'r+', 'w+'
 //TODO: open according to current working directory
-PUBLIC VFSNode* VFS_openFile(const char* filename) {
-
-    char* f = (char*) filename;
+PUBLIC VFSNode* VFS_openFile(const char* filename, const char* mode) {
 
     if(String_startsWith(filename, "/"))
-        f++;
+        filename++;
 
-    return VFS_searchForFile(rootFS->rootNode, f);
+    VFSNode* fileNode = VFS_searchForFile(rootFS->rootNode, filename);
+    Debug_assert(fileNode->mode == FILE_MODE_NOT_OPEN);
+
+    if(String_compare(mode, "r") == 0)
+        fileNode->mode = FILE_MODE_READ;
+    else if(String_compare(mode, "w") == 0)
+        fileNode->mode = FILE_MODE_WRITE;
+    else
+        Sys_panic("Invalid file mode");
+
+    /* Add opened file to process' file list */
+    Process* currentProcess = Scheduler_getCurrentProcess();
+    ArrayList_add(currentProcess->fileNodes, fileNode);
+
+    return fileNode;
+
+}
+
+PUBLIC bool VFS_closeFile(VFSNode* file) {
+
+    Debug_assert(file != NULL);
+    Debug_assert(file->mode != FILE_MODE_NOT_OPEN); /* File must be open to be closed */
+
+    //TODO:
+    //All internal buffers associated with the stream are disassociated from it
+    //and flushed: the content of any unwritten output buffer is written and the content of any unread input buffer is discarded.
+    file->mode = FILE_MODE_NOT_OPEN;
+
+    /* Remove file from process' file list */
+    Process* currentProcess = Scheduler_getCurrentProcess();
+    ArrayList_remove(currentProcess->fileNodes, file);
+
+    return 0;
 
 }
 

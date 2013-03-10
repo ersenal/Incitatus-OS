@@ -52,7 +52,6 @@ PUBLIC void RoundRobin_removeProcess(Process* process) {
 
     LinkedList_remove(processes, process);
     process->status = PROCESS_TERMINATED;
-    Process_destroy(process);
 
 }
 

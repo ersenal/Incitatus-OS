@@ -17,7 +17,7 @@
 #define VMM_H
 
 #include <Module.h>
-#include <Process/Process.h>
+#include <Process/ProcessManager.h>
 
 /*=======================================================
     TYPE

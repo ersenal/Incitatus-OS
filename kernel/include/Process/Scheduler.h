@@ -16,7 +16,7 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include <Process/Process.h>
+#include <Process/ProcessManager.h>
 
 /*=======================================================
     INTERFACE

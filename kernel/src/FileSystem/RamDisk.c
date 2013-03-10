@@ -57,18 +57,40 @@ PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
         fileNodes[i].gid = 0;
         fileNodes[i].fileSize = String_stringToInt(firstHeader->fileSize, 8) ;
         fileNodes[i].index = i;
-
-        //TODO: Also add other filetypes
-        if(firstHeader->fileType[0] == TAR_FILETYPE_NORMAL)
-            fileNodes[i].fileType = FILETYPE_NORMAL;
-        else if(firstHeader->fileType[0] == TAR_FILETYPE_DIRECTORY)
-            fileNodes[i].fileType = FILETYPE_DIRECTORY;
-        else {
-            Debug_logWarning("%s", "Unknown Tar filetype");
-        }
-
         fileNodes[i].vfs = &ramdisk;
         fileNodes[i].ptr = 0;
+        fileNodes[i].mode = FILE_MODE_NOT_OPEN;
+
+        switch(firstHeader->fileType[0]) {
+
+            case TAR_FILETYPE_NORMAL:
+                fileNodes[i].fileType = FILETYPE_NORMAL;
+                break;
+
+            case TAR_FILETYPE_DIRECTORY:
+                fileNodes[i].fileType = FILETYPE_DIRECTORY;
+                break;
+
+            case TAR_FILETYPE_NAMED_PIPE:
+                fileNodes[i].fileType = FILETYPE_PIPE;
+                break;
+
+            case TAR_FILETYPE_HARD_LINK:
+            case TAR_FILETYPE_SYM_LINK:
+                fileNodes[i].fileType = FILETYPE_SOFT_SYMLINK;
+                break;
+
+            case TAR_FILETYPE_CHAR_DEVICE:
+                fileNodes[i].fileType = FILETYPE_CHAR_DEVICE;
+                break;
+
+            case TAR_FILETYPE_BLOCK_DEVICE:
+                fileNodes[i].fileType = FILETYPE_BLOCK_DEVICE;
+                break;
+
+            default:
+                Debug_logWarning("%s", "Unknown Tar filetype");
+        }
 
         firstHeader = Tar_nextHeader(firstHeader);
         i++;
@@ -87,6 +109,7 @@ PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* bu
     Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
     Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
     Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
+    Debug_assert(self->mode == FILE_MODE_READ);
 
     /* Get nth tar header */
     TarEntryHeader* header = Tar_getHeader((TarEntryHeader*) firstHeaderAddress, self->index);
@@ -174,6 +197,7 @@ PUBLIC VFS* RamDisk_init(void) {
     root.fileType = FILETYPE_DIRECTORY;
     root.vfs = &ramdisk;
     root.ptr = 0;
+    root.mode = FILE_MODE_NOT_OPEN;
 
     /* Set ramdisk */
     ramdisk.rootNode = &root;
