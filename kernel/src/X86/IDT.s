@@ -106,6 +106,8 @@ IDT_exceptionHandlerCommon:
     jne NotSwitch        ; Jump if this is not a exit() syscall
     mov eax, DR0         ; Get new process ESP
     mov esp, eax         ; Switch process stacks
+    mov eax, 0
+    mov DR1, eax
 
     NotSwitch:
 

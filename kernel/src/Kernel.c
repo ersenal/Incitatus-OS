@@ -67,18 +67,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
         Module_load(modules[i]);
 
-    //Load HelloWorld and pass
-    VFSNode* p = VFS_openFile("/HelloWorld", "r");
-    char* buff = HeapMemory_calloc(1, p->fileSize + 1);
-    p->vfs->read(p, 0, p->fileSize, buff);
-    Memory_copy((void*) 0x300000, buff, p->fileSize + 1);
-    HeapMemory_free(buff);
-    Module_load(Usermode_getModule((void*) 0x300000));
-
-    Sys_enableInterrupts();
-
-    while(1)
-        Sys_haltCPU();
+    Module_load(Usermode_getModule((void*) USER_CODE_BASE_VADDR));
 
     Sys_panic("Should not reach here!");
 }

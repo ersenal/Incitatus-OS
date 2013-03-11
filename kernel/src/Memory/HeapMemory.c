@@ -74,7 +74,7 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
             if(physicalAddress == NULL) /* Are we out of physical memory? */
                 Sys_panic("Out of physical memory!");
 
-            VirtualMemory_mapPage(heapTop, physicalAddress);
+            VirtualMemory_mapPage(heapTop, physicalAddress, MODE_KERNEL);
             Memory_set(heapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
             heapTop += FRAME_SIZE;
 

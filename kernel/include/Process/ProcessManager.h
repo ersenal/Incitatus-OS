@@ -49,12 +49,15 @@ struct Process {
     u32int pid;
     u8int  status;
     char   name[64];
-    void*  userHeapBase;
+    // void*  userHeapBase;
     void*  kernelStack;
     void*  kernelStackBase;
     void*  userStack;
     void*  userStackBase;
     void*  pageDir;
+
+    u32int binarySize;
+    void*  binaryEntry;
 
     VFSNode* workingDirectory;
     ArrayList* fileNodes;
@@ -67,6 +70,6 @@ struct Process {
 void  ProcessManager_switch(Regs* context);
 Module* ProcessManager_getModule(void);
 void ProcessManager_killProcess(int exitCode);
-Process* ProcessManager_newProcess(void* entry, bool mode);
+Process* ProcessManager_spawnProcess(const char* binary);
 
 #endif

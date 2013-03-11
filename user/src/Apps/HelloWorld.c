@@ -3,8 +3,8 @@
 
 int main(void) {
 
-    char* s = "Hello World";
-    puts(s);
-    exit(0);
+    puts("Spawning test");
+    spawn("/test");
+    while(1);
 
 }

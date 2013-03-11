@@ -3,7 +3,7 @@ ENTRY(main)
 SECTIONS
 {
 
-    .text 0x300000: AT(0)
+    .text 0x40000000: AT(0)
     {
 
         *(.text)

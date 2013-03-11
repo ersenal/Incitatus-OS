@@ -77,7 +77,9 @@ PUBLIC VFSNode* VFS_openFile(const char* filename, const char* mode) {
 
     /* Add opened file to process' file list */
     Process* currentProcess = Scheduler_getCurrentProcess();
-    ArrayList_add(currentProcess->fileNodes, fileNode);
+
+    if(currentProcess != NULL)
+        ArrayList_add(currentProcess->fileNodes, fileNode);
 
     return fileNode;
 
@@ -95,7 +97,9 @@ PUBLIC bool VFS_closeFile(VFSNode* file) {
 
     /* Remove file from process' file list */
     Process* currentProcess = Scheduler_getCurrentProcess();
-    ArrayList_remove(currentProcess->fileNodes, file);
+
+    if(currentProcess != NULL)
+        ArrayList_remove(currentProcess->fileNodes, file);
 
     return 0;
 

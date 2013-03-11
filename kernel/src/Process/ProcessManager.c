@@ -22,67 +22,94 @@
 #include <Memory.h>
 #include <Lib/String.h>
 #include <X86/GDT.h>
-#include <Drivers/VGA.h>
 #include <Process/Mutex.h>
 
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module pmModule;
-PRIVATE u32int pid = 0;
+PRIVATE u32int pid = 1;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
 
-PRIVATE void Test2() {
+PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool mode) {
 
-    u32int i = 0;
+    Process* self = HeapMemory_calloc(1, sizeof(Process));
+    Debug_assert(self != NULL);
 
-    while(1) {
+    self->pid = pid;
+    self->workingDirectory = NULL; //TODO: implement
+    self->binaryEntry = entry;
+    self->binarySize = binarySize;
 
-        VGA_put(1, i);
-        i++;
+    if(mode == USER_PROCESS) { /* User process */
+
+        Regs registers;
+        Memory_set(&registers, 0, sizeof(Regs));
+
+        //TODO: fix heap
+        // self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
+
+        registers.eflags = 0x202; /* Interrupt enable flag */
+        registers.eip    = USER_CODE_BASE_VADDR; /* Initial code entry point */
+        registers.intNo  = IRQ0;
+
+        /* Add 3 so that they have an RPL of 3 (User ring) */
+        registers.cs     = USER_CODE_SEGMENT | 3;
+        registers.ds     = USER_DATA_SEGMENT | 3;
+        registers.es     = USER_DATA_SEGMENT | 3;
+        registers.fs     = USER_DATA_SEGMENT | 3;
+        registers.gs     = USER_DATA_SEGMENT | 3;
+
+        /* Create a new page directory for process */
+        VirtualMemory_createPageDirectory(self);
+
+        /* Map kernel bottom 4MB + kernel heap */
+        VirtualMemory_mapKernel(self);
+
+        /* Allocate kernel stack - 4KB */
+        u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
+        Debug_assert(stack != NULL);
+        self->kernelStackBase = stack;
+
+        /* Allocate and map user stack - Currently 4KB */
+        Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
+        self->userStackBase = (void*) USER_STACK_BASE_VADDR;
+        char* uStack = PhysicalMemory_allocateFrame();
+        VirtualMemory_switchPageDir(self->pageDir);
+        VirtualMemory_mapPage((void*) USER_STACK_BASE_VADDR, uStack, MODE_USER);
+        self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
+
+        /* Set up initial user ss and esp */
+        registers.esp0   = (u32int) self->userStack;;
+        registers.ss0    = USER_DATA_SEGMENT | 3;;
+        Memory_copy(self->userStack, &registers, sizeof(Regs));
+
+        /* Setup kernel stack */
+        stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
+        Memory_copy(stack, &registers, sizeof(Regs));
+        self->kernelStack = stack;
+
+        self->fileNodes = ArrayList_new(1);
+
+    } else { /* Kernel process */
+
+        self->pageDir = VirtualMemory_getKernelDir();
 
     }
 
-}
+    pid++;
+    self->status = PROCESS_CREATED;
 
-PRIVATE void Test3() {
-
-    u32int i = 0;
-
-    while(1) {
-
-        VGA_put(0, i);
-        i++;
-
-    }
-
-}
-
-PRIVATE void ProcessManager_init(void) {
-
-    Process* test1 = ProcessManager_newProcess(NULL, USER_PROCESS);
-    Scheduler_addProcess(test1);
-    String_copy(test1->name, "Test1");
-
-    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) test1->kernelStack);
-
-    Process* test2 = ProcessManager_newProcess(Test2, USER_PROCESS);
-    String_copy(test2->name, "Test2");
-    Scheduler_addProcess(test2);
-
-    Process* test3 = ProcessManager_newProcess(Test3, USER_PROCESS);
-    String_copy(test3->name, "Test3");
-    Scheduler_addProcess(test3);
+    return self;
 
 }
 
 PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
     HeapMemory_free(process->kernelStackBase);
-    HeapMemory_free(process->userStackBase);
 
     if(process->fileNodes != NULL) {
 
@@ -100,6 +127,12 @@ PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
     HeapMemory_free(process);
     VirtualMemory_destroyPageDirectory(process);
+
+}
+
+PRIVATE void ProcessManager_init(void) {
+
+
 
 }
 
@@ -127,78 +160,10 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
 }
 
-PUBLIC Process* ProcessManager_newProcess(void* entry, bool mode) {
-
-    Process* self = HeapMemory_calloc(1, sizeof(Process));
-    Debug_assert(self != NULL);
-
-    self->pid = pid;
-    self->workingDirectory = NULL; //TODO: implement
-
-    if(mode == USER_PROCESS) { /* User process */
-
-        Regs registers;
-        Memory_set(&registers, 0, sizeof(Regs));
-
-        self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
-
-        registers.eflags = 0x202; /* Interrupt enable flag */
-        registers.eip    = (u32int) entry; /* Initial code entry point */
-        registers.intNo  = IRQ0;
-
-        /* Add 3 so that they have an RPL of 3 (User ring) */
-        registers.cs     = USER_CODE_SEGMENT | 3;
-        registers.ds     = USER_DATA_SEGMENT | 3;
-        registers.es     = USER_DATA_SEGMENT | 3;
-        registers.fs     = USER_DATA_SEGMENT | 3;
-        registers.gs     = USER_DATA_SEGMENT | 3;
-
-        /* Allocate kernel stack - 4KB */
-        u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
-        Debug_assert(stack != NULL);
-        self->kernelStackBase = stack;
-
-        /* Allocate and map user stack - Currently 4KB */
-        Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
-        self->userStackBase = HeapMemory_calloc(1, FRAME_SIZE);
-        Debug_assert(self->userStackBase != NULL);
-        self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
-
-        /* Set up initial user ss and esp */
-        registers.esp0   = (u32int) self->userStack;;
-        registers.ss0    = USER_DATA_SEGMENT | 3;;
-        Memory_copy(self->userStack, &registers, sizeof(Regs));
-
-        /* Setup kernel stack */
-        stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
-        Memory_copy(stack, &registers, sizeof(Regs));
-        self->kernelStack = stack;
-
-        /* Create a new page directory for process */
-        VirtualMemory_createPageDirectory(self);
-
-        /* Map kernel bottom 4MB + kernel heap */
-        VirtualMemory_mapKernel(self);
-
-        self->fileNodes = ArrayList_new(1);
-
-    } else { /* Kernel process */
-
-        self->pageDir = VirtualMemory_getKernelDir();
-
-    }
-
-    pid++;
-    self->status = PROCESS_CREATED;
-    return self;
-
-}
-
 PUBLIC void ProcessManager_killProcess(int exitCode) {
 
     Debug_assert(exitCode == 0); /* Normal termination */
     Process* current = Scheduler_getCurrentProcess();
-    current->status = PROCESS_TERMINATED;
     Scheduler_removeProcess(current);
     ProcessManager_destroyProcess(current);
 
@@ -215,6 +180,35 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
     asm volatile("mov %0, %%DR1" : : "r" (0xDEADBEEF)); /* Store 1 at DR1 in order to distinguish the procedure */
+
+}
+
+PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
+
+    VFSNode* bin = VFS_openFile(binary, "r");
+    Debug_assert(bin != NULL);
+
+    char* buffer = HeapMemory_calloc(1, bin->fileSize + 1);
+    Debug_assert(buffer != NULL);
+    bin->vfs->read(bin, 0, bin->fileSize, buffer);
+
+    Process* p = ProcessManager_newProcess((void*) buffer, bin->fileSize, USER_PROCESS);
+    String_copy(p->name, bin->fileName); /* Set process name */
+    Debug_assert(p != NULL);
+
+    /* Copy user code from kernel heap to user space */
+    void* f = PhysicalMemory_allocateFrame();
+    VirtualMemory_mapPage((void*) USER_CODE_BASE_VADDR, f, MODE_USER);
+    Memory_copy((void*) USER_CODE_BASE_VADDR, buffer, bin->fileSize);
+
+    /* Halfway through newProcess(), we switch to new process' directory. Now return back to original directory */
+    if(Scheduler_getCurrentProcess() != NULL)
+        VirtualMemory_switchPageDir(Scheduler_getCurrentProcess()->pageDir);
+
+    HeapMemory_free(buffer);
+    VFS_closeFile(bin);
+    Scheduler_addProcess(p);
+    return p;
 
 }
 

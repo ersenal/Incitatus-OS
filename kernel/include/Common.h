@@ -19,12 +19,15 @@
 
 /* User stack size and virtual address(just below page directory recursive-map) */
 #define USER_STACK_SIZE       4096
-// #define USER_STACK_TOP_VADDR  0xFFC00000 - 0x1000
-// #define USER_STACK_BASE_VADDR USER_STACK_TOP_VADDR - USER_STACK_SIZE
+#define USER_STACK_TOP_VADDR  0xFFC00000 - 0x1000
+#define USER_STACK_BASE_VADDR (USER_STACK_TOP_VADDR - USER_STACK_SIZE)
 
 /* User heap, 2GB-4GB(ish) virtual address*/
 #define USER_HEAP_BASE_VADDR 0x80000000
 #define USER_HEAP_TOP_VADDR  USER_STACK_VADDR
+
+/* User code */
+#define USER_CODE_BASE_VADDR  0x40000000
 
 /* Kernel heap, 512MB-1GB virtual address*/
 #define KERNEL_HEAP_BASE_VADDR 0x20000000

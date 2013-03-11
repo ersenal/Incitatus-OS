@@ -20,6 +20,12 @@
 #include <Process/ProcessManager.h>
 
 /*=======================================================
+    DEFINE
+=========================================================*/
+#define MODE_KERNEL 0
+#define MODE_USER   1
+
+/*=======================================================
     TYPE
 =========================================================*/
 typedef struct PageDirectory PageDirectory;
@@ -43,10 +49,11 @@ Module* VirtualMemory_getModule(void);
 |
 | PARAM:           "virtualAddr"   4KB aligned virtual address
 |                  "physicalAddr"  4KB aligned physical address
+|                  "mode"          0 - Kernel mode, 1 - User mode
 |
 | RETURN:          Mapped virtual address
 \------------------------------------------------------------------------*/
-void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr);
+void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr, bool mode);
 
 /*-------------------------------------------------------------------------
 | Unmap virtual address
@@ -68,6 +75,7 @@ void VirtualMemory_unmapPage(void* virtualAddr);
 \------------------------------------------------------------------------*/
 void* VirtualMemory_getPhysicalAddress(void* virtualAddr);
 
+//TODO: add comments
 PageDirectory* VirtualMemory_getKernelDir(void);
 void VirtualMemory_switchPageDir(PageDirectory* dir);
 void VirtualMemory_mapKernel(Process* process);

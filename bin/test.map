@@ -1,0 +1,47 @@
+Archive member included because of file (symbol)
+
+bin/libIncitatus.a(incit.o)   test.o (puts)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000040000000      0x25c load address 0x0000000000000000
+ *(.text)
+ .text          0x0000000040000000       0x28 test.o
+                0x0000000040000000                main
+ .text          0x0000000040000028      0x12a bin/libIncitatus.a(incit.o)
+                0x000000004000005f                puts
+                0x000000004000009a                putc
+                0x00000000400000dc                exit
+                0x0000000040000117                spawn
+                0x0000000040000154                . = ALIGN (0x4)
+ *fill*         0x0000000040000152        0x2 
+ *(.eh_frame)
+ .eh_frame      0x0000000040000154       0x38 test.o
+ .eh_frame      0x000000004000018c       0xc4 bin/libIncitatus.a(incit.o)
+                0x0000000040000250                . = ALIGN (0x4)
+ *(.data)
+ .data          0x0000000040000250        0x0 test.o
+ .data          0x0000000040000250        0x0 bin/libIncitatus.a(incit.o)
+                0x0000000040000250                . = ALIGN (0x4)
+ *(.rodata)
+ .rodata        0x0000000040000250        0xc test.o
+                0x000000004000025c                . = ALIGN (0x4)
+ *(.bss)
+ .bss           0x000000004000025c        0x0 test.o
+ .bss           0x000000004000025c        0x0 bin/libIncitatus.a(incit.o)
+                0x000000004000025c                . = ALIGN (0x4)
+ *(.COMMON)
+                0x000000004000025c                . = ALIGN (0x4)
+LOAD test.o
+LOAD bin/libIncitatus.a
+OUTPUT(test binary)
+
+.comment        0x0000000000000000       0x24
+ .comment       0x0000000000000000       0x12 test.o
+ .comment       0x0000000000000012       0x12 bin/libIncitatus.a(incit.o)

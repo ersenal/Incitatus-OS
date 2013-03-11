@@ -19,9 +19,10 @@
 /*=======================================================
     DEFINE
 =========================================================*/
-#define SYSCALL_PUTS 0
-#define SYSCALL_PUTC 1
-#define SYSCALL_EXIT 2
+#define SYSCALL_PUTS  0
+#define SYSCALL_PUTC  1
+#define SYSCALL_EXIT  2
+#define SYSCALL_SPAWN 3
 
 /*=======================================================
     FUNCTION
@@ -29,5 +30,6 @@
 void puts(const char* str);
 void putc(char c);
 void exit(int exitCode);
+void spawn(const char* binary);
 
 #endif

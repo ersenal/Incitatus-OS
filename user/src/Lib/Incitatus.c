@@ -41,3 +41,9 @@ void exit(int exitCode) {
     syscall(SYSCALL_EXIT, exitCode, 0, 0, 0, 0);
 
 }
+
+void spawn(const char* binary) {
+
+    syscall(SYSCALL_SPAWN, (int) binary, 0, 0, 0, 0);
+
+}

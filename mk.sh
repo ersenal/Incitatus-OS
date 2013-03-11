@@ -8,10 +8,15 @@ $C_Compiler $CFlags -o incit.o   -c   user/src/Lib/Incitatus.c
 ar rcs bin/libIncitatus.a incit.o
 
 $C_Compiler $CFlags -o helloworld.o -c user/src/Apps/HelloWorld.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o HelloWorld helloworld.o bin/libIncitatus.a
+$C_Compiler $CFlags -o test.o       -c user/src/Apps/test.c
 
-tar cvf bootloader/initrd.tar HelloWorld
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o HelloWorld helloworld.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/test.map -o test test.o bin/libIncitatus.a
+
+tar cvf bootloader/initrd.tar HelloWorld test
+
 rm HelloWorld
+rm test
 #!
 
 nasm -f elf -o start.o   kernel/src/Start.s

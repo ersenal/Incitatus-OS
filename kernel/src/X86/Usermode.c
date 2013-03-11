@@ -17,13 +17,15 @@
 #include <Common.h>
 #include <Debug.h>
 #include <X86/IDT.h>
+#include <X86/GDT.h>
 #include <Process/ProcessManager.h>
+#include <Memory/VirtualMemory.h>
 
 /*=======================================================
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS        3
+#define NUMBER_OF_CALLS        4
 
 /*=======================================================
     PRIVATE DATA
@@ -36,6 +38,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &Console_printString,
     &Console_printChar,
     &ProcessManager_killProcess,
+    &ProcessManager_spawnProcess,
 
 };
 
@@ -72,29 +75,30 @@ PRIVATE void Usermode_init(void) {
 
     IDT_registerHandler(&Usermode_syscallHandler, SYSCALL_INTERRUPT);
 
+    Process* init = ProcessManager_spawnProcess("/HelloWorld");
+    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) init->kernelStack);
+    asm volatile("mov %0, %%esp" : : "r" (init->userStack)); /* Store initial process ESP in DR0 register */
+    VirtualMemory_switchPageDir(init->pageDir);
+
     asm volatile("        \
         cli;              \
-        mov $0x23, %ax;   \
-        mov %ax, %ds;     \
-        mov %ax, %es;     \
-        mov %ax, %fs;     \
-        mov %ax, %gs;     \
+        mov $0x23, %%ax;   \
+        mov %%ax, %%ds;     \
+        mov %%ax, %%es;     \
+        mov %%ax, %%fs;     \
+        mov %%ax, %%gs;     \
                           \
-        mov %esp, %eax;   \
+        mov %%esp, %%eax;   \
         pushl $0x23;      \
-        pushl %esp;       \
+        pushl %%eax;       \
         pushf;            \
-        pop %eax;         \
-        or $0x200, %eax;  \
-        push %eax;        \
+        pop %%eax;         \
+        or $0x200, %%eax;  \
+        push %%eax;        \
         pushl $0x1B;      \
-        push $1f;         \
+        push  %0;         \
         iret;             \
-    1:                    \
-    ");
-
-    void (*jumpTo) (void) = usermodeEntryAddr;
-    jumpTo();
+    " : : "S" (usermodeEntryAddr));
 
 }
 
