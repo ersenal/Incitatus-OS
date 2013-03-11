@@ -76,8 +76,6 @@ struct VFSNode {
     FUNCTION
 =========================================================*/
 
-//TODO: fseek, fwrite, fread
-
 /*-------------------------------------------------------------------------
 | Open file
 |--------------------------------------------------------------------------
@@ -105,6 +103,70 @@ VFSNode* VFS_openFile(const char* filename, const char* mode);
 | RETURN:       'bool' - 0 if file closed successfully
 \------------------------------------------------------------------------*/
 bool VFS_closeFile(VFSNode* file);
+
+/*-------------------------------------------------------------------------
+| Change working directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Changes the current process' working directory
+|
+| PARAM:        'file' - destination
+|
+| RETURN:       'VFSNode*' - destination file descriptor
+\------------------------------------------------------------------------*/
+VFSNode* VFS_changeDirectory(VFSNode* file);
+
+/*-------------------------------------------------------------------------
+| Get parent directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the parent directory
+|
+| PARAM:        'child' - the child file
+|
+| RETURN:       'VFSNode*' - parent directory
+\------------------------------------------------------------------------*/
+VFSNode* VFS_getParent(VFSNode* child);
+
+/*-------------------------------------------------------------------------
+| Read dir entry
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Return nth child of a directory.
+|
+| PARAM:        'dir' - directory file
+|               'index' - index of child
+|
+| RETURN:       'VFSNode*' - nth child file
+\------------------------------------------------------------------------*/
+VFSNode* VFS_readDir(VFSNode* dir, int index);
+
+/*-------------------------------------------------------------------------
+| Get current working directory, string
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the current process' working directory
+|
+| PARAM:        'buf' - buffer to store working directory path
+|
+| RETURN:       'char*' - the buffer containing the working directory.
+\------------------------------------------------------------------------*/
+char* VFS_getWorkingDirectoryStr(char* buf);
+
+/*-------------------------------------------------------------------------
+| Get current working directory, file descriptor
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Returns the current process' working directory
+|
+| RETURN:       'VFSNode*' - working directory file descriptor
+\------------------------------------------------------------------------*/
+VFSNode* VFS_getWorkingDirectoryPtr(void);
+
+/*-------------------------------------------------------------------------
+| Get file stats
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Fills the specified buffer with file information.
+|
+| PARAM:        'file' - file to be examined
+|               'buf'  - buffer to be filled
+\------------------------------------------------------------------------*/
+void VFS_getFileStats(VFSNode* file, VFSNode* buf);
 
 /*-------------------------------------------------------------------------
 | Get VFS module

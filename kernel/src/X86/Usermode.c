@@ -25,7 +25,7 @@
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS        4
+#define NUMBER_OF_CALLS       10
 
 /*=======================================================
     PRIVATE DATA
@@ -39,6 +39,12 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &Console_printChar,
     &ProcessManager_killProcess,
     &ProcessManager_spawnProcess,
+    &VFS_changeDirectory,
+    &VFS_getParent,
+    &VFS_getWorkingDirectoryStr,
+    &VFS_readDir,
+    &VFS_getWorkingDirectoryPtr,
+    &VFS_getFileStats,
 
 };
 
@@ -112,7 +118,7 @@ PUBLIC Module* Usermode_getModule(void* usermodeEntry) {
         userModule.init = &Usermode_init;
         userModule.moduleID = MODULE_USERMODE;
         userModule.numberOfDependencies = 1;
-        userModule.dependencies[0] = MODULE_PROCESS;
+        userModule.dependencies[0] = MODULE_SCHEDULER;
 
         usermodeEntryAddr = usermodeEntry;
 

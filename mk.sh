@@ -13,7 +13,7 @@ $C_Compiler $CFlags -o test.o       -c user/src/Apps/test.c
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o HelloWorld helloworld.o bin/libIncitatus.a
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/test.map -o test test.o bin/libIncitatus.a
 
-tar cvf bootloader/initrd.tar HelloWorld test
+tar cvf bootloader/initrd.tar HelloWorld test testFolder
 
 rm HelloWorld
 rm test

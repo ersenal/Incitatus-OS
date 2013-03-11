@@ -27,7 +27,6 @@
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE Module pmModule;
 PRIVATE u32int pid = 1;
 
 /*=======================================================
@@ -40,7 +39,6 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
     Debug_assert(self != NULL);
 
     self->pid = pid;
-    self->workingDirectory = NULL; //TODO: implement
     self->binaryEntry = entry;
     self->binarySize = binarySize;
 
@@ -130,12 +128,6 @@ PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
 }
 
-PRIVATE void ProcessManager_init(void) {
-
-
-
-}
-
 PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Save process state */
@@ -193,6 +185,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     bin->vfs->read(bin, 0, bin->fileSize, buffer);
 
     Process* p = ProcessManager_newProcess((void*) buffer, bin->fileSize, USER_PROCESS);
+    p->workingDirectory = VFS_getParent(bin);
     String_copy(p->name, bin->fileName); /* Set process name */
     Debug_assert(p != NULL);
 
@@ -210,19 +203,4 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     Scheduler_addProcess(p);
     return p;
 
-}
-
-PUBLIC Module* ProcessManager_getModule(void) {
-
-    if(!pmModule.isLoaded) {
-
-        pmModule.moduleName = "Process Manager";
-        pmModule.init = &ProcessManager_init;
-        pmModule.moduleID = MODULE_PROCESS;
-        pmModule.numberOfDependencies = 1;
-        pmModule.dependencies[0] = MODULE_SCHEDULER;
-
-    }
-
-    return &pmModule;
 }

@@ -27,7 +27,6 @@
 #include <Memory/VirtualMemory.h>
 #include <Memory/HeapMemory.h>
 #include <Process/Scheduler.h>
-#include <Process/ProcessManager.h>
 #include <Drivers/PS2Controller.h>
 #include <FileSystem/VFS.h>
 #include <X86/Usermode.h>
@@ -60,7 +59,6 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         PS2Controller_getModule(),
         VFS_getModule(),
         Scheduler_getModule(),
-        ProcessManager_getModule(),
 
     };
 
@@ -68,7 +66,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         Module_load(modules[i]);
 
     Module_load(Usermode_getModule((void*) USER_CODE_BASE_VADDR));
-
     Sys_panic("Should not reach here!");
+
 }
 

@@ -19,6 +19,7 @@
 #include <Debug.h>
 #include <Process/Scheduler.h>
 #include <Process/ProcessManager.h>
+#include <Memory.h>
 
 /*=======================================================
     PRIVATE DATA
@@ -102,6 +103,84 @@ PUBLIC bool VFS_closeFile(VFSNode* file) {
         ArrayList_remove(currentProcess->fileNodes, file);
 
     return 0;
+
+}
+
+PUBLIC VFSNode* VFS_getParent(VFSNode* child) {
+
+    Debug_assert(child != NULL);
+
+    int childNameLength = String_length(child->fileName);
+    char childName[childNameLength];
+    String_copy(childName, child->fileName);
+
+    if(String_countChar(childName, '/') == 0)
+        return rootFS->rootNode;
+
+    if(child->fileType == FILETYPE_DIRECTORY) {
+
+        if(String_countChar(childName, '/') == 1)
+            return rootFS->rootNode;
+
+        childName[childNameLength - 1] = '\0';
+
+    }
+
+    for(int i = childNameLength - 1; i >= 0; i--) {
+
+         if(childName[i] == '/') {
+            childName[i+1] = '\0';
+            break;
+        }
+
+    }
+
+    return VFS_searchForFile(rootFS->rootNode, childName);
+
+}
+
+PUBLIC VFSNode* VFS_readDir(VFSNode* dir, int index) {
+
+    Debug_assert(dir != NULL);
+    return dir->vfs->readDir(dir, index);
+
+}
+
+PUBLIC VFSNode* VFS_changeDirectory(VFSNode* file) {
+
+    Debug_assert(file != NULL);
+    Debug_assert(file->fileType == FILETYPE_DIRECTORY);
+
+    Scheduler_getCurrentProcess()->workingDirectory = file;
+
+    return file;
+
+}
+
+PUBLIC char* VFS_getWorkingDirectoryStr(char* buf) {
+
+    Debug_assert(buf != NULL);
+
+    String_copy(buf, Scheduler_getCurrentProcess()->workingDirectory->fileName);
+
+    if(buf[0] == '\0') { /* Root working dir */
+        buf[0] = '/';
+        buf[1] = '\0';
+    }
+
+    return buf;
+
+}
+
+PUBLIC void VFS_getFileStats(VFSNode* file, VFSNode* buf) {
+
+    Memory_copy(buf, file, sizeof(VFSNode));
+
+}
+
+PUBLIC VFSNode* VFS_getWorkingDirectoryPtr(void) {
+
+    return Scheduler_getCurrentProcess()->workingDirectory;
 
 }
 
