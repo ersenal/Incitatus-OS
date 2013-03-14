@@ -8,15 +8,15 @@ $C_Compiler $CFlags -o incit.o   -c   user/src/Lib/Incitatus.c
 ar rcs bin/libIncitatus.a incit.o
 
 $C_Compiler $CFlags -o helloworld.o -c user/src/Apps/HelloWorld.c
-$C_Compiler $CFlags -o test.o       -c user/src/Apps/test.c
+$C_Compiler $CFlags -o ls.o       -c user/src/Apps/ls.c
 
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/HelloWorld.map -o HelloWorld helloworld.o bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -Map bin/test.map -o test test.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld helloworld.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o ls ls.o bin/libIncitatus.a
 
-tar cvf bootloader/initrd.tar HelloWorld test testFolder
+tar cvf bootloader/initrd.tar HelloWorld ls
 
 rm HelloWorld
-rm test
+rm ls
 #!
 
 nasm -f elf -o start.o   kernel/src/Start.s
@@ -56,6 +56,7 @@ $C_Compiler $CFlags -o dumbH.o   -c   kernel/src/Memory/DumbHeapManager.c
 
 $C_Compiler $CFlags -o sched.o   -c   kernel/src/Process/Scheduler.c
 $C_Compiler $CFlags -o rr.o      -c   kernel/src/Process/RoundRobin.c
+$C_Compiler $CFlags -o fcfs.o    -c   kernel/src/Process/FCFS.c
 $C_Compiler $CFlags -o pm.o      -c   kernel/src/Process/ProcessManager.c
 
 $C_Compiler $CFlags -o ramdisk.o -c   kernel/src/FileSystem/RamDisk.c
@@ -89,6 +90,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         string.o \
                                                                         sched.o \
                                                                         rr.o \
+                                                                        fcfs.o \
                                                                         pm.o \
                                                                         kbd.o \
                                                                         mouse.o \

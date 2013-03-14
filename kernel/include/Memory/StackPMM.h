@@ -44,11 +44,8 @@ void StackPMM_freeFrame(void* b);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Sets up physical memory.
 |
-| PARAM:          "mbI"  points to multiboot information
-|                 "mbH"  points to multiboot header
-|                 (refer to Multiboot.h)
 \------------------------------------------------------------------------*/
-void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH);
+void StackPMM_init(void);
 
 /*-------------------------------------------------------------------------
 | Get current memory information

@@ -44,11 +44,8 @@ void BitmapPMM_freeFrame(void* b);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Sets up physical memory.
 |
-| PARAM:          "mbI"  points to multiboot information
-|                 "mbH"  points to multiboot header
-|                 (refer to Multiboot.h)
 \------------------------------------------------------------------------*/
-void BitmapPMM_init(MultibootInfo* mbI, MultibootHeader* mbH);
+void BitmapPMM_init(void);
 
 /*-------------------------------------------------------------------------
 | Get current memory information

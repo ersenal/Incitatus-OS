@@ -43,29 +43,28 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
     Debug_assert(mbHead.magic == MULTIBOOT_HEADER_MAGIC);
     Debug_assert(mbInfo->modsCount > 0); /* Make sure initrd(ram disk) is in memory */
 
-    Module_load(VGA_getModule());
-    Module_load(Console_getModule());
-    Console_clearScreen();
-
     Module* modules[] = {
 
+        VGA_getModule(),
+        Console_getModule(),
         GDT_getModule(),
         PIC8259_getModule(),
         IDT_getModule(),
         PIT8253_getModule(),
-        PhysicalMemory_getModule(mbInfo, &mbHead),
+        PhysicalMemory_getModule(),
         VirtualMemory_getModule(),
         HeapMemory_getModule(),
         PS2Controller_getModule(),
         VFS_getModule(),
         Scheduler_getModule(),
+        Usermode_getModule(),
 
     };
 
     for(u32int i = 0; i < ARRAY_SIZE(modules); i++)
         Module_load(modules[i]);
 
-    Module_load(Usermode_getModule((void*) USER_CODE_BASE_VADDR));
+    Sys_enableInterrupts();
     Sys_panic("Should not reach here!");
 
 }

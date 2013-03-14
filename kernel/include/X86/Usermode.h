@@ -23,10 +23,8 @@
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Returns the usermode module.
 |
-| PARAM:           'usermodeEntry' After switching to ring 3, jump to this.
-|
 | NOTES:           After loading this module, OS executes at ring 3.
 \------------------------------------------------------------------------*/
-Module* Usermode_getModule(void* usermodeEntry);
+Module* Usermode_getModule(void);
 
 #endif

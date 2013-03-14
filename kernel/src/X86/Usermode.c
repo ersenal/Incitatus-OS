@@ -31,7 +31,6 @@
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module userModule;
-PRIVATE void*  usermodeEntryAddr;
 
 PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
 
@@ -79,6 +78,7 @@ PRIVATE void Usermode_syscallHandler(Regs* regs) {
 
 PRIVATE void Usermode_init(void) {
 
+    Debug_logInfo("%s", "Jumping to user space");
     IDT_registerHandler(&Usermode_syscallHandler, SYSCALL_INTERRUPT);
 
     Process* init = ProcessManager_spawnProcess("/HelloWorld");
@@ -104,13 +104,11 @@ PRIVATE void Usermode_init(void) {
         pushl $0x1B;      \
         push  %0;         \
         iret;             \
-    " : : "S" (usermodeEntryAddr));
+    " : : "S" (USER_CODE_BASE_VADDR));
 
 }
 
-PUBLIC Module* Usermode_getModule(void* usermodeEntry) {
-
-    Debug_assert(usermodeEntry != NULL);
+PUBLIC Module* Usermode_getModule(void) {
 
     if(!userModule.isLoaded) {
 
@@ -119,8 +117,6 @@ PUBLIC Module* Usermode_getModule(void* usermodeEntry) {
         userModule.moduleID = MODULE_USERMODE;
         userModule.numberOfDependencies = 1;
         userModule.dependencies[0] = MODULE_SCHEDULER;
-
-        usermodeEntryAddr = usermodeEntry;
 
     }
 

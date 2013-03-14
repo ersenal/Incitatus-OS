@@ -4,23 +4,23 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| RoundRobin.h (implements Scheduler)
+| FCFS.h (implements Scheduler)
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Round robin process scheduler implementation.
+| DESCRIPTION:  First-Come, First-Served non-preemptive scheduler implementation.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
-#ifndef ROUND_ROBIN_H
-#define ROUND_ROBIN_H
+#ifndef FCFS_H
+#define FCFS_H
 
 #include <Process/ProcessManager.h>
 
-void RoundRobin_addProcess(Process* process);
-void RoundRobin_removeProcess(Process* process);
-Process* RoundRobin_getNextProcess(void);
-Process* RoundRobin_getCurrentProcess(void);
+void FCFS_addProcess(Process* process);
+void FCFS_removeProcess(Process* process);
+Process* FCFS_getNextProcess(void);
+Process* FCFS_getCurrentProcess(void);
 
 #endif

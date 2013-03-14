@@ -48,33 +48,33 @@ void spawn(const char* binary) {
 
 }
 
-FILE fchdir(FILE fd) {
+FILE* fchdir(FILE* fd) {
 
-    return syscall(SYSCALL_FCHDIR, fd, 0, 0, 0, 0);
-
-}
-
-FILE fparent(FILE fd) {
-
-    return syscall(SYSCALL_FPARENT, fd, 0, 0, 0, 0);
+    return (FILE*) syscall(SYSCALL_FCHDIR, (int) fd, 0, 0, 0, 0);
 
 }
 
-FILE readdir(FILE fd, int index) {
+FILE* fparent(FILE* fd) {
 
-    return syscall(SYSCALL_FINDDIR, fd, index, 0, 0, 0);
-
-}
-
-FILE fgetcwd(void) {
-
-    return syscall(SYSCALL_FGETCWD, 0, 0, 0, 0, 0);
+    return (FILE*) syscall(SYSCALL_FPARENT, (int) fd, 0, 0, 0, 0);
 
 }
 
-void fstat(FILE fd, struct stat* buf) {
+FILE* readdir(FILE* fd, int index) {
 
-    syscall(SYSCALL_FSTAT, fd, (int) buf, 0, 0, 0);
+    return (FILE*) syscall(SYSCALL_FINDDIR, (int) fd, index, 0, 0, 0);
+
+}
+
+FILE* fgetcwd(void) {
+
+    return (FILE*) syscall(SYSCALL_FGETCWD, 0, 0, 0, 0, 0);
+
+}
+
+void fstat(FILE* fd, struct stat* buf) {
+
+    syscall(SYSCALL_FSTAT, (int) fd, (int) buf, 0, 0, 0);
 
 }
 

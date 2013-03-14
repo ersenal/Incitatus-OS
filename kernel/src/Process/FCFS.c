@@ -4,16 +4,16 @@
 | URL: http://sam.zoy.org/wtfpl/COPYING
 |
 |--------------------------------------------------------------------------
-| RoundRobin.c (implements Scheduler)
+| FCFS.c (implements Scheduler)
 |--------------------------------------------------------------------------
 |
-| DESCRIPTION:  Round robin process scheduler implementation.
+| DESCRIPTION:  First-Come, First-Served non-preemptive scheduler implementation.
 |
 | AUTHOR:       Ali Ersenal, aliersenal@gmail.com
 \------------------------------------------------------------------------*/
 
 
-#include <Process/RoundRobin.h>
+#include <Process/FCFS.h>
 #include <Lib/LinkedList.h>
 #include <Memory/HeapMemory.h>
 #include <Debug.h>
@@ -29,11 +29,11 @@ PRIVATE Process* currentProcess;
     FUNCTION
 =========================================================*/
 
-PUBLIC void RoundRobin_addProcess(Process* process) {
+PUBLIC void FCFS_addProcess(Process* process) {
 
     Debug_assert(process != NULL);
 
-    if(processes == NULL) { /* RoundRobin initialisation */
+    if(processes == NULL) { /* FCFS initialisation */
 
         processes = LinkedList_new();
         currentProcess = process;
@@ -45,33 +45,24 @@ PUBLIC void RoundRobin_addProcess(Process* process) {
 
 }
 
-PUBLIC void RoundRobin_removeProcess(Process* process) {
+PUBLIC void FCFS_removeProcess(Process* process) {
 
     Debug_assert(process != NULL && processes != NULL);
     Debug_assert(process->pid != KERNEL_PID); /* Can't kill kernel process */
 
-    if(currentProcess == process)
-        currentProcess = LinkedList_getFront(processes);
-
     LinkedList_remove(processes, process);
     process->status = PROCESS_TERMINATED;
+    currentProcess = LinkedList_getFront(processes);
 
 }
 
-PUBLIC Process* RoundRobin_getNextProcess(void) {
+PUBLIC Process* FCFS_getNextProcess(void) {
 
-    /* Remove process from head of queue and add as the last element */
-    Process* p = LinkedList_removeFromFront(processes);
-
-    Debug_assert(p->status == PROCESS_WAITING);
-
-    LinkedList_add(processes, p);
-    currentProcess = p;
-    return p;
+    return currentProcess;
 
 }
 
-PUBLIC Process* RoundRobin_getCurrentProcess(void) {
+PUBLIC Process* FCFS_getCurrentProcess(void) {
 
     return currentProcess;
 

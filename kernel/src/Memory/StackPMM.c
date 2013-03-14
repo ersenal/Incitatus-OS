@@ -36,7 +36,6 @@ PUBLIC void* StackPMM_allocateFrame(void) {
         return NULL;
 
     void* frame = Stack_pop(&stack);
-    //Console_printf("%s%d%c", "Physical Allocation: ", frame, '\n');
     return frame;
 }
 
@@ -47,20 +46,20 @@ PUBLIC void StackPMM_freeFrame(void* b) {
 
 }
 
-PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
+PUBLIC void StackPMM_init(void) {
 
-    Debug_assert(mbI != NULL);
-    Debug_assert(mbH->magic == MULTIBOOT_HEADER_MAGIC);
+    extern MultibootHeader mbHead;
+    extern MultibootInfo* multibootInfo;
 
-    MultibootMemEntry* entry = (MultibootMemEntry*) mbI->mmapAddr;
-    u32int initrdEnd = *(u32int*)(mbI->modsAddr + 4);
-    u32int kernelEnd = mbH->bssEndAddr;
+    MultibootMemEntry* entry = (MultibootMemEntry*) multibootInfo->mmapAddr;
+    u32int initrdEnd = *(u32int*)(multibootInfo->modsAddr + 4);
+    u32int kernelEnd = mbHead.bssEndAddr;
 
     if(initrdEnd != 0)
         kernelEnd = initrdEnd;
 
     /* calculate total physical memory */
-    while((u32int) entry <  mbI->mmapAddr + mbI->mmapLength) {
+    while((u32int) entry <  multibootInfo->mmapAddr + multibootInfo->mmapLength) {
 
         totalPhysicalMemory += entry->len;
         entry++;
@@ -69,10 +68,10 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
 
     totalFrames = totalPhysicalMemory / FRAME_SIZE; /* total number of frames = physical memory / 4kB */
     Stack_init(&stack, (char*) kernelEnd, totalFrames * sizeof(void *));
-    entry = (MultibootMemEntry*) mbI->mmapAddr;
+    entry = (MultibootMemEntry*) multibootInfo->mmapAddr;
 
     /* Push usable frames to stack */
-    while((u32int) entry <  mbI->mmapAddr + mbI->mmapLength) {
+    while((u32int) entry <  multibootInfo->mmapAddr + multibootInfo->mmapLength) {
 
         if(entry->type == MULTIBOOT_MEMORY_AVAILABLE) {
 
@@ -83,7 +82,7 @@ PUBLIC void StackPMM_init(MultibootInfo* mbI, MultibootHeader* mbH) {
                 void* frameAddr = (void*) (u32int) entry->addr + (i * FRAME_SIZE);
 
                 /* Frame 0(Starting at address 0) + Kernel + PMM stack is reserved */
-                if(frameAddr != NULL && (frameAddr < (void*) mbH->loadAddr || frameAddr > (void*) kernelEnd + totalFrames * sizeof(void *)))
+                if(frameAddr != NULL && (frameAddr < (void*) mbHead.loadAddr || frameAddr > (void*) kernelEnd + totalFrames * sizeof(void *)))
                     StackPMM_freeFrame(frameAddr);
 
             }

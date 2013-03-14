@@ -177,10 +177,6 @@ PRIVATE void Keyboard_callback(void) {
             keyState.shift = TRUE;
             break;
 
-        case KB_K_RSHIFT:
-            keyState.shift = TRUE;
-            break;
-
         case KB_K_CAPS:
             keyState.capsLock = keyState.capsLock ? FALSE : TRUE;
             Keyboard_setLeds(keyState.numberLock, keyState.capsLock, keyState.scrollLock);

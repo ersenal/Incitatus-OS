@@ -154,8 +154,8 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
 PUBLIC void ProcessManager_killProcess(int exitCode) {
 
-    Debug_assert(exitCode == 0); /* Normal termination */
     Process* current = Scheduler_getCurrentProcess();
+    Debug_logInfo("%s%d%c%s%s%d", "PID:", current->pid, ' ', current->name, " exited with code ", exitCode);
     Scheduler_removeProcess(current);
     ProcessManager_destroyProcess(current);
 
@@ -171,6 +171,8 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
 
     VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
     asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+
+    //TODO: Fix this hack
     asm volatile("mov %0, %%DR1" : : "r" (0xDEADBEEF)); /* Store 1 at DR1 in order to distinguish the procedure */
 
 }
@@ -190,7 +192,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     Debug_assert(p != NULL);
 
     /* Copy user code from kernel heap to user space */
-    void* f = PhysicalMemory_allocateFrame();
+    void* f = PhysicalMemory_allocateFrame(); //TODO: what if user code > 4kB
     VirtualMemory_mapPage((void*) USER_CODE_BASE_VADDR, f, MODE_USER);
     Memory_copy((void*) USER_CODE_BASE_VADDR, buffer, bin->fileSize);
 

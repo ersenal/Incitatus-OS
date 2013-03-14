@@ -90,10 +90,7 @@ extern void  (*PhysicalMemory_freeFrame) (void* frame);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Returns the physical memory management module.
 |
-| PARAM:          "mbI"  points to multiboot information
-|                 "mbH"  points to multiboot header
-|                 (refer to Multiboot.h)
 \------------------------------------------------------------------------*/
-Module* PhysicalMemory_getModule(MultibootInfo* mbI, MultibootHeader* mbH);
+Module* PhysicalMemory_getModule(void);
 
 #endif

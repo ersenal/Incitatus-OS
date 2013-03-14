@@ -78,6 +78,7 @@ PRIVATE void Console_printInt(int integer) {
 PRIVATE void Console_init(void) {
 
     colorAttribute = CONSOLE_NORMAL;
+    Console_clearScreen();
 
 }
 

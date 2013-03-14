@@ -107,23 +107,9 @@ PUBLIC void* LinkedList_removeFromFront(LinkedList* self) {
 
 }
 
-PUBLIC void  LinkedList_push(LinkedList* self, void* data) {
+void* LinkedList_getFront(LinkedList* self) {
 
-    LinkedList_add(self, data);
-
-}
-
-PUBLIC void* LinkedList_pop(LinkedList* self) {
-
-    return LinkedList_removeNode(self, self->last);
-
-}
-
-
-PUBLIC void* LinkedList_peek(LinkedList* self) {
-
-    Debug_assert(self->last != NULL);
-    return self->last->data;
+    return self->first->data;
 
 }
 

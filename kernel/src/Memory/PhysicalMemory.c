@@ -25,8 +25,6 @@
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module pmmModule;
-PRIVATE MultibootInfo* multibootInfo;
-PRIVATE MultibootHeader* multibootHeader;
 
 /*=======================================================
     PUBLIC DATA
@@ -47,20 +45,17 @@ PRIVATE void _PhysicalMemory_init() {
     PhysicalMemory_freeFrame     = StackPMM_freeFrame;
 
     /* Call PMM init function */
-    StackPMM_init(multibootInfo, multibootHeader);
+    StackPMM_init();
 
 }
 
-PUBLIC Module* PhysicalMemory_getModule(MultibootInfo* mbI, MultibootHeader* mbH) {
+PUBLIC Module* PhysicalMemory_getModule(void) {
 
     if(!pmmModule.isLoaded) {
 
         pmmModule.moduleName = "Physical Memory Manager";
         pmmModule.moduleID = MODULE_PMM;
         pmmModule.init = _PhysicalMemory_init;
-
-        multibootInfo = mbI;
-        multibootHeader = mbH;
 
     }
 
