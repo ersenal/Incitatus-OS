@@ -50,11 +50,8 @@ PUBLIC void RoundRobin_removeProcess(Process* process) {
     Debug_assert(process != NULL && processes != NULL);
     Debug_assert(process->pid != KERNEL_PID); /* Can't kill kernel process */
 
-    if(currentProcess == process)
-        currentProcess = LinkedList_getFront(processes);
-
-    LinkedList_remove(processes, process);
     process->status = PROCESS_TERMINATED;
+    LinkedList_remove(processes, process);
 
 }
 

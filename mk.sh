@@ -9,11 +9,13 @@ ar rcs bin/libIncitatus.a incit.o
 
 $C_Compiler $CFlags -o helloworld.o -c user/src/Apps/HelloWorld.c
 $C_Compiler $CFlags -o ls.o       -c user/src/Apps/ls.c
+$C_Compiler $CFlags -o test.o       -c user/src/Apps/test.c
 
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld helloworld.o bin/libIncitatus.a
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o ls ls.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o test test.o bin/libIncitatus.a
 
-tar cvf bootloader/initrd.tar HelloWorld ls
+tar cvf bootloader/initrd.tar HelloWorld ls test
 
 rm HelloWorld
 rm ls

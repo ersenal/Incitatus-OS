@@ -11,26 +11,6 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 	› Or, you may test-run(at your own risk) the OS on a 32-bit or 64-bit X86 PC.
 		› Burn "image.iso" and boot from CD.
 
-##Progress
-
-![ScreenShot](http://oi50.tinypic.com/246rgj7.jpg)
-
-##Objectives
-
-	› Modular
-		› Orthogonal
-		› Dependency control
-		› Module Interfaces
-	› Extensible
-		› Driver interface
-		› Allow user-space development (through a minimal C library)
-	› Unambigous code design
-		› Simplicity over complexity
-		› Object oriented design
-		› Unit testing
-	› Clear and concise documentation
-		› Focus on 'Why?' more than 'What?'
-
 ##Tasks
 
 	✔ Setup development environment
@@ -54,10 +34,13 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 		 ✔ Kernel heap memory management
 		 ✔ Context switching, multi-tasking
 		 ✔ PS/2 Controller, keyboard driver
+		 ✔ Virtual File System, ramdisk
+		 ✔ Ring 0 to Ring 3 switch
+		 ✔ System call interface
 
 ##License
 
-	Copyright 2012 Ali Ersenal. Licensed under WTFPL V2.
+	Copyright 2013 Ali Ersenal. Licensed under WTFPL V2.
 
 
 

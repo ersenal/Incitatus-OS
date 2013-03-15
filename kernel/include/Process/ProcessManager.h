@@ -67,6 +67,8 @@ struct Process {
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+//TODO: comments
 void  ProcessManager_switch(Regs* context);
 void ProcessManager_killProcess(int exitCode);
 Process* ProcessManager_spawnProcess(const char* binary);

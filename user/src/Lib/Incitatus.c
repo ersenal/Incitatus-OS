@@ -83,3 +83,9 @@ char* getcwd(char* buf) {
     return (char*) syscall(SYSCALL_GETCWD, (int) buf, 0, 0, 0, 0);
 
 }
+
+char getch(void) {
+
+    return syscall(10, 0, 0, 0, 0, 0);
+
+}

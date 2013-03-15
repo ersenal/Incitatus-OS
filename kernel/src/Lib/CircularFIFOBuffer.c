@@ -64,7 +64,9 @@ PUBLIC void CircularFIFOBuffer_destroy(CircularFIFOBuffer* buf) {
 PUBLIC char CircularFIFOBuffer_read(CircularFIFOBuffer* buf) {
 
     Debug_assert(buf);
-    Debug_assert(buf->count > 0); /* Buffer should not be empty */
+
+    if(buf->count == 0) /* Buffer should not be empty */
+        return -1;
 
     char val = *buf->readPtr;
     buf->count--;
@@ -79,7 +81,7 @@ PUBLIC char CircularFIFOBuffer_read(CircularFIFOBuffer* buf) {
 PUBLIC void CircularFIFOBuffer_write(CircularFIFOBuffer* buf, char val) {
 
     Debug_assert(buf);
-    Debug_assert(buf->count == buf->size); /* Buffer should not be full */
+    Debug_assert(buf->count != buf->size); /* Buffer should not be full */
 
     *buf->writePtr = val;
     buf->count++;

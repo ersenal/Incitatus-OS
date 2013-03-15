@@ -210,7 +210,7 @@ PUBLIC Module* PS2Controller_getModule(void) {
         ps2Module.moduleID = MODULE_PS2;
         ps2Module.init = &PS2Controller_init;
         ps2Module.numberOfDependencies = 1;
-        ps2Module.dependencies[0] = MODULE_IDT;
+        ps2Module.dependencies[0] = MODULE_HEAP;
 
     }
 

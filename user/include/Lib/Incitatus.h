@@ -65,4 +65,5 @@ FILE* fparent(FILE* fd);
 FILE* fgetcwd(void);
 void fstat(FILE* fd, struct stat* buf);
 char* getcwd(char* buf);
+char getch(void);
 #endif

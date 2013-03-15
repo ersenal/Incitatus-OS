@@ -18,12 +18,15 @@
 #include <Debug.h>
 #include <X86/IDT.h>
 #include <X86/PIC8259.h>
+#include <Lib/CircularFIFOBuffer.h>
+#include <Process/Scheduler.h>
 
 /*=======================================================
     DEFINE
 =========================================================*/
 
-#define KB_INT  33 /* PS/2 keyboard interrupt number(IRQ 1) */
+#define KB_INT          33 /* PS/2 keyboard interrupt number(IRQ 1) */
+#define KB_BUFFER_SIZE  256
 
 /* Special keys */
 #define KB_K_LCTRL      0x1D
@@ -103,6 +106,7 @@ struct LedStatusByte {
 /*=======================================================
     PRIVATE DATA
 =========================================================*/
+PRIVATE CircularFIFOBuffer* keyBuffer;
 PRIVATE KeyState keyState;
 
 /* Scan code set 1 - shift or caps */
@@ -209,7 +213,7 @@ PRIVATE void Keyboard_callback(void) {
                     b = lowerMap[scanCode];
 
                 if(b)
-                    Console_printChar(b);
+                    CircularFIFOBuffer_write(keyBuffer, b);
 
             }
 
@@ -219,7 +223,13 @@ PRIVATE void Keyboard_callback(void) {
 
 }
 
-PUBLIC void Keyboard_setLeds (bool numLock, bool capsLock, bool scrollLock) {
+PUBLIC char Keyboard_getChar(void) {
+
+    return CircularFIFOBuffer_read(keyBuffer);
+
+}
+
+PUBLIC void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock) {
 
     LedStatusByte byte = {scrollLock, numLock, capsLock};
 
@@ -271,4 +281,8 @@ PUBLIC void Keyboard_init(void) {
 
     /* Set leds to default state */
     Keyboard_setLeds(FALSE, FALSE, FALSE);
+
+    /* Create a 256-byte circular buffer */
+    keyBuffer = CircularFIFOBuffer_new(KB_BUFFER_SIZE);
+
 }

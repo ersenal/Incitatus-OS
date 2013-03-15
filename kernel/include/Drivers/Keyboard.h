@@ -38,4 +38,7 @@ void Keyboard_init(void);
 |                  'scrollLock' -/
 \------------------------------------------------------------------------*/
 void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock);
+
+//TODO: Comment
+char Keyboard_getChar(void);
 #endif

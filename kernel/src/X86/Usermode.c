@@ -20,12 +20,13 @@
 #include <X86/GDT.h>
 #include <Process/ProcessManager.h>
 #include <Memory/VirtualMemory.h>
+#include <Drivers/Keyboard.h>
 
 /*=======================================================
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS       10
+#define NUMBER_OF_CALLS       11
 
 /*=======================================================
     PRIVATE DATA
@@ -44,6 +45,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &VFS_readDir,
     &VFS_getWorkingDirectoryPtr,
     &VFS_getFileStats,
+    &Keyboard_getChar,
 
 };
 

@@ -71,6 +71,7 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
         u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
         Debug_assert(stack != NULL);
         self->kernelStackBase = stack;
+        self->kernelStack = (char*) stack + FRAME_SIZE;
 
         /* Allocate and map user stack - Currently 4KB */
         Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
@@ -81,14 +82,9 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
         self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
 
         /* Set up initial user ss and esp */
-        registers.esp0   = (u32int) self->userStack;;
-        registers.ss0    = USER_DATA_SEGMENT | 3;;
+        registers.esp0   = (u32int) self->userStack;
+        registers.ss0    = USER_DATA_SEGMENT | 3;
         Memory_copy(self->userStack, &registers, sizeof(Regs));
-
-        /* Setup kernel stack */
-        stack = (u32int*) ((char*) stack + FRAME_SIZE - sizeof(Regs));
-        Memory_copy(stack, &registers, sizeof(Regs));
-        self->kernelStack = stack;
 
         self->fileNodes = ArrayList_new(1);
 
