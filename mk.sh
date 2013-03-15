@@ -45,6 +45,7 @@ $C_Compiler $CFlags -o math.o    -c   kernel/src/Lib/Math.c
 $C_Compiler $CFlags -o arrlist.o -c   kernel/src/Lib/ArrayList.c
 $C_Compiler $CFlags -o linkl.o   -c   kernel/src/Lib/LinkedList.c
 $C_Compiler $CFlags -o string.o  -c   kernel/src/Lib/String.c
+$C_Compiler $CFlags -o fifo.o    -c   kernel/src/Lib/CircularFIFOBuffer.c
 
 $C_Compiler $CFlags -o pmm.o     -c   kernel/src/Memory/PhysicalMemory.c
 $C_Compiler $CFlags -o smm.o     -c   kernel/src/Memory/StackPMM.c
@@ -88,6 +89,7 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         dumbH.o \
                                                                         linkl.o \
                                                                         string.o \
+                                                                        fifo.o \
                                                                         sched.o \
                                                                         rr.o \
                                                                         fcfs.o \
