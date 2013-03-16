@@ -77,14 +77,28 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
         Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
         self->userStackBase = (void*) USER_STACK_BASE_VADDR;
         char* uStack = PhysicalMemory_allocateFrame();
-        VirtualMemory_switchPageDir(self->pageDir);
-        VirtualMemory_mapPage((void*) USER_STACK_BASE_VADDR, uStack, MODE_USER);
+
+        VirtualMemory_mapPage(self->pageDir, (void*) USER_STACK_BASE_VADDR, uStack, MODE_USER);
         self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
 
         /* Set up initial user ss and esp */
         registers.esp0   = (u32int) self->userStack;
         registers.ss0    = USER_DATA_SEGMENT | 3;
-        Memory_copy(self->userStack, &registers, sizeof(Regs));
+
+        if(pid == 1) { /* Initial user process */
+
+            VirtualMemory_quickMap((void*) USER_STACK_BASE_VADDR, uStack);
+            Memory_copy(self->userStack, &registers, sizeof(Regs));
+
+        } else {
+
+            VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, uStack);
+            Memory_copy((void*) (TEMPORARY_MAP_VADDR + FRAME_SIZE - sizeof(Regs)), &registers, sizeof(Regs));
+            VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
+
+        }
+
+
 
         self->fileNodes = ArrayList_new(1);
 
@@ -103,24 +117,26 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
 
 PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
-    HeapMemory_free(process->kernelStackBase);
+    UNUSED(process);
+    //TODO: fix
+    // HeapMemory_free(process->kernelStackBase);
 
-    if(process->fileNodes != NULL) {
+    // if(process->fileNodes != NULL) {
 
-        /* close all opened files */
-        for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
+    //     /* close all opened files */
+    //     for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
 
-            VFSNode* file = ArrayList_get(process->fileNodes, i);
-            VFS_closeFile(file);
+    //         VFSNode* file = ArrayList_get(process->fileNodes, i);
+    //         VFS_closeFile(file);
 
-        }
+    //     }
 
-        ArrayList_destroy(process->fileNodes);
+    //     ArrayList_destroy(process->fileNodes);
 
-    }
+    // }
 
-    HeapMemory_free(process);
-    VirtualMemory_destroyPageDirectory(process);
+    // HeapMemory_free(process);
+    // VirtualMemory_destroyPageDirectory(process);
 
 }
 
@@ -189,16 +205,16 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 
     /* Copy user code from kernel heap to user space */
     void* f = PhysicalMemory_allocateFrame(); //TODO: what if user code > 4kB
-    VirtualMemory_mapPage((void*) USER_CODE_BASE_VADDR, f, MODE_USER);
-    Memory_copy((void*) USER_CODE_BASE_VADDR, buffer, bin->fileSize);
+    VirtualMemory_mapPage(p->pageDir, (void*) USER_CODE_BASE_VADDR, f, MODE_USER);
 
-    /* Halfway through newProcess(), we switch to new process' directory. Now return back to original directory */
-    if(Scheduler_getCurrentProcess() != NULL)
-        VirtualMemory_switchPageDir(Scheduler_getCurrentProcess()->pageDir);
+    VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, f);
+    Memory_copy((void*) TEMPORARY_MAP_VADDR, buffer, bin->fileSize);
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
 
     HeapMemory_free(buffer);
     VFS_closeFile(bin);
     Scheduler_addProcess(p);
+
     return p;
 
 }

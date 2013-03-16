@@ -30,7 +30,6 @@
 #define PTE_INDEX(x) ((u32int) x >> 12  & 0x03FF)
 #define ADDR_TO_FRAME_INDEX(addr) ((u32int) addr / FRAME_SIZE)
 #define FRAME_INDEX_TO_ADDR(index) ((void*) (index * FRAME_SIZE))
-#define TEMPORARY_MAP_VADDR 0xF00000
 
 #define KERNEL_HEAP_MAP_SIZE_MB  32
 
@@ -282,6 +281,59 @@ PRIVATE void VirtualMemory_init(void) {
 
 }
 
+PUBLIC void* VirtualMemory_quickMap(void* virtualAddr, void* physicalAddr) {
+
+    /* Map to current page dir */
+
+    /* Addresses should be page aligned */
+    Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0 && (u32int) physicalAddr % FRAME_SIZE == 0);
+
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000; /* Get current page directory */
+    PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
+
+    if(!pde->inMemory) { /* Need to allocate a page table */
+
+        PageTable* pageTable = PhysicalMemory_allocateFrame();
+
+        Debug_assert(pageTable != NULL); /* Out of physical memory */
+
+        VirtualMemory_setPDE(pde, pageTable, MODE_KERNEL);
+        pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+        Memory_set(pageTable, 0, sizeof(PageTable));
+
+    }
+
+    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
+    VirtualMemory_setPTE(pte, physicalAddr, MODE_KERNEL);
+    VirtualMemory_invalidateTLBEntry(virtualAddr);
+
+    return virtualAddr;
+
+}
+
+PUBLIC void VirtualMemory_quickUnmap(void* virtualAddr) {
+
+    /* Unmap from current page dir */
+
+    /* Address should be page aligned */
+    Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0);
+
+    PageDirectory* dir = (PageDirectory*) 0xFFFFF000; /* Get current page directory */
+    PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
+
+    Debug_assert(pde->inMemory);
+
+    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
+
+    Debug_assert(pte->inMemory);
+
+    Memory_set(pte, 0, sizeof(PageTableEntry));
+    VirtualMemory_invalidateTLBEntry(virtualAddr);
+
+}
+
 PUBLIC PageDirectory* VirtualMemory_getKernelDir(void) {
 
     return kernelDir;
@@ -306,9 +358,8 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
 
     Debug_assert(process != NULL);
 
-    PageDirectory* pageDir = (PageDirectory*) process->pageDir;
-    pageDir = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, pageDir, MODE_KERNEL); /* Map it so that we can access it */
-    PageDirectory* kDir = VirtualMemory_mapPage((void*) (TEMPORARY_MAP_VADDR + 0x1000), (void*) kernelDir, MODE_KERNEL); /* Map it so that we can access it */
+    PageDirectory* pageDir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, process->pageDir); /* Map it so that we can access it */
+    PageDirectory* kDir = VirtualMemory_quickMap((void*) (TEMPORARY_MAP_VADDR + 0x1000), kernelDir); /* Map it so that we can access it */
 
     /* Map bottom 4MB */
     PageDirectoryEntry* pde = &pageDir->entries[0];
@@ -323,16 +374,21 @@ PUBLIC void VirtualMemory_mapKernel(Process* process) {
 
         pde = &pageDir->entries[i];
         Memory_set(pde, 0, sizeof(PageDirectoryEntry));
-        pde->frameIndex = kDir->entries[PDE_INDEX(KERNEL_HEAP_BASE_VADDR)].frameIndex;
-        pde->inMemory = TRUE;
-        pde->rwFlag = TRUE;
-        pde->mode = MODE_KERNEL;
+
+        if(kDir->entries[i].inMemory) {
+
+            pde->frameIndex = kDir->entries[i].frameIndex;
+            pde->inMemory = TRUE;
+            pde->rwFlag = TRUE;
+            pde->mode = MODE_KERNEL;
+
+        }
 
     }
 
     /* Unmap temporary mappings */
-    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
-    VirtualMemory_unmapPage((void*) (TEMPORARY_MAP_VADDR + 0x1000));
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
+    VirtualMemory_quickUnmap((void*) (TEMPORARY_MAP_VADDR + 0x1000));
 
 }
 
@@ -342,7 +398,7 @@ PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
 
     PageDirectory* dir = (PageDirectory*) PhysicalMemory_allocateFrame();
     process->pageDir = dir;
-    dir = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, dir, MODE_KERNEL); /* Map it so that we can access it */
+    dir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, dir); /* Map it so that we can access it */
     Memory_set(dir, 0, sizeof(PageDirectory));
 
     /* Map directory to last virtual 4MB - recursive mapping, lets us manipulate the page directory after paging is enabled */
@@ -355,7 +411,7 @@ PUBLIC void VirtualMemory_createPageDirectory(Process* process) {
     for(int i = 0; i < 1023; i++)
         dir->entries[i].mode = MODE_KERNEL;
 
-    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
 
 }
 
@@ -364,17 +420,17 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
     Debug_assert(process->pageDir != NULL);
 
     /* Free every page table starting at 1GB(everything except kernel which is bottom 4MB + kernel heap) */
-    for(int i = PDE_INDEX(KERNEL_HEAP_TOP_VADDR); i < 1024; i++) {
+    for(int i = PDE_INDEX(USER_CODE_BASE_VADDR); i < 1024; i++) {
 
         /* Map page directory so that we can access it */
-        PageDirectory* dir = (PageDirectory*) VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, process->pageDir, MODE_KERNEL);
+        PageDirectory* dir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, process->pageDir);
         PageDirectoryEntry* pde = &dir->entries[i];
 
         if(pde->inMemory) {
 
             PageTable* pageTable = (PageTable*) FRAME_INDEX_TO_ADDR(pde->frameIndex);
             Debug_assert(pageTable != NULL);
-            pageTable = VirtualMemory_mapPage((void*) TEMPORARY_MAP_VADDR, pageTable, MODE_KERNEL); /* Map page table so that we can access it */
+            pageTable = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, pageTable); /* Map page table so that we can access it */
 
             /* Free all page table entries*/
             for(int y = 0; y < 1024; y++) {
@@ -397,17 +453,18 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
 
     }
 
-    VirtualMemory_unmapPage((void*) TEMPORARY_MAP_VADDR);
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
     PhysicalMemory_freeFrame(process->pageDir);
 
 }
 
-PUBLIC void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr, bool mode) {
+PUBLIC void* VirtualMemory_mapPage(PageDirectory* dir, void* virtualAddr, void* physicalAddr, bool mode) {
 
     /* Addresses should be page aligned */
     Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0 && (u32int) physicalAddr % FRAME_SIZE == 0);
+    Debug_assert(dir != NULL);
 
-    PageDirectory* dir = (PageDirectory*) 0xFFFFF000; /* Get current process' page directory */
+    dir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, dir);
     PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
 
     if(!pde->inMemory) { /* Need to allocate a page table */
@@ -417,37 +474,42 @@ PUBLIC void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr, bool m
         Debug_assert(pageTable != NULL); /* Out of physical memory */
 
         VirtualMemory_setPDE(pde, pageTable, mode);
-        pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+        pageTable = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR + 0x1000, pageTable);
         Memory_set(pageTable, 0, sizeof(PageTable));
 
     }
 
-    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTable* pageTable = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR + 0x1000, FRAME_INDEX_TO_ADDR(pde->frameIndex));
     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
     VirtualMemory_setPTE(pte, physicalAddr, mode);
     VirtualMemory_invalidateTLBEntry(virtualAddr);
+
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR + 0x1000);
 
     return virtualAddr;
 
 }
 
-PUBLIC void VirtualMemory_unmapPage(void* virtualAddr) {
+PUBLIC void VirtualMemory_unmapPage(PageDirectory* dir, void* virtualAddr) {
 
     /* Address should be page aligned */
     Debug_assert((u32int) virtualAddr % FRAME_SIZE == 0);
+    Debug_assert(dir != NULL);
 
-    PageDirectory* dir = (PageDirectory*) 0xFFFFF000; /* Get current process' page directory */
+    dir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, dir);
     PageDirectoryEntry* pde = &dir->entries[PDE_INDEX(virtualAddr)];
 
     Debug_assert(pde->inMemory);
 
-    PageTable* pageTable = (PageTable*) (((u32int*) 0xFFC00000) + (0x400 * PDE_INDEX(virtualAddr)));
+    PageTable* pageTable = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, FRAME_INDEX_TO_ADDR(pde->frameIndex));
     PageTableEntry* pte = &pageTable->entries[PTE_INDEX(virtualAddr)];
 
     Debug_assert(pte->inMemory);
 
     Memory_set(pte, 0, sizeof(PageTableEntry));
     VirtualMemory_invalidateTLBEntry(virtualAddr);
+    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
 
 }
 

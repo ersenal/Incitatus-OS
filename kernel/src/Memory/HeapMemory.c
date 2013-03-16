@@ -19,6 +19,7 @@
 #include <Memory/PhysicalMemory.h>
 #include <Memory.h>
 #include <Debug.h>
+#include <Process/Scheduler.h>
 
 /* Include Heap manager implementation */
 /* #include <Memory/DumbHeapManager.h> */
@@ -74,7 +75,11 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
             if(physicalAddress == NULL) /* Are we out of physical memory? */
                 Sys_panic("Out of physical memory!");
 
-            VirtualMemory_mapPage(heapTop, physicalAddress, MODE_KERNEL);
+            if(Scheduler_getCurrentProcess == NULL || Scheduler_getCurrentProcess() == NULL)
+                VirtualMemory_mapPage(VirtualMemory_getKernelDir(), heapTop, physicalAddress, MODE_KERNEL);
+            else
+                VirtualMemory_mapPage(Scheduler_getCurrentProcess()->pageDir, heapTop, physicalAddress, MODE_KERNEL);
+
             Memory_set(heapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
             heapTop += FRAME_SIZE;
 
@@ -94,7 +99,7 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
             void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
             Debug_assert(physicalAddress != NULL);
             PhysicalMemory_freeFrame(physicalAddress);
-            VirtualMemory_unmapPage(heapTop);
+            VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, heapTop);
 
         }
 

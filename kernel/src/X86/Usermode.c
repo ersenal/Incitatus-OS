@@ -85,7 +85,7 @@ PRIVATE void Usermode_init(void) {
 
     Process* init = ProcessManager_spawnProcess("/HelloWorld");
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) init->kernelStack);
-    asm volatile("mov %0, %%esp" : : "r" (init->userStack)); /* Store initial process ESP in DR0 register */
+    asm volatile("mov %0, %%esp" : : "r" (init->userStack));
     VirtualMemory_switchPageDir(init->pageDir);
 
     asm volatile("        \

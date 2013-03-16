@@ -25,6 +25,8 @@
 #define MODE_KERNEL 0
 #define MODE_USER   1
 
+#define TEMPORARY_MAP_VADDR 0xF00000
+
 /*=======================================================
     TYPE
 =========================================================*/
@@ -53,7 +55,7 @@ Module* VirtualMemory_getModule(void);
 |
 | RETURN:          Mapped virtual address
 \------------------------------------------------------------------------*/
-void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr, bool mode);
+void* VirtualMemory_mapPage(PageDirectory* dir, void* virtualAddr, void* physicalAddr, bool mode);
 
 /*-------------------------------------------------------------------------
 | Unmap virtual address
@@ -63,7 +65,7 @@ void* VirtualMemory_mapPage(void* virtualAddr, void* physicalAddr, bool mode);
 | PARAM:           "virtualAddr"   4KB aligned virtual address
 |
 \------------------------------------------------------------------------*/
-void VirtualMemory_unmapPage(void* virtualAddr);
+void VirtualMemory_unmapPage(PageDirectory* dir, void* virtualAddr);
 
 /*-------------------------------------------------------------------------
 | Get physical address
@@ -76,6 +78,8 @@ void VirtualMemory_unmapPage(void* virtualAddr);
 void* VirtualMemory_getPhysicalAddress(void* virtualAddr);
 
 //TODO: add comments
+void* VirtualMemory_quickMap(void* virtualAddr, void* physicalAddr);
+void VirtualMemory_quickUnmap(void* virtualAddr);
 PageDirectory* VirtualMemory_getKernelDir(void);
 void VirtualMemory_switchPageDir(PageDirectory* dir);
 void VirtualMemory_mapKernel(Process* process);
