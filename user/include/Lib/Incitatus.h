@@ -49,6 +49,9 @@ struct stat {
 #define SYSCALL_FINDDIR     7
 #define SYSCALL_FGETCWD     8
 #define SYSCALL_FSTAT       9
+#define SYSCALL_GETCH       10
+#define SYSCALL_CLS         11
+#define SYSCALL_RESTART     12
 
 #define FILE int
 
@@ -58,7 +61,7 @@ struct stat {
 void puts(const char* str);
 void putc(char c);
 void exit(int exitCode);
-void spawn(const char* binary);
+int spawn(const char* binary);
 FILE* readdir(FILE* fd, int index);
 FILE* fchdir(FILE* fd);
 FILE* fparent(FILE* fd);
@@ -66,4 +69,6 @@ FILE* fgetcwd(void);
 void fstat(FILE* fd, struct stat* buf);
 char* getcwd(char* buf);
 char getch(void);
+void cls(void);
+void restart(void);
 #endif

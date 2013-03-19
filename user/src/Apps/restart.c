@@ -2,7 +2,6 @@
 
 int main(void) {
 
-    puts("Test\n");
-    exit(0);
+    restart();
 
 }

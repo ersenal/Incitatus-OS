@@ -2,7 +2,7 @@
 
 int main(void) {
 
-    puts("Test\n");
+    cls();
     exit(0);
 
 }

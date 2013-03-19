@@ -26,7 +26,7 @@
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS       11
+#define NUMBER_OF_CALLS       13
 
 /*=======================================================
     PRIVATE DATA
@@ -46,6 +46,8 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &VFS_getWorkingDirectoryPtr,
     &VFS_getFileStats,
     &Keyboard_getChar,
+    &Console_clearScreen,
+    &Sys_restart
 
 };
 
@@ -83,29 +85,29 @@ PRIVATE void Usermode_init(void) {
     Debug_logInfo("%s", "Jumping to user space");
     IDT_registerHandler(&Usermode_syscallHandler, SYSCALL_INTERRUPT);
 
-    Process* init = ProcessManager_spawnProcess("/HelloWorld");
+    Process* init = ProcessManager_spawnProcess("/Shell");
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) init->kernelStack);
     asm volatile("mov %0, %%esp" : : "r" (init->userStack));
     VirtualMemory_switchPageDir(init->pageDir);
 
-    asm volatile("        \
-        cli;              \
-        mov $0x23, %%ax;   \
+    asm volatile("          \
+        cli;                \
+        mov $0x23, %%ax;    \
         mov %%ax, %%ds;     \
         mov %%ax, %%es;     \
         mov %%ax, %%fs;     \
         mov %%ax, %%gs;     \
-                          \
+                            \
         mov %%esp, %%eax;   \
-        pushl $0x23;      \
-        pushl %%eax;       \
-        pushf;            \
-        pop %%eax;         \
-        or $0x200, %%eax;  \
-        push %%eax;        \
-        pushl $0x1B;      \
-        push  %0;         \
-        iret;             \
+        pushl $0x23;        \
+        pushl %%eax;        \
+        pushf;              \
+        pop %%eax;          \
+        or $0x200, %%eax;   \
+        push %%eax;         \
+        pushl $0x1B;        \
+        push  %0;           \
+        iret;               \
     " : : "S" (USER_CODE_BASE_VADDR));
 
 }

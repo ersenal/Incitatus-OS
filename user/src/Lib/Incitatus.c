@@ -42,9 +42,9 @@ void exit(int exitCode) {
 
 }
 
-void spawn(const char* binary) {
+int spawn(const char* binary) {
 
-    syscall(SYSCALL_SPAWN, (int) binary, 0, 0, 0, 0);
+    return syscall(SYSCALL_SPAWN, (int) binary, 0, 0, 0, 0);
 
 }
 
@@ -86,6 +86,18 @@ char* getcwd(char* buf) {
 
 char getch(void) {
 
-    return syscall(10, 0, 0, 0, 0, 0);
+    return syscall(SYSCALL_GETCH, 0, 0, 0, 0, 0);
+
+}
+
+void cls(void) {
+
+    syscall(SYSCALL_CLS, 0, 0, 0, 0, 0);
+
+}
+
+void restart(void) {
+
+    syscall(SYSCALL_RESTART, 0, 0, 0, 0, 0);
 
 }

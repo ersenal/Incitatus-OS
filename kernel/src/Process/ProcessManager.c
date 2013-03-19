@@ -98,8 +98,6 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
 
         }
 
-
-
         self->fileNodes = ArrayList_new(1);
 
     } else { /* Kernel process */
@@ -115,10 +113,10 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
 
 }
 
+//TODO: system becomes critically unstable after calling this
 PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
     UNUSED(process);
-    //TODO: fix
     // HeapMemory_free(process->kernelStackBase);
 
     // if(process->fileNodes != NULL) {
@@ -192,7 +190,8 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
 PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 
     VFSNode* bin = VFS_openFile(binary, "r");
-    Debug_assert(bin != NULL);
+    if(bin == NULL) /* Couldn't open the file */
+        return NULL;
 
     char* buffer = HeapMemory_calloc(1, bin->fileSize + 1);
     Debug_assert(buffer != NULL);
@@ -203,13 +202,21 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     String_copy(p->name, bin->fileName); /* Set process name */
     Debug_assert(p != NULL);
 
-    /* Copy user code from kernel heap to user space */
-    void* f = PhysicalMemory_allocateFrame(); //TODO: what if user code > 4kB
-    VirtualMemory_mapPage(p->pageDir, (void*) USER_CODE_BASE_VADDR, f, MODE_USER);
+    u32int i;
 
-    VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, f);
+    /* Copy user code from kernel heap to user space */
+    for(i = 0; i < (bin->fileSize / FRAME_SIZE) + 1; i++) {
+
+        void* phys = PhysicalMemory_allocateFrame();
+        VirtualMemory_mapPage(p->pageDir, (void*) USER_CODE_BASE_VADDR + (i * FRAME_SIZE), phys, MODE_USER);
+        VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR + (i * FRAME_SIZE), phys);
+
+    }
+
     Memory_copy((void*) TEMPORARY_MAP_VADDR, buffer, bin->fileSize);
-    VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
+
+    for(u32int y = 0; y < i; y++)
+         VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR + (y * FRAME_SIZE));
 
     HeapMemory_free(buffer);
     VFS_closeFile(bin);

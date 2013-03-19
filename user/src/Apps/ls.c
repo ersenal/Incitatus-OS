@@ -6,7 +6,6 @@ int main(void) {
     FILE* file = 0;
     int i = 0;
     struct stat buf;
-    putc('\n');
 
     while((file = readdir(cwd, i))) {
 

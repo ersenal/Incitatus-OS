@@ -67,6 +67,10 @@ PUBLIC VFSNode* VFS_openFile(const char* filename, const char* mode) {
         filename++;
 
     VFSNode* fileNode = VFS_searchForFile(rootFS->rootNode, filename);
+
+    if(fileNode == NULL) /* Coulnd't find the file */
+        return NULL;
+
     Debug_assert(fileNode->mode == FILE_MODE_NOT_OPEN);
 
     if(String_compare(mode, "r") == 0)

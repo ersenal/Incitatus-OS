@@ -7,20 +7,28 @@ CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -s
 $C_Compiler $CFlags -o incit.o   -c   user/src/Lib/Incitatus.c
 ar rcs bin/libIncitatus.a incit.o
 
-$C_Compiler $CFlags -o helloworld.o -c user/src/Apps/HelloWorld.c
+$C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
 $C_Compiler $CFlags -o ls.o       -c user/src/Apps/ls.c
-$C_Compiler $CFlags -o test.o       -c user/src/Apps/test.c
+$C_Compiler $CFlags -o test.o     -c user/src/Apps/test.c
+$C_Compiler $CFlags -o restart.o  -c user/src/Apps/restart.c
+$C_Compiler $CFlags -o cls.o      -c user/src/Apps/cls.c
 
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld helloworld.o bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o ls ls.o bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o test test.o bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o Shell   shell.o     bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o ls      ls.o        bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o test    test.o      bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o restart restart.o   bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o cls     cls.o       bin/libIncitatus.a
 
-tar cvf bootloader/initrd.tar HelloWorld ls test
+tar cvf bootloader/initrd.tar Shell ls test restart cls
 
-rm HelloWorld
+rm Shell
 rm ls
+rm test
+rm restart
+rm cls
 #!
 
+#! Kernel
 nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 

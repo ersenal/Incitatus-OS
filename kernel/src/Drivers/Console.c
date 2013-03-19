@@ -51,6 +51,13 @@ PRIVATE void Console_nextLine(void) {
 
 }
 
+PRIVATE void Console_previousLine(void) {
+
+    cursorX = vgaWidth;
+    cursorY--;
+
+}
+
 PRIVATE void Console_scrollDown(void) {
 
     /* move every line i to line i-1 */
@@ -121,16 +128,24 @@ PUBLIC void Console_printChar(u8int c) {
     switch(c) {
 
         case '\n':
-        Console_nextLine();
-        break;
+            Console_nextLine();
+            break;
+
+        case '\b':
+            if(cursorX <= 0)
+                Console_previousLine();
+
+            VGA_put(cursorY * vgaWidth + (cursorX - 1), (colorAttribute << 0x8) + ' ');
+            cursorX--;
+            break;
 
         default:
-        VGA_put(cursorY * vgaWidth + cursorX, (colorAttribute << 0x8) + c);
-        cursorX++;
+            VGA_put(cursorY * vgaWidth + cursorX, (colorAttribute << 0x8) + c);
+            cursorX++;
 
-        if(cursorX >= vgaWidth)
-            Console_nextLine();
-        break;
+            if(cursorX >= vgaWidth)
+                Console_nextLine();
+            break;
     }
 
     if(cursorY >= vgaHeight) Console_scrollDown();
