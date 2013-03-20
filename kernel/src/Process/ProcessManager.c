@@ -201,19 +201,23 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 
     u32int i;
 
+    /* VirtualMemory_mapPage uses TEMPORARY_MAP_VADDR and TEMPORARY_MAP_VADDR + 0x1000 */
+    /* This could interfere with our VirtualMemory_quickMap, so use a higher temporary map address */
+    u32int tempMapAddr = TEMPORARY_MAP_VADDR + (2 * FRAME_SIZE);
+
     /* Copy user code from kernel heap to user space */
     for(i = 0; i < (bin->fileSize / FRAME_SIZE) + 1; i++) {
 
         void* phys = PhysicalMemory_allocateFrame();
-        VirtualMemory_mapPage(p->pageDir, (void*) USER_CODE_BASE_VADDR + (i * FRAME_SIZE), phys, MODE_USER);
-        VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR + (i * FRAME_SIZE), phys);
+        VirtualMemory_mapPage(p->pageDir, (void*) (USER_CODE_BASE_VADDR + (i * FRAME_SIZE)), phys, MODE_USER);
+        VirtualMemory_quickMap((void*) (tempMapAddr + (i * FRAME_SIZE)), phys);
 
     }
 
-    Memory_copy((void*) TEMPORARY_MAP_VADDR, buffer, bin->fileSize);
+    Memory_copy((void*) tempMapAddr, buffer, bin->fileSize);
 
     for(u32int y = 0; y < i; y++)
-         VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR + (y * FRAME_SIZE));
+         VirtualMemory_quickUnmap((void*) (tempMapAddr + (y * FRAME_SIZE)));
 
     HeapMemory_free(buffer);
     VFS_closeFile(bin);

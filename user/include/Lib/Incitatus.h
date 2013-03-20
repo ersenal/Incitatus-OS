@@ -57,7 +57,7 @@ struct stat {
 #define SYSCALL_READ        15
 #define SYSCALL_WRITE       16
 #define SYSCALL_MKDIR       17
-#define SYSCALL_BRK         18
+#define SYSCALL_SBRK        18
 #define SYSCALL_FINDDIR     19
 
 
@@ -85,5 +85,5 @@ void fclose(FILE* file);
 unsigned int read(FILE* file, unsigned int offset, unsigned int count, char* buffer);
 unsigned int write(FILE* file, unsigned int offset, unsigned int count, const char* buffer);
 FILE* mkdir(const char* pathname);
-void* brk(int size);
+void* sbrk(int size);
 #endif

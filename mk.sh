@@ -4,8 +4,10 @@ C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
 CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/ -I user/include"
 
 #! User Space
-$C_Compiler $CFlags -o incit.o   -c   user/src/Lib/Incitatus.c
-ar rcs bin/libIncitatus.a incit.o
+$C_Compiler $CFlags -o incit.o    -c   user/src/Lib/Incitatus.c
+$C_Compiler $CFlags -o douglea.o  -c   user/src/Lib/libc/DougLea.c
+$C_Compiler $CFlags -o str.o      -c   user/src/Lib/libc/string.c
+ar rcs bin/libIncitatus.a incit.o douglea.o str.o
 
 $C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
 $C_Compiler $CFlags -o ls.o       -c user/src/Apps/ls.c

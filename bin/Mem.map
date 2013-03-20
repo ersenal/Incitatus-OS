@@ -268,50 +268,51 @@ Linker script and memory map
                 0x000000000010c679                FCFS_getNextProcess
                 0x000000000010c683                FCFS_getCurrentProcess
  *fill*         0x000000000010c68d        0x3 
- .text          0x000000000010c690      0xb64 pm.o
+ .text          0x000000000010c690      0xb6e pm.o
                 0x000000000010cb95                ProcessManager_switch
                 0x000000000010cd46                ProcessManager_killProcess
                 0x000000000010cf84                ProcessManager_spawnProcess
- .text          0x000000000010d1f4      0x567 kbd.o
-                0x000000000010d3ab                Keyboard_getChar
-                0x000000000010d3c0                Keyboard_setLeds
-                0x000000000010d45c                Keyboard_init
- *fill*         0x000000000010d75b        0x1 
- .text          0x000000000010d75c      0x2d9 mouse.o
-                0x000000000010d82d                Mouse_init
- *fill*         0x000000000010da35        0x3 
- .text          0x000000000010da38      0x69e ps2.o
-                0x000000000010e042                PS2Controller_send
-                0x000000000010e071                PS2Controller_receive
-                0x000000000010e091                PS2Controller_getModule
- *fill*         0x000000000010e0d6        0x2 
- .text          0x000000000010e0d8      0x96d ramdisk.o
-                0x000000000010e93e                RamDisk_init
- *fill*         0x000000000010ea45        0x3 
- .text          0x000000000010ea48      0x299 tar.o
-                0x000000000010eb27                Tar_nextHeader
-                0x000000000010ebf8                Tar_getHeader
-                0x000000000010ec3f                Tar_getNumberOfFiles
- *fill*         0x000000000010ece1        0x3 
- .text          0x000000000010ece4      0xff2 vfs.o
-                0x000000000010eee1                VFS_openFile
-                0x000000000010f01e                VFS_closeFile
-                0x000000000010f135                VFS_getParent
-                0x000000000010f2a7                VFS_readDir
-                0x000000000010f417                VFS_findDir
-                0x000000000010f515                VFS_changeDirectory
-                0x000000000010f609                VFS_getWorkingDirectoryStr
-                0x000000000010f6ad                VFS_getFileStats
-                0x000000000010f6cf                VFS_getWorkingDirectoryPtr
-                0x000000000010f6e1                VFS_read
-                0x000000000010f9b4                VFS_write
-                0x000000000010fc87                VFS_mkdir
-                0x000000000010fc91                VFS_getModule
- *fill*         0x000000000010fcd6        0x2 
- .text          0x000000000010fcd8      0x1f8 user.o
-                0x000000000010fe8b                Usermode_getModule
+ *fill*         0x000000000010d1fe        0x2 
+ .text          0x000000000010d200      0x567 kbd.o
+                0x000000000010d3b7                Keyboard_getChar
+                0x000000000010d3cc                Keyboard_setLeds
+                0x000000000010d468                Keyboard_init
+ *fill*         0x000000000010d767        0x1 
+ .text          0x000000000010d768      0x2d9 mouse.o
+                0x000000000010d839                Mouse_init
+ *fill*         0x000000000010da41        0x3 
+ .text          0x000000000010da44      0x69e ps2.o
+                0x000000000010e04e                PS2Controller_send
+                0x000000000010e07d                PS2Controller_receive
+                0x000000000010e09d                PS2Controller_getModule
+ *fill*         0x000000000010e0e2        0x2 
+ .text          0x000000000010e0e4      0x96d ramdisk.o
+                0x000000000010e94a                RamDisk_init
+ *fill*         0x000000000010ea51        0x3 
+ .text          0x000000000010ea54      0x299 tar.o
+                0x000000000010eb33                Tar_nextHeader
+                0x000000000010ec04                Tar_getHeader
+                0x000000000010ec4b                Tar_getNumberOfFiles
+ *fill*         0x000000000010eced        0x3 
+ .text          0x000000000010ecf0      0xff2 vfs.o
+                0x000000000010eeed                VFS_openFile
+                0x000000000010f02a                VFS_closeFile
+                0x000000000010f141                VFS_getParent
+                0x000000000010f2b3                VFS_readDir
+                0x000000000010f423                VFS_findDir
+                0x000000000010f521                VFS_changeDirectory
+                0x000000000010f615                VFS_getWorkingDirectoryStr
+                0x000000000010f6b9                VFS_getFileStats
+                0x000000000010f6db                VFS_getWorkingDirectoryPtr
+                0x000000000010f6ed                VFS_read
+                0x000000000010f9c0                VFS_write
+                0x000000000010fc93                VFS_mkdir
+                0x000000000010fc9d                VFS_getModule
+ *fill*         0x000000000010fce2        0x2 
+ .text          0x000000000010fce4      0x1f8 user.o
+                0x000000000010fe97                Usermode_getModule
                 0x0000000000110000                . = ALIGN (0x1000)
- *fill*         0x000000000010fed0      0x130 
+ *fill*         0x000000000010fedc      0x124 
 
 .eh_frame       0x0000000000110000     0x20b4
  .eh_frame      0x0000000000110000       0x58 kernel.o

@@ -108,9 +108,9 @@ FILE* mkdir(const char* pathname) {
 
 }
 
-void* brk(int size) {
+void* sbrk(int size) {
 
-    return (void*) syscall(SYSCALL_BRK, size, 0, 0, 0, 0);
+    return (void*) syscall(SYSCALL_SBRK, size, 0, 0, 0, 0);
 
 }
 
