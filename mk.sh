@@ -21,7 +21,8 @@ $Linker -T user/src/Apps/apps.ld -s -nostdlib -o test    test.o      bin/libInci
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o restart restart.o   bin/libIncitatus.a
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o cls     cls.o       bin/libIncitatus.a
 
-tar cvf bootloader/initrd.tar Shell ls test restart cls
+tar --delete --file bootloader/initrd.tar Shell ls test restart cls
+tar --append --file bootloader/initrd.tar Shell ls test restart cls
 
 rm Shell
 rm ls

@@ -52,8 +52,8 @@ struct stat {
 #define SYSCALL_GETCH       10
 #define SYSCALL_CLS         11
 #define SYSCALL_RESTART     12
-#define SYSCALL_FOPEN       13
-#define SYSCALL_FCLOSE      14
+#define SYSCALL_OPEN        13
+#define SYSCALL_CLOSE       14
 #define SYSCALL_READ        15
 #define SYSCALL_WRITE       16
 #define SYSCALL_MKDIR       17
@@ -80,8 +80,8 @@ char* getcwd(char* buf);
 char getch(void);
 void cls(void);
 void restart(void);
-FILE* fopen(FILE* file, const char* mode);
-void fclose(FILE* file);
+FILE* open(const char* path, const char* mode);
+void close(FILE* file);
 unsigned int read(FILE* file, unsigned int offset, unsigned int count, char* buffer);
 unsigned int write(FILE* file, unsigned int offset, unsigned int count, const char* buffer);
 FILE* mkdir(const char* pathname);

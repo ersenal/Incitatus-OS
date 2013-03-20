@@ -78,15 +78,15 @@ FILE* fgetcwd(void) {
 
 }
 
-FILE* fopen(FILE* fd, const char* mode) {
+FILE* open(const char* path, const char* mode) {
 
-    return (FILE*) syscall(SYSCALL_FOPEN, (int) fd, (int) mode, 0, 0, 0);
+    return (FILE*) syscall(SYSCALL_OPEN, (int) path, (int) mode, 0, 0, 0);
 
 }
 
-void fclose(FILE* fd) {
+void close(FILE* fd) {
 
-    syscall(SYSCALL_FCLOSE, (int) fd, 0, 0, 0, 0);
+    syscall(SYSCALL_CLOSE, (int) fd, 0, 0, 0, 0);
 
 }
 

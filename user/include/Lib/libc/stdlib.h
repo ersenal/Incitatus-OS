@@ -2,6 +2,7 @@
 #define STDLIB_H
 
 #define size_t unsigned int
+#define NULL ((void*) 0)
 
 void* malloc(size_t size);
 void* calloc(size_t numberOfElements, size_t elementSize);

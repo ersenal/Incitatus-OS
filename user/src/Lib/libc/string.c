@@ -102,4 +102,68 @@ char *strcat(char *restrict dest, const char *restrict src)
     return dest;
 }
 
+char *strchrnul(const char *s, int c)
+{
+    #define HASZERO_chrnul(x) ((x)-((size_t)-1/UCHAR_MAX) & ~(x) & (((size_t)-1/UCHAR_MAX) * (UCHAR_MAX/2+1)))
+
+    size_t *w, k;
+
+    c = (unsigned char)c;
+    if (!c) return (char *)s + strlen(s);
+
+    for (; (uintptr_t)s % (sizeof(size_t)); s++)
+        if (!*s || *(unsigned char *)s == c) return (char *)s;
+    k = ((size_t)-1/UCHAR_MAX) * c;
+    for (w = (void *)s; !HASZERO_chrnul(*w) && !HASZERO_chrnul(*w^k); w++);
+    for (s = (void *)w; *s && *(unsigned char *)s != c; s++);
+    return (char *)s;
+}
+
+
+size_t strspn(const char *s, const char *c)
+{
+
+    #define BITOP(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+
+    const char *a = s;
+    size_t byteset[32/sizeof(size_t)] = { 0 };
+
+    if (!c[0]) return 0;
+    if (!c[1]) {
+        for (; *s == *c; s++);
+        return s-a;
+    }
+
+    for (; *c && BITOP(byteset, *(unsigned char *)c, |=); c++);
+    for (; *s && BITOP(byteset, *(unsigned char *)s, &); s++);
+    return s-a;
+}
+
+size_t strcspn(const char *s, const char *c)
+{
+    #define BITOP_CSPN(a,b,op) ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
+
+    const char *a = s;
+    size_t byteset[32/sizeof(size_t)];
+
+    if (!c[0] || !c[1]) return strchrnul(s, *c)-a;
+
+    memset(byteset, 0, sizeof byteset);
+    for (; *c && BITOP_CSPN(byteset, *(unsigned char *)c, |=); c++);
+    for (; *s && !BITOP_CSPN(byteset, *(unsigned char *)s, &); s++);
+    return s-a;
+}
+
+char *strtok(char *restrict s, const char *restrict sep)
+{
+    static char *p;
+    if (!s && !(s = p)) return NULL;
+    s += strspn(s, sep);
+    if (!*s) return p = 0;
+    p = s + strcspn(s, sep);
+    if (*p) *p++ = 0;
+    else p = 0;
+    return s;
+}
+
 #pragma GCC diagnostic pop
