@@ -104,13 +104,6 @@ PRIVATE void RamDisk_parseArchive(const TarEntryHeader* firstHeader) {
 
 PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* buffer) {
 
-    Debug_assert(self != NULL);
-    Debug_assert(buffer != NULL);
-    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
-    Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
-    Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
-    Debug_assert(self->mode == FILE_MODE_READ);
-
     /* Get nth tar header */
     TarEntryHeader* header = Tar_getHeader((TarEntryHeader*) firstHeaderAddress, self->index);
     Debug_assert(header != NULL);
@@ -125,10 +118,6 @@ PRIVATE u32int RamDisk_read(VFSNode* self, u32int offset, u32int count, char* bu
 
 /* Return nth child of a directory */
 PRIVATE VFSNode* RamDisk_readDir(VFSNode* self, u32int index) {
-
-    Debug_assert(self != NULL);
-    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
-    Debug_assert(self->fileType == FILETYPE_DIRECTORY);
 
     u32int nthChild = -1;
 
@@ -157,8 +146,6 @@ PRIVATE VFSNode* RamDisk_readDir(VFSNode* self, u32int index) {
 PRIVATE VFSNode* RamDisk_findDir(VFSNode* self, const char* path) {
 
     UNUSED(self);
-    Debug_assert(self != NULL);
-    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
 
     for(u32int i = 0; i < numberOfFiles; i++)
         if(String_compare(fileNodes[i].fileName, path) == 0)

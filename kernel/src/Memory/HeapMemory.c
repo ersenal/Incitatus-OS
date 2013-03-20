@@ -29,7 +29,7 @@
     PRIVATE DATA
 =========================================================*/
 PRIVATE Module heapModule;
-PRIVATE char*  heapTop;
+PRIVATE char*  kernelHeapTop;
 
 /*=======================================================
     PUBLIC DATA
@@ -45,7 +45,7 @@ PUBLIC void  (*HeapMemory_free)    (void* mem);
 
 PRIVATE void HeapMemory_init(void) {
 
-    heapTop = (void*) KERNEL_HEAP_BASE_VADDR;
+    kernelHeapTop = (void*) KERNEL_HEAP_BASE_VADDR;
 
     /* Point to heap manager implementation */
     HeapMemory_alloc   = &DougLea_malloc;
@@ -58,15 +58,15 @@ PRIVATE void HeapMemory_init(void) {
 PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
     Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
-    Debug_assert((u32int) heapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
+    Debug_assert((u32int) kernelHeapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
 
     /* The number of needed pages */
     u32int pages = size / FRAME_SIZE;
 
     if(size >= 0) { /* Expand heap */
 
-        Debug_assert((u32int) heapTop + size < KERNEL_HEAP_TOP_VADDR); /* heap should not overflow */
-        void* ret = heapTop;
+        Debug_assert((u32int) kernelHeapTop + size < KERNEL_HEAP_TOP_VADDR); /* heap should not overflow */
+        void* ret = kernelHeapTop;
 
         for(u32int i = 0; i < pages; i++) {
 
@@ -76,12 +76,12 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
                 Sys_panic("Out of physical memory!");
 
             if(Scheduler_getCurrentProcess == NULL || Scheduler_getCurrentProcess() == NULL)
-                VirtualMemory_mapPage(VirtualMemory_getKernelDir(), heapTop, physicalAddress, MODE_KERNEL);
+                VirtualMemory_mapPage(VirtualMemory_getKernelDir(), kernelHeapTop, physicalAddress, MODE_KERNEL);
             else
-                VirtualMemory_mapPage(Scheduler_getCurrentProcess()->pageDir, heapTop, physicalAddress, MODE_KERNEL);
+                VirtualMemory_mapPage(Scheduler_getCurrentProcess()->pageDir, kernelHeapTop, physicalAddress, MODE_KERNEL);
 
-            Memory_set(heapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
-            heapTop += FRAME_SIZE;
+            Memory_set(kernelHeapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
+            kernelHeapTop += FRAME_SIZE;
 
         }
 
@@ -89,21 +89,74 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
 
     } else { /* Contract heap */
 
-        Debug_assert((u32int) heapTop - size >= KERNEL_HEAP_BASE_VADDR); /* heap should not underflow */
+        Debug_assert((u32int) kernelHeapTop - size >= KERNEL_HEAP_BASE_VADDR); /* heap should not underflow */
 
         for(u32int i = 0; i < pages * -1; i++) {
 
-            heapTop -= FRAME_SIZE;
-            Debug_assert(heapTop >= (char*) KERNEL_HEAP_BASE_VADDR);
+            kernelHeapTop -= FRAME_SIZE;
+            Debug_assert(kernelHeapTop >= (char*) KERNEL_HEAP_BASE_VADDR);
 
-            void* physicalAddress = VirtualMemory_getPhysicalAddress(heapTop);
+            void* physicalAddress = VirtualMemory_getPhysicalAddress(kernelHeapTop);
             Debug_assert(physicalAddress != NULL);
             PhysicalMemory_freeFrame(physicalAddress);
-            VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, heapTop);
+            VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, kernelHeapTop);
 
         }
 
-        return heapTop;
+        return kernelHeapTop;
+
+    }
+
+}
+
+PUBLIC void* HeapMemory_expandUser(ptrdiff_t size) {
+
+    Process* currentProcess = Scheduler_getCurrentProcess();
+
+    Debug_assert(size % FRAME_SIZE == 0); /* requested size needs to be page aligned */
+    Debug_assert((u32int) currentProcess->userHeapTop % FRAME_SIZE == 0);  /* heap top needs to be page aligned */
+
+    /* The number of needed pages */
+    u32int pages = size / FRAME_SIZE;
+
+    if(size >= 0) { /* Expand heap */
+
+        Debug_assert((u32int) currentProcess->userHeapTop + size < USER_HEAP_TOP_VADDR); /* heap should not overflow */
+        void* ret = currentProcess->userHeapTop;
+
+        for(u32int i = 0; i < pages; i++) {
+
+            void* physicalAddress = PhysicalMemory_allocateFrame();
+
+            if(physicalAddress == NULL) /* Are we out of physical memory? */
+                Sys_panic("Out of physical memory!");
+
+            VirtualMemory_mapPage(Scheduler_getCurrentProcess()->pageDir, currentProcess->userHeapTop, physicalAddress, MODE_USER);
+
+            Memory_set(currentProcess->userHeapTop, 0, FRAME_SIZE); /* Nullify allocated frame */
+            currentProcess->userHeapTop += FRAME_SIZE;
+
+        }
+
+        return ret;
+
+    } else { /* Contract heap */
+
+        Debug_assert((u32int) currentProcess->userHeapTop - size >= USER_HEAP_BASE_VADDR); /* heap should not underflow */
+
+        for(u32int i = 0; i < pages * -1; i++) {
+
+            currentProcess->userHeapTop -= FRAME_SIZE;
+            Debug_assert((char*) currentProcess->userHeapTop >= (char*) USER_HEAP_BASE_VADDR);
+
+            void* physicalAddress = VirtualMemory_getPhysicalAddress(currentProcess->userHeapTop);
+            Debug_assert(physicalAddress != NULL);
+            PhysicalMemory_freeFrame(physicalAddress);
+            VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, currentProcess->userHeapTop);
+
+        }
+
+        return currentProcess->userHeapTop;
 
     }
 

@@ -24,7 +24,7 @@
 
 /* User heap, 2GB-4GB(ish) virtual address*/
 #define USER_HEAP_BASE_VADDR 0x80000000
-#define USER_HEAP_TOP_VADDR  USER_STACK_VADDR
+#define USER_HEAP_TOP_VADDR  USER_STACK_BASE_VADDR
 
 /* User code */
 #define USER_CODE_BASE_VADDR  0x40000000

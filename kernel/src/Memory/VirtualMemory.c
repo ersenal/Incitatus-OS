@@ -420,7 +420,7 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
     Debug_assert(process->pageDir != NULL);
 
     /* Free every page table starting at 1GB(everything except kernel which is bottom 4MB + kernel heap) */
-    for(int i = PDE_INDEX(USER_CODE_BASE_VADDR); i < 1024; i++) {
+    for(int i = PDE_INDEX(USER_CODE_BASE_VADDR); i < 1023; i++) {
 
         /* Map page directory so that we can access it */
         PageDirectory* dir = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, process->pageDir);
@@ -429,6 +429,7 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
         if(pde->inMemory) {
 
             PageTable* pageTable = (PageTable*) FRAME_INDEX_TO_ADDR(pde->frameIndex);
+            void* pageTablePhys = pageTable;
             Debug_assert(pageTable != NULL);
             pageTable = VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, pageTable); /* Map page table so that we can access it */
 
@@ -447,7 +448,7 @@ PUBLIC void VirtualMemory_destroyPageDirectory(Process* process) {
 
             }
 
-            PhysicalMemory_freeFrame(pageTable);
+            PhysicalMemory_freeFrame(pageTablePhys);
 
         }
 

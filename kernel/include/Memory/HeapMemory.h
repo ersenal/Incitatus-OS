@@ -81,24 +81,25 @@ extern void  (*HeapMemory_free)    (void* mem);
 =========================================================*/
 
 /*-------------------------------------------------------------------------
-| Heap expand
+| Kernel heap expand
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Expands the heap space by "size" bytes. "size" needs to
-|                  be page aligned.
+| DESCRIPTION:     Expands or contracts(if negative value given) the kernel heap
+|                  space by "size" bytes. "size" needs to be page aligned.
 |
 | PARAM:           "size"  Page aligned number of bytes
 \------------------------------------------------------------------------*/
 void*   HeapMemory_expand(ptrdiff_t size);
 
 /*-------------------------------------------------------------------------
-| Heap contract
+| User heap expand
 |--------------------------------------------------------------------------
-| DESCRIPTION:     Contracts the heap space by "size" bytes. "size" needs to
-|                  be page aligned.
+| DESCRIPTION:     Expands or contracts(if negative value given) the user heap
+|                  space by "size" bytes. "size" needs to be page aligned.
 |
 | PARAM:           "size"  Page aligned number of bytes
 \------------------------------------------------------------------------*/
-void*    HeapMemory_contract(size_t size);
+void* HeapMemory_expandUser(ptrdiff_t size);
+
 
 /*-------------------------------------------------------------------------
 | Get kernel heap manager module

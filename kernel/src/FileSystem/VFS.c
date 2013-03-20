@@ -44,7 +44,7 @@ PRIVATE VFSNode* VFS_searchForFile(VFSNode* node, const char* filename) {
     VFSNode* n;
     u32int i = 0;
 
-    while((n = node->vfs->readDir(node, i))) {
+    while((n = VFS_readDir(node, i))) {
 
         if(String_compare(n->fileName, filename) == 0)
             return n;
@@ -146,7 +146,17 @@ PUBLIC VFSNode* VFS_getParent(VFSNode* child) {
 PUBLIC VFSNode* VFS_readDir(VFSNode* dir, int index) {
 
     Debug_assert(dir != NULL);
+    Debug_assert(dir->vfs != NULL); /* Ensure we have a valid node */
+    Debug_assert(dir->fileType == FILETYPE_DIRECTORY);
     return dir->vfs->readDir(dir, index);
+
+}
+
+PUBLIC VFSNode* VFS_findDir(VFSNode* dir, const char* path) {
+
+    Debug_assert(dir != NULL);
+    Debug_assert(dir->vfs != NULL); /* Ensure we have a valid node */
+    return dir->vfs->findDir(dir, path);
 
 }
 
@@ -185,6 +195,41 @@ PUBLIC void VFS_getFileStats(VFSNode* file, VFSNode* buf) {
 PUBLIC VFSNode* VFS_getWorkingDirectoryPtr(void) {
 
     return Scheduler_getCurrentProcess()->workingDirectory;
+
+}
+
+PUBLIC u32int VFS_read(VFSNode* self, u32int offset, u32int count, char* buffer) {
+
+    Debug_assert(self != NULL);
+    Debug_assert(buffer != NULL);
+    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
+    Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
+    Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
+    Debug_assert(self->mode == FILE_MODE_READ);
+
+    return self->vfs->read(self, offset, count, buffer);
+
+}
+
+PUBLIC u32int VFS_write(VFSNode* self, u32int offset, u32int count, const char* buffer) {
+
+    Debug_assert(self != NULL);
+    Debug_assert(buffer != NULL);
+    Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
+    Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
+    Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
+    Debug_assert(self->mode == FILE_MODE_READ);
+
+    //TODO: implement
+    return self->vfs->write(self, offset, count, buffer);
+
+}
+
+PUBLIC VFSNode* VFS_mkdir(const char* pathname) {
+
+    //TODO: implement
+    UNUSED(pathname);
+    return NULL;
 
 }
 

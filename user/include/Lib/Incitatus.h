@@ -46,12 +46,20 @@ struct stat {
 #define SYSCALL_FCHDIR      4
 #define SYSCALL_FPARENT     5
 #define SYSCALL_GETCWD      6
-#define SYSCALL_FINDDIR     7
+#define SYSCALL_READDIR     7
 #define SYSCALL_FGETCWD     8
 #define SYSCALL_FSTAT       9
 #define SYSCALL_GETCH       10
 #define SYSCALL_CLS         11
 #define SYSCALL_RESTART     12
+#define SYSCALL_FOPEN       13
+#define SYSCALL_FCLOSE      14
+#define SYSCALL_READ        15
+#define SYSCALL_WRITE       16
+#define SYSCALL_MKDIR       17
+#define SYSCALL_BRK         18
+#define SYSCALL_FINDDIR     19
+
 
 #define FILE int
 
@@ -63,6 +71,7 @@ void putc(char c);
 void exit(int exitCode);
 int spawn(const char* binary);
 FILE* readdir(FILE* fd, int index);
+FILE* finddir(FILE* fs, const char* childname);
 FILE* fchdir(FILE* fd);
 FILE* fparent(FILE* fd);
 FILE* fgetcwd(void);
@@ -71,4 +80,10 @@ char* getcwd(char* buf);
 char getch(void);
 void cls(void);
 void restart(void);
+FILE* fopen(FILE* file, const char* mode);
+void fclose(FILE* file);
+unsigned int read(FILE* file, unsigned int offset, unsigned int count, char* buffer);
+unsigned int write(FILE* file, unsigned int offset, unsigned int count, const char* buffer);
+FILE* mkdir(const char* pathname);
+void* brk(int size);
 #endif

@@ -39,6 +39,15 @@ void Keyboard_init(void);
 \------------------------------------------------------------------------*/
 void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock);
 
-//TODO: Comment
+/*-------------------------------------------------------------------------
+| Keyboard get char
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Reads and returns a character stored inside circular key
+|                  buffer.
+|
+| RETURN:          'char'  -1 if no character in buffer, char value if there is
+|
+| NOTES:           Currently polls.
+\------------------------------------------------------------------------*/
 char Keyboard_getChar(void);
 #endif

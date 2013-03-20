@@ -51,7 +51,7 @@ struct VFS {
     void       (*open)      (VFSNode* self);
     void       (*close)     (VFSNode* self);
     u32int     (*read)      (VFSNode* self, u32int offset, u32int count, char* buffer);
-    u32int     (*write)     (VFSNode* self, u32int offset, u32int count, char* buffer);
+    u32int     (*write)     (VFSNode* self, u32int offset, u32int count, const char* buffer);
     VFSNode*   (*readDir)   (VFSNode* self, u32int index);
     VFSNode*   (*findDir)   (VFSNode* self, const char* path);
 
@@ -175,5 +175,11 @@ void VFS_getFileStats(VFSNode* file, VFSNode* buf);
 |
 \------------------------------------------------------------------------*/
 Module* VFS_getModule(void);
+
+//TODO: comment
+VFSNode* VFS_findDir(VFSNode* dir, const char* path);
+u32int VFS_read(VFSNode* self, u32int offset, u32int count, char* buffer);
+u32int VFS_write(VFSNode* self, u32int offset, u32int count, const char* buffer);
+VFSNode* VFS_mkdir(const char* pathname);
 
 #endif

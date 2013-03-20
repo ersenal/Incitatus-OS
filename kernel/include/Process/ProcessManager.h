@@ -49,7 +49,7 @@ struct Process {
     u32int pid;
     u8int  status;
     char   name[64];
-    // void*  userHeapBase;
+    void*  userHeapTop;
     void*  kernelStack;
     void*  kernelStackBase;
     void*  userStack;

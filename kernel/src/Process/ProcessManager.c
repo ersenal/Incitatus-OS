@@ -47,8 +47,7 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
         Regs registers;
         Memory_set(&registers, 0, sizeof(Regs));
 
-        //TODO: fix heap
-        // self->userHeapBase = (void*) USER_HEAP_BASE_VADDR;
+        self->userHeapTop = (void*) USER_HEAP_BASE_VADDR;
 
         registers.eflags = 0x202; /* Interrupt enable flag */
         registers.eip    = USER_CODE_BASE_VADDR; /* Initial code entry point */
@@ -113,28 +112,26 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
 
 }
 
-//TODO: system becomes critically unstable after calling this
 PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
-    UNUSED(process);
-    // HeapMemory_free(process->kernelStackBase);
+    HeapMemory_free(process->kernelStackBase);
 
-    // if(process->fileNodes != NULL) {
+    if(process->fileNodes != NULL) {
 
-    //     /* close all opened files */
-    //     for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
+        /* close all opened files */
+        for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
 
-    //         VFSNode* file = ArrayList_get(process->fileNodes, i);
-    //         VFS_closeFile(file);
+            VFSNode* file = ArrayList_get(process->fileNodes, i);
+            VFS_closeFile(file);
 
-    //     }
+        }
 
-    //     ArrayList_destroy(process->fileNodes);
+        ArrayList_destroy(process->fileNodes);
 
-    // }
+    }
 
-    // HeapMemory_free(process);
-    // VirtualMemory_destroyPageDirectory(process);
+    VirtualMemory_destroyPageDirectory(process);
+    HeapMemory_free(process);
 
 }
 
@@ -167,7 +164,6 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     Process* current = Scheduler_getCurrentProcess();
     Debug_logInfo("%s%d%c%s%s%d", "PID:", current->pid, ' ', current->name, " exited with code ", exitCode);
     Scheduler_removeProcess(current);
-    ProcessManager_destroyProcess(current);
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
@@ -180,6 +176,7 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
 
     VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
+    ProcessManager_destroyProcess(current);
     asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
 
     //TODO: Fix this hack
@@ -195,7 +192,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 
     char* buffer = HeapMemory_calloc(1, bin->fileSize + 1);
     Debug_assert(buffer != NULL);
-    bin->vfs->read(bin, 0, bin->fileSize, buffer);
+    VFS_read(bin, 0, bin->fileSize, buffer);
 
     Process* p = ProcessManager_newProcess((void*) buffer, bin->fileSize, USER_PROCESS);
     p->workingDirectory = VFS_getParent(bin);

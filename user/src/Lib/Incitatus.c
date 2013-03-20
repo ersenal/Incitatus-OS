@@ -62,13 +62,55 @@ FILE* fparent(FILE* fd) {
 
 FILE* readdir(FILE* fd, int index) {
 
-    return (FILE*) syscall(SYSCALL_FINDDIR, (int) fd, index, 0, 0, 0);
+    return (FILE*) syscall(SYSCALL_READDIR, (int) fd, index, 0, 0, 0);
+
+}
+
+FILE* finddir(FILE* fs, const char* childname) {
+
+    return (FILE*) syscall(SYSCALL_FINDDIR, (int) fs, (int) childname, 0, 0, 0);
 
 }
 
 FILE* fgetcwd(void) {
 
     return (FILE*) syscall(SYSCALL_FGETCWD, 0, 0, 0, 0, 0);
+
+}
+
+FILE* fopen(FILE* fd, const char* mode) {
+
+    return (FILE*) syscall(SYSCALL_FOPEN, (int) fd, (int) mode, 0, 0, 0);
+
+}
+
+void fclose(FILE* fd) {
+
+    syscall(SYSCALL_FCLOSE, (int) fd, 0, 0, 0, 0);
+
+}
+
+unsigned int read(FILE* fd, unsigned int offset, unsigned int count, char* buffer) {
+
+    return syscall(SYSCALL_READ, (int) fd, offset, count, (int) buffer, 0);
+
+}
+
+unsigned int write(FILE* fd, unsigned int offset, unsigned int count, const char* buffer) {
+
+    return syscall(SYSCALL_WRITE, (int) fd, offset, count, (int) buffer, 0);
+
+}
+
+FILE* mkdir(const char* pathname) {
+
+    return (FILE*) syscall(SYSCALL_MKDIR, (int) pathname, 0, 0, 0, 0);
+
+}
+
+void* brk(int size) {
+
+    return (void*) syscall(SYSCALL_BRK, size, 0, 0, 0, 0);
 
 }
 
