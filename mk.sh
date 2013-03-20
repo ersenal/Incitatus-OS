@@ -10,25 +10,16 @@ $C_Compiler $CFlags -o str.o      -c   user/src/Lib/libc/string.c
 ar rcs bin/libIncitatus.a incit.o douglea.o str.o
 
 $C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
-$C_Compiler $CFlags -o ls.o       -c user/src/Apps/ls.c
-$C_Compiler $CFlags -o test.o     -c user/src/Apps/test.c
-$C_Compiler $CFlags -o restart.o  -c user/src/Apps/restart.c
-$C_Compiler $CFlags -o cls.o      -c user/src/Apps/cls.c
-
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o Shell   shell.o     bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o ls      ls.o        bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o test    test.o      bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o restart restart.o   bin/libIncitatus.a
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o cls     cls.o       bin/libIncitatus.a
 
-tar --delete --file bootloader/initrd.tar Shell ls test restart cls
-tar --append --file bootloader/initrd.tar Shell ls test restart cls
+$C_Compiler $CFlags -o hw.o    -c user/src/Apps/HelloWorld.c
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld   hw.o     bin/libIncitatus.a
+
+tar --delete --file bootloader/initrd.tar Shell HelloWorld
+tar --append --file bootloader/initrd.tar Shell HelloWorld
 
 rm Shell
-rm ls
-rm test
-rm restart
-rm cls
+rm HelloWorld
 #!
 
 #! Kernel

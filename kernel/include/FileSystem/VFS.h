@@ -105,15 +105,26 @@ VFSNode* VFS_openFile(const char* filename, const char* mode);
 bool VFS_closeFile(VFSNode* file);
 
 /*-------------------------------------------------------------------------
-| Change working directory
+| Change working directory using file descriptor
 |--------------------------------------------------------------------------
 | DESCRIPTION:  Changes the current process' working directory
 |
-| PARAM:        'file' - destination
+| PARAM:        'file' - destination file descriptor
 |
 | RETURN:       'VFSNode*' - destination file descriptor
 \------------------------------------------------------------------------*/
-VFSNode* VFS_changeDirectory(VFSNode* file);
+VFSNode* VFS_changeDirectoryPtr(VFSNode* file);
+
+/*-------------------------------------------------------------------------
+| Change working directory using file name
+|--------------------------------------------------------------------------
+| DESCRIPTION:  Changes the current process' working directory
+|
+| PARAM:        'dir' - destination name
+|
+| RETURN:       'VFSNode*' - destination file descriptor
+\------------------------------------------------------------------------*/
+VFSNode* VFS_changeDirectoryStr(const char* dir);
 
 /*-------------------------------------------------------------------------
 | Get parent directory

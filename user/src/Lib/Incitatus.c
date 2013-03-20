@@ -54,6 +54,12 @@ FILE* fchdir(FILE* fd) {
 
 }
 
+FILE* chdir(const char* dir) {
+
+    return (FILE*) syscall(SYSCALL_CHDIR, (int) dir, 0, 0, 0, 0);
+
+}
+
 FILE* fparent(FILE* fd) {
 
     return (FILE*) syscall(SYSCALL_FPARENT, (int) fd, 0, 0, 0, 0);

@@ -49,8 +49,13 @@ PRIVATE VFSNode* VFS_searchForFile(VFSNode* node, const char* filename) {
         if(String_compare(n->fileName, filename) == 0)
             return n;
 
+        VFSNode* f = NULL;
+
         if(n->fileType == FILETYPE_DIRECTORY)
-            return VFS_searchForFile(n, filename);
+            f = VFS_searchForFile(n, filename);
+
+        if(f != NULL && String_compare(f->fileName, filename) == 0)
+            return f;
 
         i++;
     }
@@ -68,7 +73,7 @@ PUBLIC VFSNode* VFS_openFile(const char* filename, const char* mode) {
 
     VFSNode* fileNode = VFS_searchForFile(rootFS->rootNode, filename);
 
-    if(fileNode == NULL) /* Coulnd't find the file */
+    if(fileNode == NULL || fileNode->fileType != FILETYPE_NORMAL) /* Coulnd't find the file */
         return NULL;
 
     Debug_assert(fileNode->mode == FILE_MODE_NOT_OPEN);
@@ -160,10 +165,30 @@ PUBLIC VFSNode* VFS_findDir(VFSNode* dir, const char* path) {
 
 }
 
-PUBLIC VFSNode* VFS_changeDirectory(VFSNode* file) {
+PUBLIC VFSNode* VFS_changeDirectoryPtr(VFSNode* file) {
 
     Debug_assert(file != NULL);
     Debug_assert(file->fileType == FILETYPE_DIRECTORY);
+
+    Scheduler_getCurrentProcess()->workingDirectory = file;
+
+    return file;
+
+}
+
+PUBLIC VFSNode* VFS_changeDirectoryStr(const char* dir) {
+
+    Debug_assert(dir != NULL);
+
+    VFSNode* file = NULL;
+
+    if(String_compare(dir, "/") == 0)
+        file = rootFS->rootNode;
+    else
+        file = VFS_searchForFile(rootFS->rootNode, dir);
+
+    if(file == NULL || file->fileType != FILETYPE_DIRECTORY)
+        return NULL;
 
     Scheduler_getCurrentProcess()->workingDirectory = file;
 

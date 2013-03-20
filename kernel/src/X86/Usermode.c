@@ -27,7 +27,7 @@
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS       20
+#define NUMBER_OF_CALLS       21
 
 /*=======================================================
     PRIVATE DATA
@@ -40,7 +40,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &Console_printChar,
     &ProcessManager_killProcess,
     &ProcessManager_spawnProcess,
-    &VFS_changeDirectory,
+    &VFS_changeDirectoryPtr,
     &VFS_getParent,
     &VFS_getWorkingDirectoryStr,
     &VFS_readDir,
@@ -56,6 +56,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &VFS_mkdir,
     &HeapMemory_expandUser,
     &VFS_findDir,
+    &VFS_changeDirectoryStr,
 
 };
 

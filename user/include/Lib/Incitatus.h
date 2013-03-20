@@ -59,6 +59,7 @@ struct stat {
 #define SYSCALL_MKDIR       17
 #define SYSCALL_SBRK        18
 #define SYSCALL_FINDDIR     19
+#define SYSCALL_CHDIR       20
 
 
 #define FILE int
@@ -73,6 +74,7 @@ int spawn(const char* binary);
 FILE* readdir(FILE* fd, int index);
 FILE* finddir(FILE* fs, const char* childname);
 FILE* fchdir(FILE* fd);
+FILE* chdir(const char* dir);
 FILE* fparent(FILE* fd);
 FILE* fgetcwd(void);
 void fstat(FILE* fd, struct stat* buf);
