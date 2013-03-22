@@ -433,40 +433,40 @@ Linker script and memory map
  .data          0x00000000001120e8        0x0 tar.o
  .data          0x00000000001120e8        0x0 vfs.o
  *fill*         0x00000000001120e8       0x18 
- .data          0x0000000000112100       0x54 user.o
+ .data          0x0000000000112100       0x58 user.o
  *(.rodata)
- .rodata        0x0000000000112154       0x54 kernel.o
- .rodata        0x00000000001121a8       0x12 vga.o
- .rodata        0x00000000001121ba       0x6d console.o
- .rodata        0x0000000000112227        0xe sys.o
- .rodata        0x0000000000112235       0x3d module.o
- .rodata        0x0000000000112272       0x18 gdt.o
- .rodata        0x000000000011228a        0xa pic.o
- .rodata        0x0000000000112294       0x9f idt.o
- .rodata        0x0000000000112333        0x9 pit.o
- .rodata        0x000000000011233c       0x28 cpu.o
- .rodata        0x0000000000112364       0x41 bitmap.o
- .rodata        0x00000000001123a5       0x40 stack.o
- .rodata        0x00000000001123e5       0x18 pmm.o
- .rodata        0x00000000001123fd       0x46 smm.o
- .rodata        0x0000000000112443       0x5f bmm.o
- *fill*         0x00000000001124a2        0x2 
- .rodata        0x00000000001124a4       0xcc vmm.o
- .rodata        0x0000000000112570       0x8f heap.o
- .rodata        0x00000000001125ff       0x41 dl.o
- .rodata        0x0000000000112640       0x44 arrlist.o
- .rodata        0x0000000000112684       0x50 dumbH.o
- .rodata        0x00000000001126d4       0x45 linkl.o
- .rodata        0x0000000000112719       0x11 string.o
- *fill*         0x000000000011272a        0x2 
- .rodata        0x000000000011272c       0x50 fifo.o
- .rodata        0x000000000011277c       0x12 sched.o
- *fill*         0x000000000011278e        0x2 
- .rodata        0x0000000000112790       0x4c rr.o
- .rodata        0x00000000001127dc       0x43 fcfs.o
- *fill*         0x000000000011281f        0x1 
- .rodata        0x0000000000112820       0xa1 pm.o
- *fill*         0x00000000001128c1       0x1f 
+ .rodata        0x0000000000112158       0x54 kernel.o
+ .rodata        0x00000000001121ac       0x12 vga.o
+ .rodata        0x00000000001121be       0x6d console.o
+ .rodata        0x000000000011222b        0xe sys.o
+ .rodata        0x0000000000112239       0x3d module.o
+ .rodata        0x0000000000112276       0x18 gdt.o
+ .rodata        0x000000000011228e        0xa pic.o
+ .rodata        0x0000000000112298       0x9f idt.o
+ .rodata        0x0000000000112337        0x9 pit.o
+ .rodata        0x0000000000112340       0x28 cpu.o
+ .rodata        0x0000000000112368       0x41 bitmap.o
+ .rodata        0x00000000001123a9       0x40 stack.o
+ .rodata        0x00000000001123e9       0x18 pmm.o
+ .rodata        0x0000000000112401       0x46 smm.o
+ .rodata        0x0000000000112447       0x5f bmm.o
+ *fill*         0x00000000001124a6        0x2 
+ .rodata        0x00000000001124a8       0xcc vmm.o
+ .rodata        0x0000000000112574       0x8f heap.o
+ .rodata        0x0000000000112603       0x41 dl.o
+ .rodata        0x0000000000112644       0x44 arrlist.o
+ .rodata        0x0000000000112688       0x50 dumbH.o
+ .rodata        0x00000000001126d8       0x45 linkl.o
+ .rodata        0x000000000011271d       0x11 string.o
+ *fill*         0x000000000011272e        0x2 
+ .rodata        0x0000000000112730       0x50 fifo.o
+ .rodata        0x0000000000112780       0x12 sched.o
+ *fill*         0x0000000000112792        0x2 
+ .rodata        0x0000000000112794       0x4c rr.o
+ .rodata        0x00000000001127e0       0x43 fcfs.o
+ *fill*         0x0000000000112823        0x1 
+ .rodata        0x0000000000112824       0xa1 pm.o
+ *fill*         0x00000000001128c5       0x1b 
  .rodata        0x00000000001128e0      0x2eb kbd.o
  *fill*         0x0000000000112bcb        0x1 
  .rodata        0x0000000000112bcc       0xc4 mouse.o

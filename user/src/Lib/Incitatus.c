@@ -149,3 +149,9 @@ void restart(void) {
     syscall(SYSCALL_RESTART, 0, 0, 0, 0, 0);
 
 }
+
+void color(unsigned int attr) {
+
+    syscall(SYSCALL_SETCOLOR, attr, 0, 0, 0, 0);
+
+}

@@ -42,6 +42,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 		 ✔ Virtual File System, ramdisk
 		 ✔ Ring 0 to Ring 3 switch
 		 ✔ System call interface
+		 ✔ Shell
 
 ##License
 

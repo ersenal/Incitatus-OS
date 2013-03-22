@@ -21,6 +21,8 @@
 /*=======================================================
     INTERFACE
 =========================================================*/
+
+//TODO: add comments
 extern void (*Scheduler_addProcess) (Process* process);
 extern void (*Scheduler_removeProcess) (Process* process);
 extern Process* (*Scheduler_getNextProcess) (void);
@@ -29,6 +31,8 @@ extern Process* (*Scheduler_getCurrentProcess) (void);
 /*=======================================================
     FUNCTION
 =========================================================*/
+
+//TODO: add comments
 Module* Scheduler_getModule(void);
 
 #endif

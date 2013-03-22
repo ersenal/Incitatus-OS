@@ -18,6 +18,7 @@
 
 #include <Process/ProcessManager.h>
 
+//TODO: add comment
 void FCFS_addProcess(Process* process);
 void FCFS_removeProcess(Process* process);
 Process* FCFS_getNextProcess(void);

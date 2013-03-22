@@ -18,6 +18,7 @@
 
 #include <Process/ProcessManager.h>
 
+//TODO: add comments
 void RoundRobin_addProcess(Process* process);
 void RoundRobin_removeProcess(Process* process);
 Process* RoundRobin_getNextProcess(void);

@@ -1,22 +1,25 @@
 #include <Lib/Incitatus.h>
 #include <Lib/libc/string.h>
+#include <Lib/libc/stdio.h>
+
+static char workingDirectory[64];
 
 static void parseInput(char* in);
 static void cat(const char* path);
 static void ls(void);
 static void help(void);
 
+//TODO: comments
 int main(void) {
 
     char entry[64];
-    char cwd[64];
     char c = 0;
     int i = 0;
 
     cls();
     cat("logo.ascii");
-    puts(getcwd(cwd));
-    putc('>');
+    getcwd(workingDirectory);
+    printf("%s%c", workingDirectory, '>');
 
     while(1) {
 
@@ -40,13 +43,12 @@ int main(void) {
 
         }
 
-        if(c == '\n') {
+        if(c == '\n') { /* Handle enter */
 
             entry[i - 1] = '\0';
             i = 0;
             parseInput(entry);
-            puts(getcwd(cwd));
-            putc('>');
+            printf("%s%c", workingDirectory, '>');
 
         }
 
@@ -71,6 +73,8 @@ static void parseInput(char* in) {
 
         if(!spawn(param))
             puts("Couldn't find that binary\n");
+        else
+            putc('\n');
 
     } else if(strcmp(command, "cat") == 0) { /* Display file contents */
 
@@ -90,6 +94,8 @@ static void parseInput(char* in) {
 
         if(chdir(param) == NULL)
             puts("No such directory\n");
+        else
+            getcwd(workingDirectory);
 
     } else if(strcmp(command, "ls") == 0) { /* list directory */
 
@@ -106,6 +112,12 @@ static void parseInput(char* in) {
     } else if(strcmp(command, "help") == 0) { /* list valid commands */
 
         help();
+
+    } else if(strcmp(command, "suicide") == 0) { /* kills the shell */
+
+        /* raise a page fault */
+        char* f = 0;
+        *f = 0;
 
     } else {
 
@@ -142,8 +154,7 @@ static void ls(void) {
     while((file = readdir(cwd, i))) {
 
         fstat(file, &buf);
-        puts(buf.fileName);
-        putc('\n');
+        printf("%s%s%d%s", buf.fileName, ", " ,buf.fileSize, "bytes\n");
         i++;
 
     }
@@ -153,15 +164,13 @@ static void ls(void) {
 static void help(void) {
 
     puts(
-
         "ls - list files inside current working directory\n"
         "cd [dir] - change working directory\n"
         "cls - clear console\n"
         "cat [file] - display file contents\n"
         "restart - restart machine\n"
         "exec [file] - execute binary file\n"
-
+        "suicide - kills the shell\n"
         );
-
 
 }

@@ -60,6 +60,7 @@ struct stat {
 #define SYSCALL_SBRK        18
 #define SYSCALL_FINDDIR     19
 #define SYSCALL_CHDIR       20
+#define SYSCALL_SETCOLOR    21
 
 
 #define FILE int
@@ -88,4 +89,5 @@ unsigned int read(FILE* file, unsigned int offset, unsigned int count, char* buf
 unsigned int write(FILE* file, unsigned int offset, unsigned int count, const char* buffer);
 FILE* mkdir(const char* pathname);
 void* sbrk(int size);
+void color(unsigned int attr);
 #endif

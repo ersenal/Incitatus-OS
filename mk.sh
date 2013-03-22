@@ -7,7 +7,8 @@ CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -s
 $C_Compiler $CFlags -o incit.o    -c   user/src/Lib/Incitatus.c
 $C_Compiler $CFlags -o douglea.o  -c   user/src/Lib/libc/DougLea.c
 $C_Compiler $CFlags -o str.o      -c   user/src/Lib/libc/string.c
-ar rcs bin/libIncitatus.a incit.o douglea.o str.o
+$C_Compiler $CFlags -o stdio.o    -c   user/src/Lib/libc/stdio.c
+ar rcs bin/libIncitatus.a incit.o douglea.o str.o stdio.o
 
 $C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o Shell   shell.o     bin/libIncitatus.a
