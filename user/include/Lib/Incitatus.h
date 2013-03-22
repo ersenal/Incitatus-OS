@@ -61,6 +61,7 @@ struct stat {
 #define SYSCALL_FINDDIR     19
 #define SYSCALL_CHDIR       20
 #define SYSCALL_SETCOLOR    21
+#define SYSCALL_POWEROFF    22
 
 
 #define FILE int
@@ -83,6 +84,7 @@ char* getcwd(char* buf);
 char getch(void);
 void cls(void);
 void restart(void);
+void poweroff(void);
 FILE* open(const char* path, const char* mode);
 void close(FILE* file);
 unsigned int read(FILE* file, unsigned int offset, unsigned int count, char* buffer);

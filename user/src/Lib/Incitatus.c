@@ -150,6 +150,12 @@ void restart(void) {
 
 }
 
+void poweroff(void) {
+
+    syscall(SYSCALL_POWEROFF, 0, 0, 0, 0, 0);
+
+}
+
 void color(unsigned int attr) {
 
     syscall(SYSCALL_SETCOLOR, attr, 0, 0, 0, 0);

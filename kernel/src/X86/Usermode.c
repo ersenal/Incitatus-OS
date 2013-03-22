@@ -27,7 +27,7 @@
     DEFINE
 =========================================================*/
 #define SYSCALL_INTERRUPT   0x80
-#define NUMBER_OF_CALLS       22
+#define NUMBER_OF_CALLS       23
 
 /*=======================================================
     PRIVATE DATA
@@ -58,6 +58,7 @@ PRIVATE void* syscalls[NUMBER_OF_CALLS] = {
     &VFS_findDir,
     &VFS_changeDirectoryStr,
     &Console_setColor,
+    &Sys_powerOff,
 
 };
 

@@ -4,6 +4,7 @@
 
 static char workingDirectory[64];
 
+static void suicide(void);
 static void parseInput(char* in);
 static void cat(const char* path);
 static void ls(void);
@@ -109,21 +110,32 @@ static void parseInput(char* in) {
 
         restart();
 
+    } else if(strcmp(command, "shutdown") == 0) { /* shut down machine */
+
+        poweroff();
+        suicide(); /* panic if not successful */
+
     } else if(strcmp(command, "help") == 0) { /* list valid commands */
 
         help();
 
     } else if(strcmp(command, "suicide") == 0) { /* kills the shell */
 
-        /* raise a page fault */
-        char* f = 0;
-        *f = 0;
+        suicide();
 
     } else {
 
         puts("Unknown command\n");
 
     }
+
+}
+
+static void suicide(void) {
+
+    /* raise a page fault */
+    char* f = 0;
+    *f = 0;
 
 }
 
@@ -171,6 +183,7 @@ static void help(void) {
         "restart - restart machine\n"
         "exec [file] - execute binary file\n"
         "suicide - kills the shell\n"
+        "shutdown - shuts down the machine\n"
         );
 
 }
