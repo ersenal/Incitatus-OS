@@ -161,3 +161,9 @@ void color(unsigned int attr) {
     syscall(SYSCALL_SETCOLOR, attr, 0, 0, 0, 0);
 
 }
+
+void waitpid(int pid) {
+
+    syscall(SYSCALL_WAITPID, pid, 0, 0, 0, 0);
+
+}

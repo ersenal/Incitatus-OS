@@ -62,7 +62,7 @@ struct stat {
 #define SYSCALL_CHDIR       20
 #define SYSCALL_SETCOLOR    21
 #define SYSCALL_POWEROFF    22
-
+#define SYSCALL_WAITPID     23
 
 #define FILE int
 
@@ -92,4 +92,5 @@ unsigned int write(FILE* file, unsigned int offset, unsigned int count, const ch
 FILE* mkdir(const char* pathname);
 void* sbrk(int size);
 void color(unsigned int attr);
+void waitpid(int pid);
 #endif

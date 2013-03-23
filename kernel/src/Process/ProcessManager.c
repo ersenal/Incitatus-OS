@@ -25,9 +25,28 @@
 #include <Process/Mutex.h>
 
 /*=======================================================
+    DEFINE
+=========================================================*/
+#define PROCESS_MSG_WAITING 0x100
+
+/*=======================================================
+    STRUCT
+=========================================================*/
+typedef struct Message Message;
+
+struct Message {
+
+    Process* to;
+    Process* from;
+    u32int   message;
+
+};
+
+/*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE u32int pid = 1;
+PRIVATE u32int     pid = 1;
+PRIVATE ArrayList* globalMailbox;
 
 /*=======================================================
     FUNCTION
@@ -135,17 +154,45 @@ PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
 }
 
+PRIVATE void ProcessManager_notify(void) {
+
+    for(u32int i = 0; i < ArrayList_getSize(globalMailbox); i++) {
+
+        Message* m = ArrayList_get(globalMailbox, i);
+
+        if(m->to == Scheduler_getCurrentProcess()) {
+
+            if(m->message == PROCESS_MSG_WAITING)
+                m->from->status = PROCESS_WAITING;
+
+            ArrayList_remove(globalMailbox, m);
+            HeapMemory_free(m);
+
+        }
+
+    }
+
+}
+
 PUBLIC void ProcessManager_switch(Regs* context) {
 
     /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
     Debug_assert(currentProcess != NULL);
+
+    if(currentProcess->status != PROCESS_BLOCKED)
+        currentProcess->status = PROCESS_WAITING;
+
     currentProcess->userStack = context;
-    currentProcess->status = PROCESS_WAITING;
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
     Debug_assert(next != NULL);
+
+    while(next->status == PROCESS_BLOCKED)
+        next = Scheduler_getNextProcess();
+
+    Debug_assert(next->status == PROCESS_WAITING);
     next->status = PROCESS_RUNNING;
     if(currentProcess == next) /* No need for a context switch */
         return;
@@ -163,13 +210,21 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
 
     Process* current = Scheduler_getCurrentProcess();
     Debug_logInfo("%s%d%c%s%s%d", "PID:", current->pid, ' ', current->name, " exited with code ", exitCode);
+    ProcessManager_notify();
     Scheduler_removeProcess(current);
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
     Debug_assert(next != NULL);
     Debug_assert(next != current);
+
+    while(next->status == PROCESS_BLOCKED)
+        next = Scheduler_getNextProcess();
+
+    Debug_assert(next->status == PROCESS_WAITING);
     next->status = PROCESS_RUNNING;
+    if(current == next) /* No need for a context switch */
+        return;
 
     /* Do context switch */
     Debug_assert(next->kernelStack != NULL);
@@ -185,6 +240,9 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
 }
 
 PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
+
+    if(globalMailbox == NULL)
+        globalMailbox = ArrayList_new(10);
 
     VFSNode* bin = VFS_openFile(binary, "r");
     if(bin == NULL) /* Couldn't open the file */
@@ -224,5 +282,25 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     Scheduler_addProcess(p);
 
     return p;
+
+}
+
+PUBLIC void ProcessManager_blockCurrentProcess(void) {
+
+    Scheduler_getCurrentProcess()->status = PROCESS_BLOCKED;
+    asm volatile("int $32"); /* Force task switch */
+
+}
+
+PUBLIC void ProcessManager_waitPID(Process* process) {
+
+    Message* m = HeapMemory_calloc(1, sizeof(Message));
+
+    /* Set current process as waiting for parameter process' termination */
+    m->from = Scheduler_getCurrentProcess();
+    m->to = process;
+    m->message = PROCESS_MSG_WAITING;
+    ArrayList_add(globalMailbox, m);
+    ProcessManager_blockCurrentProcess();
 
 }

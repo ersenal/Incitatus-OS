@@ -107,6 +107,7 @@ struct LedStatusByte {
     PRIVATE DATA
 =========================================================*/
 PRIVATE CircularFIFOBuffer* keyBuffer;
+PRIVATE Process* focused;
 PRIVATE KeyState keyState;
 
 /* Scan code set 1 - shift or caps */
@@ -212,8 +213,14 @@ PRIVATE void Keyboard_callback(void) {
                 else
                     b = lowerMap[scanCode];
 
-                if(b)
+                if(b) {
+
                     CircularFIFOBuffer_write(keyBuffer, b);
+
+                    if(focused != NULL)
+                        focused->status = PROCESS_WAITING;
+
+                }
 
             }
 
@@ -225,7 +232,18 @@ PRIVATE void Keyboard_callback(void) {
 
 PUBLIC char Keyboard_getChar(void) {
 
-    return CircularFIFOBuffer_read(keyBuffer);
+    char c = CircularFIFOBuffer_read(keyBuffer);
+
+    while(c == -1) { /* No input */
+
+        focused = Scheduler_getCurrentProcess();
+        ProcessManager_blockCurrentProcess();
+        c = CircularFIFOBuffer_read(keyBuffer);
+
+    }
+
+    Console_printChar(c);
+    return c;
 
 }
 

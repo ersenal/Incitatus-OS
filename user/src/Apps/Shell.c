@@ -19,15 +19,13 @@ int main(void) {
 
     cls();
     cat("logo.ascii");
+    spawn("/HelloWorld"); /* Todo: kernel idle process */
     getcwd(workingDirectory);
     printf("%s%c", workingDirectory, '>');
 
     while(1) {
 
-        c = getch();
-
-        if(c != -1) {
-            putc(c);
+        while((c = getch()) != '\n') {
 
             /* Handle backspace */
             if(c == '\b') {
@@ -44,14 +42,11 @@ int main(void) {
 
         }
 
-        if(c == '\n') { /* Handle enter */
-
-            entry[i - 1] = '\0';
-            i = 0;
-            parseInput(entry);
-            printf("%s%c", workingDirectory, '>');
-
-        }
+        /* Handle enter */
+        entry[i] = '\0';
+        i = 0;
+        parseInput(entry);
+        printf("%s%c", workingDirectory, '>');
 
     }
 
@@ -72,10 +67,12 @@ static void parseInput(char* in) {
             return;
         }
 
-        if(!spawn(param))
+        int pid = spawn(param);
+
+        if(!pid)
             puts("Couldn't find that binary\n");
         else
-            putc('\n');
+            waitpid(pid);
 
     } else if(strcmp(command, "cat") == 0) { /* Display file contents */
 

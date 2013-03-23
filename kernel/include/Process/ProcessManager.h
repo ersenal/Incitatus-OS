@@ -72,5 +72,7 @@ struct Process {
 void  ProcessManager_switch(Regs* context);
 void ProcessManager_killProcess(int exitCode);
 Process* ProcessManager_spawnProcess(const char* binary);
+void ProcessManager_waitPID(Process* process);
+void ProcessManager_blockCurrentProcess(void);
 
 #endif

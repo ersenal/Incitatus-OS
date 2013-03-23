@@ -60,8 +60,6 @@ PUBLIC Process* RoundRobin_getNextProcess(void) {
     /* Remove process from head of queue and add as the last element */
     Process* p = LinkedList_removeFromFront(processes);
 
-    Debug_assert(p->status == PROCESS_WAITING);
-
     LinkedList_add(processes, p);
     currentProcess = p;
     return p;
