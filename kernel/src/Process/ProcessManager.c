@@ -288,7 +288,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 PUBLIC void ProcessManager_blockCurrentProcess(void) {
 
     Scheduler_getCurrentProcess()->status = PROCESS_BLOCKED;
-    asm volatile("int $32"); /* Force task switch */
+    asm volatile("int %0" : : "i" (IRQ0)); /* Force task switch */
 
 }
 

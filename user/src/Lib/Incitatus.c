@@ -165,5 +165,6 @@ void color(unsigned int attr) {
 void waitpid(int pid) {
 
     syscall(SYSCALL_WAITPID, pid, 0, 0, 0, 0);
+    for(int i = 0; i < 1000000; i++); /* TODO: Fix race condition */
 
 }
