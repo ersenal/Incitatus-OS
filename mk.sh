@@ -19,12 +19,16 @@ $Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld   hw.o     bin/libIn
 $C_Compiler $CFlags -o inputtest.o    -c user/src/Apps/InputTest.c
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o InputTest   inputtest.o     bin/libIncitatus.a
 
-tar --delete --file bootloader/initrd.tar Shell HelloWorld InputTest
-tar --append --file bootloader/initrd.tar Shell HelloWorld InputTest
+$C_Compiler $CFlags -o calc.o    -c user/src/Apps/Calculator.c
+$Linker -T user/src/Apps/apps.ld -s -nostdlib -o Calculator   calc.o     bin/libIncitatus.a
+
+tar --delete --file bootloader/initrd.tar Shell HelloWorld InputTest Calculator
+tar --append --file bootloader/initrd.tar Shell HelloWorld InputTest Calculator
 
 rm Shell
 rm HelloWorld
 rm InputTest
+rm Calculator
 #!
 
 #! Kernel

@@ -18,7 +18,9 @@ int main(void) {
     int i = 0;
 
     cls();
+    color(WHITE);
     cat("logo.ascii");
+    color(LGREY);
     getcwd(workingDirectory);
     printf("%s%c", workingDirectory, '>');
 
@@ -147,7 +149,7 @@ static void cat(const char* path) {
     fstat(file, &fileStat);
     char buf[fileStat.fileSize + 1];
     read(file, 0, fileStat.fileSize, buf);
-    puts(buf);
+    printf("%s%c", buf, '\n');
     close(file);
 
 }
