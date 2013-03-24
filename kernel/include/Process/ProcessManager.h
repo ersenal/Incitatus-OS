@@ -56,9 +56,6 @@ struct Process {
     void*  userStackBase;
     void*  pageDir;
 
-    u32int binarySize;
-    void*  binaryEntry;
-
     VFSNode* workingDirectory;
     ArrayList* fileNodes;
 
@@ -74,5 +71,6 @@ void ProcessManager_killProcess(int exitCode);
 Process* ProcessManager_spawnProcess(const char* binary);
 void ProcessManager_waitPID(Process* process);
 void ProcessManager_blockCurrentProcess(void);
+Module* ProcessManager_getModule(void);
 
 #endif

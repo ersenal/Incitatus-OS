@@ -33,7 +33,7 @@
 #define MODULE_PMM          106
 #define MODULE_VMM          107
 #define MODULE_HEAP         108
-#define MODULE_SCHEDULER    109
+#define MODULE_PROCESS      109
 #define MODULE_PS2          110
 #define MODULE_VFS          111
 #define MODULE_USERMODE     112

@@ -19,7 +19,9 @@
 #include <X86/IDT.h>
 #include <X86/GDT.h>
 #include <Process/ProcessManager.h>
+#include <Process/Scheduler.h>
 #include <Memory/VirtualMemory.h>
+#include <Memory/PhysicalMemory.h>
 #include <Memory/HeapMemory.h>
 #include <Drivers/Keyboard.h>
 
@@ -98,6 +100,8 @@ PRIVATE void Usermode_init(void) {
     IDT_registerHandler(&Usermode_syscallHandler, SYSCALL_INTERRUPT);
 
     Process* init = ProcessManager_spawnProcess("/Shell");
+    extern Process* kernelProcess; /* Defined in ProcessManager.c */
+    Scheduler_addProcess(kernelProcess);
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) init->kernelStack);
     asm volatile("mov %0, %%esp" : : "r" (init->userStack));
     VirtualMemory_switchPageDir(init->pageDir);
@@ -132,7 +136,7 @@ PUBLIC Module* Usermode_getModule(void) {
         userModule.init = &Usermode_init;
         userModule.moduleID = MODULE_USERMODE;
         userModule.numberOfDependencies = 1;
-        userModule.dependencies[0] = MODULE_SCHEDULER;
+        userModule.dependencies[0] = MODULE_PROCESS;
 
     }
 

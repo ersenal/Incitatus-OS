@@ -43,84 +43,78 @@ struct Message {
 };
 
 /*=======================================================
+    PUBLIC DATA
+=========================================================*/
+PUBLIC Process*  kernelProcess;
+
+/*=======================================================
     PRIVATE DATA
 =========================================================*/
-PRIVATE u32int     pid = 1;
+PRIVATE Module     pmModule;
+PRIVATE u32int     pid;
 PRIVATE ArrayList* globalMailbox;
 
 /*=======================================================
     FUNCTION
 =========================================================*/
 
-PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool mode) {
+PRIVATE Process* ProcessManager_newProcess(void) {
 
     Process* self = HeapMemory_calloc(1, sizeof(Process));
     Debug_assert(self != NULL);
 
     self->pid = pid;
-    self->binaryEntry = entry;
-    self->binarySize = binarySize;
+    self->userHeapTop = (void*) USER_HEAP_BASE_VADDR;
+    self->fileNodes = ArrayList_new(1);
 
-    if(mode == USER_PROCESS) { /* User process */
+    Regs registers;
+    Memory_set(&registers, 0, sizeof(Regs));
 
-        Regs registers;
-        Memory_set(&registers, 0, sizeof(Regs));
+    registers.eflags = 0x202; /* Interrupt enable flag */
+    registers.eip    = USER_CODE_BASE_VADDR; /* Initial code entry point */
+    registers.intNo  = IRQ0;
 
-        self->userHeapTop = (void*) USER_HEAP_BASE_VADDR;
+    /* Add 3 so that they have an RPL of 3 (User ring) */
+    registers.cs = USER_CODE_SEGMENT | 3;
+    registers.ds = USER_DATA_SEGMENT | 3;
+    registers.es = USER_DATA_SEGMENT | 3;
+    registers.fs = USER_DATA_SEGMENT | 3;
+    registers.gs = USER_DATA_SEGMENT | 3;
 
-        registers.eflags = 0x202; /* Interrupt enable flag */
-        registers.eip    = USER_CODE_BASE_VADDR; /* Initial code entry point */
-        registers.intNo  = IRQ0;
+    /* Create a new page directory for process */
+    VirtualMemory_createPageDirectory(self);
 
-        /* Add 3 so that they have an RPL of 3 (User ring) */
-        registers.cs     = USER_CODE_SEGMENT | 3;
-        registers.ds     = USER_DATA_SEGMENT | 3;
-        registers.es     = USER_DATA_SEGMENT | 3;
-        registers.fs     = USER_DATA_SEGMENT | 3;
-        registers.gs     = USER_DATA_SEGMENT | 3;
+    /* Map kernel bottom 4MB + kernel heap */
+    VirtualMemory_mapKernel(self);
 
-        /* Create a new page directory for process */
-        VirtualMemory_createPageDirectory(self);
+    /* Allocate kernel stack - 4KB */
+    u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
+    Debug_assert(stack != NULL);
+    self->kernelStackBase = stack;
+    self->kernelStack = (char*) stack + FRAME_SIZE;
 
-        /* Map kernel bottom 4MB + kernel heap */
-        VirtualMemory_mapKernel(self);
+    /* Allocate and map user stack - Currently 4KB */
+    Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
+    self->userStackBase = (void*) USER_STACK_BASE_VADDR;
+    char* uStack = PhysicalMemory_allocateFrame();
 
-        /* Allocate kernel stack - 4KB */
-        u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
-        Debug_assert(stack != NULL);
-        self->kernelStackBase = stack;
-        self->kernelStack = (char*) stack + FRAME_SIZE;
+    VirtualMemory_mapPage(self->pageDir, (void*) USER_STACK_BASE_VADDR, uStack, MODE_USER);
+    self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
 
-        /* Allocate and map user stack - Currently 4KB */
-        Debug_assert(USER_STACK_SIZE == FRAME_SIZE);
-        self->userStackBase = (void*) USER_STACK_BASE_VADDR;
-        char* uStack = PhysicalMemory_allocateFrame();
+    /* Set up initial user ss and esp */
+    registers.esp0   = (u32int) self->userStack;
+    registers.ss0    = USER_DATA_SEGMENT | 3;
 
-        VirtualMemory_mapPage(self->pageDir, (void*) USER_STACK_BASE_VADDR, uStack, MODE_USER);
-        self->userStack = (void*) ((char*) self->userStackBase + FRAME_SIZE - sizeof(Regs));
+    if(pid == 1) { /* Initial user process, prevent page fault by NOT unmapping while entering user mode */
 
-        /* Set up initial user ss and esp */
-        registers.esp0   = (u32int) self->userStack;
-        registers.ss0    = USER_DATA_SEGMENT | 3;
+        VirtualMemory_quickMap((void*) USER_STACK_BASE_VADDR, uStack);
+        Memory_copy(self->userStack, &registers, sizeof(Regs));
 
-        if(pid == 1) { /* Initial user process */
+    } else {
 
-            VirtualMemory_quickMap((void*) USER_STACK_BASE_VADDR, uStack);
-            Memory_copy(self->userStack, &registers, sizeof(Regs));
-
-        } else {
-
-            VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, uStack);
-            Memory_copy((void*) (TEMPORARY_MAP_VADDR + FRAME_SIZE - sizeof(Regs)), &registers, sizeof(Regs));
-            VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
-
-        }
-
-        self->fileNodes = ArrayList_new(1);
-
-    } else { /* Kernel process */
-
-        self->pageDir = VirtualMemory_getKernelDir();
+        VirtualMemory_quickMap((void*) TEMPORARY_MAP_VADDR, uStack);
+        Memory_copy((void*) (TEMPORARY_MAP_VADDR + FRAME_SIZE - sizeof(Regs)), &registers, sizeof(Regs));
+        VirtualMemory_quickUnmap((void*) TEMPORARY_MAP_VADDR);
 
     }
 
@@ -131,24 +125,62 @@ PRIVATE Process* ProcessManager_newProcess(void* entry, u32int binarySize, bool 
 
 }
 
+PRIVATE void ProcessManager_initKernelProcess(void) {
+
+    extern void Kernel_idle(void); /* Defined in Kernel.c */
+    kernelProcess = HeapMemory_calloc(1, sizeof(Process));
+    Debug_assert(kernelProcess != NULL);
+
+    kernelProcess->pid = 0;
+    kernelProcess->fileNodes = NULL;
+    kernelProcess->userHeapTop = NULL;
+    kernelProcess->userStackBase = NULL;
+    kernelProcess->userStack = NULL;
+    kernelProcess->workingDirectory = NULL;
+    String_copy(kernelProcess->name, "Idle");
+
+    Regs registers;
+    Memory_set(&registers, 0, sizeof(Regs));
+
+    registers.eflags = 0x202; /* Interrupt enable flag */
+    registers.eip    = (u32int) &Kernel_idle; /* Initial code entry point */
+    registers.intNo  = IRQ0;
+
+    registers.cs   = KERNEL_CODE_SEGMENT;
+    registers.ds   = KERNEL_DATA_SEGMENT;
+    registers.es   = KERNEL_DATA_SEGMENT;
+    registers.fs   = KERNEL_DATA_SEGMENT;
+    registers.gs   = KERNEL_DATA_SEGMENT;
+    registers.esp0 = 0;
+    registers.ss0  = 0;
+
+    /* Set page directory */
+    kernelProcess->pageDir = VirtualMemory_getKernelDir();
+
+    /* Allocate kernel stack - 4KB */
+    u32int* stack = HeapMemory_calloc(1, FRAME_SIZE);
+    Debug_assert(stack != NULL);
+    kernelProcess->kernelStackBase = stack;
+    kernelProcess->kernelStack = (char*) stack + FRAME_SIZE - sizeof(Regs);
+    Memory_copy(kernelProcess->kernelStack, &registers, sizeof(Regs));
+
+    kernelProcess->status = PROCESS_CREATED;
+
+}
+
 PRIVATE void ProcessManager_destroyProcess(Process* process) {
 
     HeapMemory_free(process->kernelStackBase);
 
-    if(process->fileNodes != NULL) {
+    /* close all opened files */
+    for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
 
-        /* close all opened files */
-        for(u32int i = 0; i < ArrayList_getSize(process->fileNodes); i++) {
-
-            VFSNode* file = ArrayList_get(process->fileNodes, i);
-            VFS_closeFile(file);
-
-        }
-
-        ArrayList_destroy(process->fileNodes);
+        VFSNode* file = ArrayList_get(process->fileNodes, i);
+        VFS_closeFile(file);
 
     }
 
+    ArrayList_destroy(process->fileNodes);
     VirtualMemory_destroyPageDirectory(process);
     HeapMemory_free(process);
 
@@ -174,22 +206,39 @@ PRIVATE void ProcessManager_notify(void) {
 
 }
 
+PRIVATE void ProcessManager_init(void) {
+
+    pid = 1; /* User process pids are >= 1 */
+    Scheduler_init();
+    globalMailbox = ArrayList_new(10);
+    ProcessManager_initKernelProcess();
+
+}
+
 PUBLIC void ProcessManager_switch(Regs* context) {
 
-    /* Save process state */
     Process* currentProcess = Scheduler_getCurrentProcess();
     Debug_assert(currentProcess != NULL);
 
-    if(currentProcess->status != PROCESS_BLOCKED)
+    if(currentProcess == kernelProcess) { /* Switching from kernel process */
+
+        currentProcess->kernelStack = context; /* Save process state */
         currentProcess->status = PROCESS_WAITING;
 
-    currentProcess->userStack = context;
+    } else { /* Switching from a user process */
+
+        if(currentProcess->status != PROCESS_BLOCKED)
+            currentProcess->status = PROCESS_WAITING;
+
+        currentProcess->userStack = context; /* Save process state */
+
+    }
 
     /* Get next process from scheduler */
     Process* next = Scheduler_getNextProcess();
     Debug_assert(next != NULL);
 
-    while(next->status == PROCESS_BLOCKED)
+    while(next->status == PROCESS_BLOCKED) /* Find a waiting process */
         next = Scheduler_getNextProcess();
 
     Debug_assert(next->status == PROCESS_WAITING);
@@ -197,18 +246,28 @@ PUBLIC void ProcessManager_switch(Regs* context) {
     if(currentProcess == next) /* No need for a context switch */
         return;
 
-    /* Do context switch */
     Debug_assert(next->kernelStack != NULL);
-    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
 
-    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
-    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+    if(next == kernelProcess) { /* Next process is kernel process */
+
+        asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store kernel process' ESP in DR0 register */
+
+    } else { /* Next process is a user process */
+
+        GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
+        asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store next process' ESP in DR0 register */
+
+    }
+
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to next process' address space */
 
 }
 
 PUBLIC void ProcessManager_killProcess(int exitCode) {
 
     Process* current = Scheduler_getCurrentProcess();
+    Debug_assert(current != NULL);
+    Debug_assert(current != kernelProcess); /* Can't kill kernel process */
     Debug_logInfo("%s%d%c%s%s%d", "PID:", current->pid, ' ', current->name, " exited with code ", exitCode);
     ProcessManager_notify();
     Scheduler_removeProcess(current);
@@ -218,7 +277,7 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     Debug_assert(next != NULL);
     Debug_assert(next != current);
 
-    while(next->status == PROCESS_BLOCKED)
+    while(next->status == PROCESS_BLOCKED) /* Find a waiting process */
         next = Scheduler_getNextProcess();
 
     Debug_assert(next->status == PROCESS_WAITING);
@@ -226,23 +285,27 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     if(current == next) /* No need for a context switch */
         return;
 
-    /* Do context switch */
     Debug_assert(next->kernelStack != NULL);
-    GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
 
-    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
-    ProcessManager_destroyProcess(current);
-    asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+    if(next == kernelProcess) { /* Next process is kernel process */
+
+        asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store kernel process' ESP in DR0 register */
+
+    } else { /* Next process is a user process */
+
+        GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
+        asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
+
+    }
 
     //TODO: Fix this hack
     asm volatile("mov %0, %%DR1" : : "r" (0xDEADBEEF)); /* Store 1 at DR1 in order to distinguish the procedure */
+    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
+    ProcessManager_destroyProcess(current);
 
 }
 
 PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
-
-    if(globalMailbox == NULL)
-        globalMailbox = ArrayList_new(10);
 
     VFSNode* bin = VFS_openFile(binary, "r");
     if(bin == NULL) /* Couldn't open the file */
@@ -252,7 +315,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     Debug_assert(buffer != NULL);
     VFS_read(bin, 0, bin->fileSize, buffer);
 
-    Process* p = ProcessManager_newProcess((void*) buffer, bin->fileSize, USER_PROCESS);
+    Process* p = ProcessManager_newProcess();
     p->workingDirectory = VFS_getParent(bin);
     String_copy(p->name, bin->fileName); /* Set process name */
     Debug_assert(p != NULL);
@@ -302,5 +365,21 @@ PUBLIC void ProcessManager_waitPID(Process* process) {
     m->message = PROCESS_MSG_WAITING;
     ArrayList_add(globalMailbox, m);
     ProcessManager_blockCurrentProcess();
+
+}
+
+PUBLIC Module* ProcessManager_getModule(void) {
+
+    if(!pmModule.isLoaded) {
+
+        pmModule.moduleName = "Process Manager";
+        pmModule.moduleID   = MODULE_PROCESS;
+        pmModule.init       = &ProcessManager_init;
+        pmModule.numberOfDependencies = 1;
+        pmModule.dependencies[0] = MODULE_HEAP;
+
+    }
+
+    return &pmModule;
 
 }

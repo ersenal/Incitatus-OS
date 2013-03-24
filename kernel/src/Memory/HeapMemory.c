@@ -99,7 +99,11 @@ PUBLIC void* HeapMemory_expand(ptrdiff_t size) {
             void* physicalAddress = VirtualMemory_getPhysicalAddress(kernelHeapTop);
             Debug_assert(physicalAddress != NULL);
             PhysicalMemory_freeFrame(physicalAddress);
-            VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, kernelHeapTop);
+
+            if(Scheduler_getCurrentProcess == NULL || Scheduler_getCurrentProcess() == NULL)
+                VirtualMemory_unmapPage(VirtualMemory_getKernelDir(), kernelHeapTop);
+            else
+                VirtualMemory_unmapPage(Scheduler_getCurrentProcess()->pageDir, kernelHeapTop);
 
         }
 

@@ -29,7 +29,7 @@ PRIVATE Module pmmModule;
 /*=======================================================
     PUBLIC DATA
 =========================================================*/
-PUBLIC PhysicalMemoryInfo  (*PhysicalMemory_getInfo) (void);
+PUBLIC PhysicalMemoryInfo*  (*PhysicalMemory_getInfo) (PhysicalMemoryInfo* buf);
 PUBLIC void* (*PhysicalMemory_allocateFrame) (void);
 PUBLIC void  (*PhysicalMemory_freeFrame) (void* frame);
 

@@ -52,7 +52,10 @@ void StackPMM_init(void);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Returns a structure containing physical memory info.
 |
+| PARAM:           'buf' memory info structure to be filled with the info.
+|
+| RETURN:          'PhysicalMemoryInfo*' pointer to filled memory info structure.
 \------------------------------------------------------------------------*/
-PhysicalMemoryInfo  StackPMM_getInfo(void);
+PhysicalMemoryInfo*  StackPMM_getInfo(PhysicalMemoryInfo* buf);
 
 #endif

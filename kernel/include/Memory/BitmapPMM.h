@@ -52,7 +52,10 @@ void BitmapPMM_init(void);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Returns a structure containing physical memory info.
 |
+| PARAM:           'buf' memory info structure to be filled with the info.
+|
+| RETURN:          'PhysicalMemoryInfo*' pointer to filled memory info structure.
 \------------------------------------------------------------------------*/
-PhysicalMemoryInfo BitmapPMM_getInfo(void);
+PhysicalMemoryInfo*  BitmapPMM_getInfo(PhysicalMemoryInfo* buf);
 
 #endif

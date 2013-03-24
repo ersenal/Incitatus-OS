@@ -58,8 +58,11 @@ extern void (*PhysicalMemory_init) (MultibootInfo* mbI, MultibootHeader* mbH);
 |--------------------------------------------------------------------------
 | DESCRIPTION:     Returns a structure containing physical memory info.
 |
+| PARAM:           'buf' memory info structure to be filled with the info.
+|
+| RETURN:          'PhysicalMemoryInfo*' pointer to filled memory info structure.
 \------------------------------------------------------------------------*/
-extern PhysicalMemoryInfo  (*PhysicalMemory_getInfo) (void);
+extern PhysicalMemoryInfo*  (*PhysicalMemory_getInfo) (PhysicalMemoryInfo* buf);
 
 /*-------------------------------------------------------------------------
 | Allocate frame

@@ -33,6 +33,6 @@ extern Process* (*Scheduler_getCurrentProcess) (void);
 =========================================================*/
 
 //TODO: add comments
-Module* Scheduler_getModule(void);
+void Scheduler_init(void);
 
 #endif

@@ -26,7 +26,7 @@
 #include <Memory/PhysicalMemory.h>
 #include <Memory/VirtualMemory.h>
 #include <Memory/HeapMemory.h>
-#include <Process/Scheduler.h>
+#include <Process/ProcessManager.h>
 #include <Drivers/PS2Controller.h>
 #include <FileSystem/VFS.h>
 #include <X86/Usermode.h>
@@ -34,9 +34,16 @@
 
 PUBLIC MultibootInfo* multibootInfo;
 
+PUBLIC void Kernel_idle(void) {
+
+    while(1)
+        Sys_haltCPU();
+
+}
+
 PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
 
-    extern MultibootHeader mbHead;
+    extern MultibootHeader mbHead; /* Defined in Start.s */
     multibootInfo = mbInfo;
 
     Debug_assert(mbMagic == MULTIBOOT_BOOTLOADER_MAGIC);
@@ -56,7 +63,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         HeapMemory_getModule(),
         PS2Controller_getModule(),
         VFS_getModule(),
-        Scheduler_getModule(),
+        ProcessManager_getModule(),
         Usermode_getModule(),
 
     };
@@ -65,6 +72,7 @@ PUBLIC void Kernel(MultibootInfo* mbInfo, u32int mbMagic) {
         Module_load(modules[i]);
 
     Sys_enableInterrupts();
+    Kernel_idle();
     Sys_panic("Should not reach here!");
 
 }

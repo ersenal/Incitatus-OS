@@ -28,7 +28,7 @@
 #include <IO.h>
 #include <X86/IDT.h>
 #include <X86/PIC8259.h>
-#include <Process/Scheduler.h>
+#include <Process/ProcessManager.h>
 #include <Sys.h>
 
 /*=======================================================
@@ -113,7 +113,7 @@ PRIVATE void PIT8253_timerHandler(Regs* regs) {
     tick++;
 
      /* Do context switch only if the process management module is loaded */
-    if(Scheduler_getModule()->isLoaded) {
+    if(ProcessManager_getModule()->isLoaded) {
 
       if(tick % 2 == 0) /* context switch every 20ms */
           ProcessManager_switch(regs);

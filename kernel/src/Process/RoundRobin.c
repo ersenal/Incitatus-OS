@@ -32,6 +32,7 @@ PRIVATE Process* currentProcess;
 PUBLIC void RoundRobin_addProcess(Process* process) {
 
     Debug_assert(process != NULL);
+    Debug_assert(process->status = PROCESS_CREATED);
 
     if(processes == NULL) { /* RoundRobin initialisation */
 
@@ -48,7 +49,7 @@ PUBLIC void RoundRobin_addProcess(Process* process) {
 PUBLIC void RoundRobin_removeProcess(Process* process) {
 
     Debug_assert(process != NULL && processes != NULL);
-    Debug_assert(process->pid != KERNEL_PID); /* Can't kill kernel process */
+    Debug_assert(process->pid != KERNEL_PID); /* Can't remove kernel process */
 
     process->status = PROCESS_TERMINATED;
     LinkedList_remove(processes, process);

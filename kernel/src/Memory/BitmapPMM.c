@@ -93,17 +93,20 @@ PUBLIC void BitmapPMM_freeFrame(void* b) {
 
 }
 
-PUBLIC PhysicalMemoryInfo BitmapPMM_getInfo(void) {
+PUBLIC PhysicalMemoryInfo* BitmapPMM_getInfo(PhysicalMemoryInfo* buf) {
 
-    PhysicalMemoryInfo info = {totalPhysicalMemory, totalFrames, totalFrames - usedFrames};
-    return info;
+    buf->totalMemory = totalPhysicalMemory;
+    buf->totalFrames = totalFrames;
+    buf->freeFrames = totalFrames - usedFrames;
+
+    return buf;
 
 }
 
 PUBLIC void BitmapPMM_init(void) {
 
-    extern MultibootHeader mbHead;
-    extern MultibootInfo* multibootInfo;
+    extern MultibootHeader mbHead; /* Defined in Start.s */
+    extern MultibootInfo* multibootInfo; /* Defined in Kernel.c */
 
     MultibootMemEntry* entry = (MultibootMemEntry*) multibootInfo->mmapAddr;
     u32int initrdEnd = *(u32int*)(multibootInfo->modsAddr + 4);

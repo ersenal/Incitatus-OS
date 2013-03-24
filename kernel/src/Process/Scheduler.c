@@ -19,10 +19,6 @@
 /* #include <Process/FCFS.h> */
 #include <Process/RoundRobin.h>
 
-/*=======================================================
-    PRIVATE DATA
-=========================================================*/
-PRIVATE Module schedulerModule;
 
 /*=======================================================
     PUBLIC DATA
@@ -36,28 +32,12 @@ PUBLIC Process* (*Scheduler_getCurrentProcess) (void);
     FUNCTION
 =========================================================*/
 
-PRIVATE void Scheduler_init(void) {
+PUBLIC void Scheduler_init(void) {
 
     /* Point to scheduler implementation */
     Scheduler_addProcess        = &RoundRobin_addProcess;
     Scheduler_removeProcess     = &RoundRobin_removeProcess;
     Scheduler_getNextProcess    = &RoundRobin_getNextProcess;
     Scheduler_getCurrentProcess = &RoundRobin_getCurrentProcess;
-
-}
-
-PUBLIC Module* Scheduler_getModule(void) {
-
-    if(!schedulerModule.isLoaded) {
-
-        schedulerModule.moduleName = "Process Scheduler";
-        schedulerModule.moduleID = MODULE_SCHEDULER;
-        schedulerModule.init = &Scheduler_init;
-        schedulerModule.numberOfDependencies = 1;
-        schedulerModule.dependencies[0] = MODULE_HEAP;
-
-    }
-
-    return &schedulerModule;
 
 }

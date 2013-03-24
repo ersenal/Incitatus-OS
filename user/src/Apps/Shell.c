@@ -19,7 +19,6 @@ int main(void) {
 
     cls();
     cat("logo.ascii");
-    spawn("/HelloWorld"); /* Todo: kernel idle process */
     getcwd(workingDirectory);
     printf("%s%c", workingDirectory, '>');
 
