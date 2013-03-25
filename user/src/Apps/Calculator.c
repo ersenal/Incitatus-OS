@@ -20,6 +20,8 @@ int main(void) {
 
         while((c = getch()) != '\n' && c != 'e') {
 
+            putc(c); /* Echo input */
+
             /* Handle backspace */
             if(c == '\b') {
 
@@ -38,7 +40,8 @@ int main(void) {
         if(c == 'e')
             break;
 
-        puts("Answer: ");
+        /* Handle enter */
+        puts("\nAnswer: ");
         entry[i] = '\0';
         i = 0;
         parseInput(entry);
@@ -57,10 +60,6 @@ static void parseInput(char* entry) {
 
     int x = atoi(left);
     int y = atoi(right);
-
-    if(left == NULL || op == NULL || right == NULL)
-        puts("Invalid input!\n");
-
 
     switch(op[0]) {
 

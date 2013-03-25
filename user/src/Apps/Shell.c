@@ -28,6 +28,8 @@ int main(void) {
 
         while((c = getch()) != '\n') {
 
+            putc(c); /* Echo input */
+
             /* Handle backspace */
             if(c == '\b') {
 
@@ -44,6 +46,7 @@ int main(void) {
         }
 
         /* Handle enter */
+        putc('\n');
         entry[i] = '\0';
         i = 0;
         parseInput(entry);

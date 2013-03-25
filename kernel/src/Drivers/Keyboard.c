@@ -232,6 +232,8 @@ PRIVATE void Keyboard_callback(void) {
 
 PUBLIC char Keyboard_getChar(void) {
 
+    /* NOTE: works only in multitasking usermode */
+
     char c = CircularFIFOBuffer_read(keyBuffer);
 
     while(c == -1) { /* No input */
@@ -242,7 +244,6 @@ PUBLIC char Keyboard_getChar(void) {
 
     }
 
-    Console_printChar(c);
     return c;
 
 }

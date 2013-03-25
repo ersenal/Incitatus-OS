@@ -9,11 +9,25 @@ int main(void) {
 
     while((c = getch()) != '\n') {
 
-        buf[i] = c;
-        i++;
+        putc(c); /* Echo input */
+
+        /* Handle backspace */
+        if(c == '\b') {
+
+            i--;
+            buf[i] = '\0';
+
+        } else {
+
+            buf[i] = c;
+            i++;
+
+        }
 
     }
 
+    /* Handle enter */
+    putc('\n');
     buf[i] = '\0';
 
     printf("%s%s%c", "You typed: ", buf, '\n');
