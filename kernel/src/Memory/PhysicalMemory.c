@@ -15,6 +15,7 @@
 
 
 #include <Memory/PhysicalMemory.h>
+#include <Debug.h>
 
 /* Include PMM implementation */
 /* #include Memory/BitmapPMM.h */
@@ -38,6 +39,8 @@ PUBLIC void  (*PhysicalMemory_freeFrame) (void* frame);
 =========================================================*/
 
 PRIVATE void _PhysicalMemory_init() {
+
+    Debug_logInfo("%s%s", "Initialising ", pmmModule.moduleName);
 
     /* Point to PMM implementation */
     PhysicalMemory_getInfo       = StackPMM_getInfo;

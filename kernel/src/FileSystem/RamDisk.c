@@ -167,6 +167,8 @@ PRIVATE void RamDisk_test(void) {
 
 PUBLIC VFS* RamDisk_init(void) {
 
+    Debug_logInfo("%s", "Initialising Ramdisk");
+
     /* Get initrd tar module address */
     extern MultibootInfo* multibootInfo; /* Defined in Kernel.c */
     firstHeaderAddress = *((u32int*) multibootInfo->modsAddr);

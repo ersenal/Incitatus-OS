@@ -222,6 +222,8 @@ PRIVATE void GDT_flush(void) {
 
 PRIVATE void GDT_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", gdtModule.moduleName);
+
     /*
     ** Simulate a flat-memory model(all segments 0 to 4GB)
     */

@@ -14,6 +14,7 @@
 
 
 #include <Process/Scheduler.h>
+#include <Debug.h>
 
 /* Include scheduler implementation */
 /* #include <Process/FCFS.h> */
@@ -33,6 +34,8 @@ PUBLIC Process* (*Scheduler_getCurrentProcess) (void);
 =========================================================*/
 
 PUBLIC void Scheduler_init(void) {
+
+    Debug_logInfo("%s", "Initialising Scheduler");
 
     /* Point to scheduler implementation */
     Scheduler_addProcess        = &RoundRobin_addProcess;

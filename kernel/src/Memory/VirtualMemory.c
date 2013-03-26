@@ -248,6 +248,8 @@ PRIVATE void VirtualMemory_setPTE(PageTableEntry* pte, void* physicalAddr, bool 
 
 PRIVATE void VirtualMemory_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", vmmModule.moduleName);
+
     /* Create the initial page directory */
     PageDirectory* dir = PhysicalMemory_allocateFrame();
     Memory_set(dir, 0, sizeof(PageDirectory));

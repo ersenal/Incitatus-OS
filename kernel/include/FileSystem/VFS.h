@@ -187,10 +187,55 @@ void VFS_getFileStats(VFSNode* file, VFSNode* buf);
 \------------------------------------------------------------------------*/
 Module* VFS_getModule(void);
 
-//TODO: comment
+/*-------------------------------------------------------------------------
+| Find inside dir
+|--------------------------------------------------------------------------
+| DESCRIPTION:    Finds child file in a directory.
+|
+| PARAM:          'dir'  parent directory
+|                 'path' absolute child path
+|
+| RETURN:         'VFSNode*' - child file descriptor
+\------------------------------------------------------------------------*/
 VFSNode* VFS_findDir(VFSNode* dir, const char* path);
+
+/*-------------------------------------------------------------------------
+| Read file
+|--------------------------------------------------------------------------
+| DESCRIPTION:    Reads from a file.
+|
+| PARAM:          'self'    the file to read from
+|                 'offset'  starts reading from this offset
+|                 'count'   number of bytes to read
+|                 'buffer'  buffer to store read bytes
+|
+| RETURN:         'u32int'  the number of read bytes
+\------------------------------------------------------------------------*/
 u32int VFS_read(VFSNode* self, u32int offset, u32int count, char* buffer);
+
+/*-------------------------------------------------------------------------
+| Write file
+|--------------------------------------------------------------------------
+| DESCRIPTION:    Writes to a file.
+|
+| PARAM:          'self'    the file to write to
+|                 'offset'  starts writing from this offset
+|                 'count'   number of bytes to write
+|                 'buffer'  buffer to write bytes from
+|
+| RETURN:         'u32int'  the number of bytes written
+\------------------------------------------------------------------------*/
 u32int VFS_write(VFSNode* self, u32int offset, u32int count, const char* buffer);
+
+/*-------------------------------------------------------------------------
+| Make directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:    Creates a new directory inside current working directory.
+|
+| PARAM:          'pathname'  pathname of the new directory.
+|
+| RETURN:         'VFSNode*'  file descriptor pointing to newly created dir
+\------------------------------------------------------------------------*/
 VFSNode* VFS_mkdir(const char* pathname);
 
 #endif

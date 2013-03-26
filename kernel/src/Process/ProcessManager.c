@@ -208,6 +208,8 @@ PRIVATE void ProcessManager_notify(void) {
 
 PRIVATE void ProcessManager_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", pmModule.moduleName);
+
     pid = 1; /* User process pids are >= 1 */
     Scheduler_init();
     globalMailbox = ArrayList_new(10);
@@ -264,6 +266,8 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 }
 
 PUBLIC void ProcessManager_killProcess(int exitCode) {
+
+    UNUSED(exitCode);
 
     Process* current = Scheduler_getCurrentProcess();
     Debug_assert(current != NULL);

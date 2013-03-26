@@ -138,6 +138,8 @@ PRIVATE void Mouse_callback(void) {
 
 PUBLIC void Mouse_init(void) {
 
+    Debug_logInfo("%s", "Initialising Mouse");
+
     /* Enable auxiliary mouse device */
     PS2Controller_send(PS2_STATE,MS_C_ENABLE_AUX);
     PS2Controller_receive(PS2_DATA); /* flush */

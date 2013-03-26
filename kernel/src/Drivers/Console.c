@@ -87,6 +87,8 @@ PRIVATE void Console_init(void) {
     colorAttribute = CONSOLE_NORMAL;
     Console_clearScreen();
 
+    Debug_logInfo("%s%s", "Initialised ", console.moduleName);
+
 }
 
 PUBLIC void Console_printf(const char* template, ...) {

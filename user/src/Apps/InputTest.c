@@ -1,3 +1,18 @@
+/**
+| Copyright(C) 2012 Ali Ersenal
+| License: WTFPL v2
+| URL: http://sam.zoy.org/wtfpl/COPYING
+|
+|--------------------------------------------------------------------------
+| InputTest.c
+|--------------------------------------------------------------------------
+|
+| DESCRIPTION:  Used for testing userspace keyboard input.
+|
+| AUTHOR:       Ali Ersenal, aliersenal@gmail.com
+\------------------------------------------------------------------------*/
+
+
 #include <Lib/Incitatus.h>
 #include <Lib/libc/stdio.h>
 

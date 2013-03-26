@@ -149,6 +149,8 @@ PRIVATE Module picModule;
 
 PRIVATE void PIC8259_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", picModule.moduleName);
+
     /* IRQ 0-7 normally use INT 8-15, which conflicts with the exception INTs.
     *  Remap IRQ so that IRQ 0-15 correspond to INT 32-47.
     */

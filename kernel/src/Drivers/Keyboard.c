@@ -107,7 +107,7 @@ struct LedStatusByte {
     PRIVATE DATA
 =========================================================*/
 PRIVATE CircularFIFOBuffer* keyBuffer;
-PRIVATE Process* focused;
+PRIVATE Process* focused; /* Send key char to this process */
 PRIVATE KeyState keyState;
 
 /* Scan code set 1 - shift or caps */
@@ -152,13 +152,12 @@ PRIVATE const u8int lowerMap[256] = {
     FUNCTION
 =========================================================*/
 
-/** No commands are SENT to the keyboard after enabling interrupts(IRQ)
- *  should receive an ack after sending a command */
+/* NOTE: No commands are SENT to the keyboard after enabling interrupts(IRQ) */
 PRIVATE bool Keyboard_sendCommand(u8int command) {
 
     PS2Controller_send(PS2_DATA, command);
 
-    if(PS2Controller_receive(PS2_DATA) != KB_R_ACK) return 0;
+    if(PS2Controller_receive(PS2_DATA) != KB_R_ACK) return 0; /* We should receive an ack after sending a command */
     else return 1;
 
 }
@@ -261,6 +260,8 @@ PUBLIC void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock) {
 }
 
 PUBLIC void Keyboard_init(void) {
+
+    Debug_logInfo("%s", "Initialising Keyboard");
 
     /* disable scanning, should receive ACK */
     if(Keyboard_sendCommand(KB_C_SCAN_DISABLE)) {

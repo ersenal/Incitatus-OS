@@ -53,7 +53,7 @@ Module* VirtualMemory_getModule(void);
 |                  "physicalAddr"  4KB aligned physical address
 |                  "mode"          0 - Kernel mode, 1 - User mode
 |
-| RETURN:          Mapped virtual address
+| RETURN:          'void*' mapped virtual address
 \------------------------------------------------------------------------*/
 void* VirtualMemory_mapPage(PageDirectory* dir, void* virtualAddr, void* physicalAddr, bool mode);
 
@@ -63,7 +63,6 @@ void* VirtualMemory_mapPage(PageDirectory* dir, void* virtualAddr, void* physica
 | DESCRIPTION:     Unmaps a virtual address
 |
 | PARAM:           "virtualAddr"   4KB aligned virtual address
-|
 \------------------------------------------------------------------------*/
 void VirtualMemory_unmapPage(PageDirectory* dir, void* virtualAddr);
 
@@ -74,15 +73,74 @@ void VirtualMemory_unmapPage(PageDirectory* dir, void* virtualAddr);
 |
 | PARAM:           "virtualAddr"   4KB aligned virtual address
 |
+| RETURN:         'void*' the physical address
 \------------------------------------------------------------------------*/
 void* VirtualMemory_getPhysicalAddress(void* virtualAddr);
 
-//TODO: add comments
+/*-------------------------------------------------------------------------
+| Quick map
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Temporarily maps a virtual address to a physical address.
+|                  Maps to current page directory.
+|
+| PARAM:           "virtualAddr"   4KB aligned virtual address
+|                  "physicalAddr"  4KB aligned physical address
+|
+| RETURN:         'void*' the virtual address
+\------------------------------------------------------------------------*/
 void* VirtualMemory_quickMap(void* virtualAddr, void* physicalAddr);
+
+/*-------------------------------------------------------------------------
+| Quick unmap
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Unmaps a virtual address from current page directory.
+|
+| PARAM:           "virtualAddr"   4KB aligned virtual address
+\------------------------------------------------------------------------*/
 void VirtualMemory_quickUnmap(void* virtualAddr);
+
+/*-------------------------------------------------------------------------
+| Get kernel directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Returns the kernel's page directory
+|
+| RETURN:         'PageDirectory*' the kernel page directory
+\------------------------------------------------------------------------*/
 PageDirectory* VirtualMemory_getKernelDir(void);
+
+/*-------------------------------------------------------------------------
+| Switch page directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Changes the current page directory(address space) to specified one.
+|
+| PARAM:           "dir"   the page directory to switch to
+\------------------------------------------------------------------------*/
 void VirtualMemory_switchPageDir(PageDirectory* dir);
+
+/*-------------------------------------------------------------------------
+| Map kernel
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Maps the OS kernel to specified process' page directory
+|
+| PARAM:           'process' the process to map to
+\------------------------------------------------------------------------*/
 void VirtualMemory_mapKernel(Process* process);
+
+/*-------------------------------------------------------------------------
+| Create page directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Creates a new page directory for the specified process.
+|
+| PARAM:           'process'   the process to create page directory for
+\------------------------------------------------------------------------*/
 void VirtualMemory_createPageDirectory(Process* process);
+
+/*-------------------------------------------------------------------------
+| Destroy page directory
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Destroys(deallocates) a page directory from the specified process.
+|
+| PARAM:           'process'   the process to destroy page directory from
+\------------------------------------------------------------------------*/
 void VirtualMemory_destroyPageDirectory(Process* process);
 #endif

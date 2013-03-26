@@ -33,6 +33,8 @@ PRIVATE VFS*   rootFS;
 
 PRIVATE void VFS_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", vfsModule.moduleName);
+
     rootFS = RamDisk_init();
 
 }

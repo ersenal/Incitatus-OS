@@ -45,6 +45,8 @@ PUBLIC void  (*HeapMemory_free)    (void* mem);
 
 PRIVATE void HeapMemory_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", heapModule.moduleName);
+
     kernelHeapTop = (void*) KERNEL_HEAP_BASE_VADDR;
 
     /* Point to heap manager implementation */

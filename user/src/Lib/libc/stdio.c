@@ -2,16 +2,19 @@
 #include <Lib/Incitatus.h>
 #include <stdarg.h> /* we need var-args for printf */
 
+/* Borrowed from musl libc */
 int isspace(int c)
 {
     return c == ' ' || (unsigned)c-'\t' < 5;
 }
 
+/* Borrowed from musl libc */
 int isdigit(int c)
 {
     return (unsigned)c-'0' < 10;
 }
 
+/* Borrowed from musl libc */
 int atoi(const char *s)
 {
     int n=0, neg=0;
@@ -26,6 +29,7 @@ int atoi(const char *s)
     return neg ? n : -n;
 }
 
+/* Borrowed from musl libc */
 long atol(const char *s)
 {
     long n=0;

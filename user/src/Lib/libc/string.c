@@ -1,3 +1,9 @@
+/**
+|
+| Code borrowed from musl libc.
+|
+\------------------------------*/
+
 #include <Lib/libc/string.h>
 #include <Lib/libc/limits.h>
 #include <Lib/libc/stdint.h>

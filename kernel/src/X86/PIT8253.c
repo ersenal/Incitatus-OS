@@ -30,6 +30,7 @@
 #include <X86/PIC8259.h>
 #include <Process/ProcessManager.h>
 #include <Sys.h>
+#include <Debug.h>
 
 /*=======================================================
     DEFINE
@@ -125,6 +126,8 @@ PRIVATE void PIT8253_timerHandler(Regs* regs) {
 }
 
 PRIVATE void PIT8253_init(void) {
+
+    Debug_logInfo("%s%s", "Initialising ", pitModule.moduleName);
 
     u16int divisor = INPUT_HZ / OUTPUT_HZ;
 

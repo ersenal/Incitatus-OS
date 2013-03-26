@@ -65,12 +65,59 @@ struct Process {
     FUNCTION
 =========================================================*/
 
-//TODO: comments
+/*-------------------------------------------------------------------------
+| Process switch
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Performs a process switch.
+|                  Called by PIT(See PIT.c : PIT8253_timerHandler)
+|
+| PARAM:          'Regs*' the context
+\------------------------------------------------------------------------*/
 void  ProcessManager_switch(Regs* context);
+
+/*-------------------------------------------------------------------------
+| Kill process
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Terminates the current process and switches to next one.
+|
+| PARAM:           'exitCode' the exit code
+\------------------------------------------------------------------------*/
 void ProcessManager_killProcess(int exitCode);
+
+/*-------------------------------------------------------------------------
+| Spawn process
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Spawns a new process from an executable binary file.
+|
+| PARAM:           'binary' the binary pathname
+|
+| RETURN:          'Process*' the process that was spawned
+\------------------------------------------------------------------------*/
 Process* ProcessManager_spawnProcess(const char* binary);
+
+/*-------------------------------------------------------------------------
+| Wait process ID
+|--------------------------------------------------------------------------
+| DESCRIPTION:    Causes the current process to wait for specified process' termination.
+|
+| PARAM:          'Process*' the process to wait for
+\------------------------------------------------------------------------*/
 void ProcessManager_waitPID(Process* process);
+
+/*-------------------------------------------------------------------------
+| Block current process
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Blocks the current process from further execution.
+|
+\------------------------------------------------------------------------*/
 void ProcessManager_blockCurrentProcess(void);
+
+/*-------------------------------------------------------------------------
+| Get process management module
+|--------------------------------------------------------------------------
+| DESCRIPTION:     Returns the process management module.
+|
+\------------------------------------------------------------------------*/
 Module* ProcessManager_getModule(void);
 
 #endif

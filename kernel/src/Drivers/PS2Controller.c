@@ -130,6 +130,8 @@ PRIVATE void PS2Controller_writeConfigByte(void) {
 
 PRIVATE void PS2Controller_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", ps2Module.moduleName);
+
     /* disable both PS/2 ports */
     Debug_logInfo("%s", PS2_M_DISABLE);
     PS2Controller_send(PS2_STATE, PS2_C_DISABLE_1);

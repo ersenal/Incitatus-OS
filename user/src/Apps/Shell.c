@@ -1,3 +1,18 @@
+/**
+| Copyright(C) 2012 Ali Ersenal
+| License: WTFPL v2
+| URL: http://sam.zoy.org/wtfpl/COPYING
+|
+|--------------------------------------------------------------------------
+| Shell.c
+|--------------------------------------------------------------------------
+|
+| DESCRIPTION:  Simplistic user-space shell.
+|
+| AUTHOR:       Ali Ersenal, aliersenal@gmail.com
+\------------------------------------------------------------------------*/
+
+
 #include <Lib/Incitatus.h>
 #include <Lib/libc/string.h>
 #include <Lib/libc/stdio.h>
@@ -10,7 +25,6 @@ static void cat(const char* path);
 static void ls(void);
 static void help(void);
 
-//TODO: comments
 int main(void) {
 
     char entry[64];

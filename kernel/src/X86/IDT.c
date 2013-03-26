@@ -239,6 +239,8 @@ PRIVATE void IDT_initIRQHandlers(void) {
 
 PRIVATE void IDT_init(void) {
 
+    Debug_logInfo("%s%s", "Initialising ", idtModule.moduleName);
+
     /* Initialise interrupt service routines */
     IDT_initExceptionHandlers();
     IDT_initIRQHandlers();
