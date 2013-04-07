@@ -70,4 +70,13 @@ extern Process* (*Scheduler_getCurrentProcess) (void);
 \------------------------------------------------------------------------*/
 void Scheduler_init(void);
 
+/*-------------------------------------------------------------------------
+| Is Scheduler preemptive?
+|--------------------------------------------------------------------------
+| RETURN:   true    if scheduler is preemptive.
+|           false   if secheduler is NOT preemptive.
+|
+\------------------------------------------------------------------------*/
+bool Scheduler_isPreemptive(void);
+
 #endif

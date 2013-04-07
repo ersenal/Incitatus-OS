@@ -99,13 +99,23 @@ PRIVATE void Usermode_init(void) {
     Debug_logInfo("%s", "Jumping to user space");
     IDT_registerHandler(&Usermode_syscallHandler, SYSCALL_INTERRUPT);
 
+    /* This is our initial user mode process */
     Process* init = ProcessManager_spawnProcess("/Shell");
-    extern Process* kernelProcess; /* Defined in ProcessManager.c */
-    Scheduler_addProcess(kernelProcess);
+
+    /* Add idle kernel process to process queue if the scheduler is preemptive */
+    if(Scheduler_isPreemptive()) {
+
+        extern Process* kernelProcess; /* Defined in ProcessManager.c */
+        Scheduler_addProcess(kernelProcess);
+
+    }
+
+    /* Set task state segment and switch to initial process' stack and address space */
     GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) init->kernelStack);
     asm volatile("mov %0, %%esp" : : "r" (init->userStack));
     VirtualMemory_switchPageDir(init->pageDir);
 
+    /* Change segments to user mode and jump to user code base address(defined in Common.h) */
     asm volatile("          \
         cli;                \
         mov $0x23, %%ax;    \

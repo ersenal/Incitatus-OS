@@ -52,12 +52,12 @@ PUBLIC void FCFS_removeProcess(Process* process) {
 
     LinkedList_remove(processes, process);
     process->status = PROCESS_TERMINATED;
-    currentProcess = LinkedList_getFront(processes);
 
 }
 
 PUBLIC Process* FCFS_getNextProcess(void) {
 
+    currentProcess = LinkedList_getFront(processes);
     return currentProcess;
 
 }

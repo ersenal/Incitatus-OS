@@ -206,6 +206,12 @@ PRIVATE void ProcessManager_notify(void) {
 
 }
 
+PRIVATE void ProcessManager_forceSwitch(void) {
+
+    asm volatile("int %0" : : "i" (IRQ0)); /* Force task switch */
+
+}
+
 PRIVATE void ProcessManager_init(void) {
 
     Debug_logInfo("%s%s", "Initialising ", pmModule.moduleName);
@@ -229,10 +235,26 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     } else { /* Switching from a user process */
 
-        if(currentProcess->status != PROCESS_BLOCKED)
-            currentProcess->status = PROCESS_WAITING;
+        if(currentProcess->status == PROCESS_TERMINATED) { /* Switching from a *killed* user process, free resources */
 
-        currentProcess->userStack = context; /* Save process state */
+            ProcessManager_destroyProcess(currentProcess);
+
+        } else {
+
+            if(Scheduler_isPreemptive()) {
+
+                if(currentProcess->status != PROCESS_BLOCKED)
+                    currentProcess->status = PROCESS_WAITING;
+
+            } else {
+
+                currentProcess->status = PROCESS_WAITING;
+
+            }
+
+            currentProcess->userStack = context; /* Save process state */
+
+        }
 
     }
 
@@ -256,6 +278,8 @@ PUBLIC void ProcessManager_switch(Regs* context) {
 
     } else { /* Next process is a user process */
 
+        Debug_assert(next->userStack != NULL);
+
         GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
         asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store next process' ESP in DR0 register */
 
@@ -273,39 +297,13 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     Debug_assert(current != NULL);
     Debug_assert(current != kernelProcess); /* Can't kill kernel process */
     Debug_logInfo("%s%d%c%s%s%d", "PID:", current->pid, ' ', current->name, " exited with code ", exitCode);
+
     ProcessManager_notify();
     Scheduler_removeProcess(current);
 
-    /* Get next process from scheduler */
-    Process* next = Scheduler_getNextProcess();
-    Debug_assert(next != NULL);
-    Debug_assert(next != current);
-
-    while(next->status == PROCESS_BLOCKED) /* Find a waiting process */
-        next = Scheduler_getNextProcess();
-
-    Debug_assert(next->status == PROCESS_WAITING);
-    next->status = PROCESS_RUNNING;
-    if(current == next) /* No need for a context switch */
-        return;
-
-    Debug_assert(next->kernelStack != NULL);
-
-    if(next == kernelProcess) { /* Next process is kernel process */
-
-        asm volatile("mov %0, %%DR0" : : "r" (next->kernelStack)); /* Store kernel process' ESP in DR0 register */
-
-    } else { /* Next process is a user process */
-
-        GDT_setTSS(KERNEL_DATA_SEGMENT, (u32int) next->kernelStack);
-        asm volatile("mov %0, %%DR0" : : "r" (next->userStack)); /* Store new process ESP in DR0 register */
-
-    }
-
-    //TODO: Fix this hack
-    asm volatile("mov %0, %%DR1" : : "r" (0xDEADBEEF)); /* Store 1 at DR1 in order to distinguish the procedure */
-    VirtualMemory_switchPageDir(next->pageDir); /* Switch to new process' address space */
-    ProcessManager_destroyProcess(current);
+    Sys_enableInterrupts();
+    ProcessManager_forceSwitch();
+    while(1); /* Should not reach here */
 
 }
 
@@ -355,11 +353,13 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
 PUBLIC void ProcessManager_blockCurrentProcess(void) {
 
     Scheduler_getCurrentProcess()->status = PROCESS_BLOCKED;
-    asm volatile("int %0" : : "i" (IRQ0)); /* Force task switch */
+    ProcessManager_forceSwitch();
 
 }
 
 PUBLIC void ProcessManager_waitPID(Process* process) {
+
+    Debug_assert(process != NULL);
 
     Message* m = HeapMemory_calloc(1, sizeof(Message));
 

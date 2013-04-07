@@ -20,6 +20,10 @@
 /* #include <Process/FCFS.h> */
 #include <Process/RoundRobin.h>
 
+/*=======================================================
+    PRIVATE DATA
+=========================================================*/
+PRIVATE bool isPreemptive;
 
 /*=======================================================
     PUBLIC DATA
@@ -42,5 +46,14 @@ PUBLIC void Scheduler_init(void) {
     Scheduler_removeProcess     = &RoundRobin_removeProcess;
     Scheduler_getNextProcess    = &RoundRobin_getNextProcess;
     Scheduler_getCurrentProcess = &RoundRobin_getCurrentProcess;
+
+    /* Is this scheduler implementation preemptive or not */
+    isPreemptive = TRUE;
+
+}
+
+PUBLIC bool Scheduler_isPreemptive(void) {
+
+    return isPreemptive;
 
 }

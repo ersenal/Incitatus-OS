@@ -260,22 +260,7 @@ PUBLIC void IDT_registerHandler(void* functionAddr, u8int interruptNo) {
 
 }
 
-PUBLIC void IDT_handlerException(Regs* regs) {
-
-    if(handlers[regs->intNo] != NULL) {
-
-        (*handlers[regs->intNo]) (regs);
-
-    } else {
-
-        Debug_logError("%d", regs->intNo);
-        Sys_panic("Unhandled Exception Interrupt!");
-
-    }
-
-}
-
-PUBLIC void IDT_handlerIRQ(Regs* regs) {
+PUBLIC void IDT_interruptHandler(Regs* regs) {
 
     /* Handle spurious interrupts. Spurious interrupts are fake interrupts caused
      * by an invalid EOI or line noise. This is a temporary solution. */
@@ -289,11 +274,12 @@ PUBLIC void IDT_handlerIRQ(Regs* regs) {
     } else{
 
         Debug_logError("%d", regs->intNo);
-        Sys_panic("Unhandled IRQ Interrupt!");
+        Sys_panic("Unhandled Interrupt!");
 
     }
 
-    PIC8259_sendEOI(regs->intNo);
+    if(regs->intNo >= IRQ0)
+        PIC8259_sendEOI(regs->intNo);
 
 }
 

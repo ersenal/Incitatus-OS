@@ -81,24 +81,14 @@ struct Regs {
 void IDT_registerHandler(void* functionAddr, u8int interruptNo);
 
 /*-------------------------------------------------------------------------
-| Exception Handler
+| High-level interrupt handler
 |--------------------------------------------------------------------------
-| DESCRIPTION:     C-level common interrupt handler for exceptions, called
-|                  from common exception handler(see IDT.s)
+| DESCRIPTION:     C-level common interrupt handler, called from:
+|                  IDT_commonHandler() (see IDT.s)
 |
 | PARAM:           "regs"   cpu registers
 \------------------------------------------------------------------------*/
-void IDT_handlerException(Regs* regs);
-
-/*-------------------------------------------------------------------------
-| Request(IRQ) Handler
-|--------------------------------------------------------------------------
-| DESCRIPTION:     C-level common interrupt handler for IRQs, called from
-|                  common IRQ handler(see IDT.s)
-|
-| PARAM:           "regs"   cpu registers
-\------------------------------------------------------------------------*/
-void IDT_handlerIRQ(Regs* regs);
+void IDT_interruptHandler(Regs* regs);
 
 /*-------------------------------------------------------------------------
 | Get IDT module

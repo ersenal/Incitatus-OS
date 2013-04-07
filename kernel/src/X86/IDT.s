@@ -13,8 +13,7 @@
 ;--------------------------------------------------------------------------
 
 
-[EXTERN IDT_handlerException] ; Common C-level exception handler in IDT.c
-[EXTERN IDT_handlerIRQ] ; Common C-level IRQ handler in IDT.c
+[EXTERN IDT_interruptHandler] ; Common C-level exception handler in IDT.c
 
 ;Exceptions
 [GLOBAL IDT_handler0]
@@ -69,61 +68,9 @@
 [GLOBAL IDT_request14]
 [GLOBAL IDT_request15]
 
-; Common exception handler
-; Save processor state, set segments and call C-handler and then restore stack frame
-IDT_exceptionHandlerCommon:
-
-    ; Save register state: Push EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI
-    pusha
-
-    ; Save segment selectors
-    mov eax, ds
-    push eax
-
-    mov eax, es
-    push eax
-
-    mov eax, fs
-    push eax
-
-    mov eax, gs
-    push eax
-
-    ; Switch to kernel data segment
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    push esp                   ; Push stack pointer(Regs* in IDT.c)
-    call IDT_handlerException  ; Call C-level common exception handler
-    add esp, 4                 ; Drop stack pointer
-
-    ;TODO: fix this hack
-    mov eax, DR1
-    cmp eax, 0xDEADBEEF
-    jne NotSwitch        ; Jump if this is not a exit() syscall
-    mov eax, DR0         ; Get new process ESP
-    mov esp, eax         ; Switch process stacks
-    mov eax, 0
-    mov DR1, eax
-
-    NotSwitch:
-
-    ; Restore the segment selectors
-    pop gs
-    pop fs
-    pop es
-    pop ds
-
-    popa                     ; Restore register state, Pop EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX
-    add esp, 8               ; Drop interrupt number and error code
-    iret                     ; Restore CS:EIP and EFLAGS
-
 ; Common IRQ handler
 ; Save processor state, set segments and call C-handler and then restore stack frame
-IDT_irqHandlerCommon:
+IDT_handlerCommon:
 
     ; Save register state: Push EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI
     pusha
@@ -148,9 +95,9 @@ IDT_irqHandlerCommon:
     mov fs, ax
     mov gs, ax
 
-    push esp             ; Push stack pointer(Regs* in IDT.c)
-    call IDT_handlerIRQ  ; Call C-level common exception handler
-    add esp, 4           ; Drop stack pointer
+    push esp                    ; Push stack pointer(Regs* in IDT.c)
+    call IDT_interruptHandler   ; Call C-level common exception handler
+    add esp, 4                  ; Drop stack pointer
 
     mov eax, [esp + 48]  ; Get interrupt number
     cmp eax, 32
@@ -179,14 +126,14 @@ IDT_handler0:
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 0 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler1:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 1 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 
 IDT_handler2:
@@ -194,321 +141,321 @@ IDT_handler2:
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 2 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler3:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 3 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler4:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 4 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler5:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 5 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler6:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 6 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler7:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 7 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler8:
 
     cli ; Disable interrupts
     push byte 8 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler9:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 9 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler10:
 
     cli ; Disable interrupts
     push byte 10 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler11:
 
     cli ; Disable interrupts
     push byte 11 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler12:
 
     cli ; Disable interrupts
     push byte 12 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler13:
 
     cli ; Disable interrupts
     push byte 13 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler14:
 
     cli ; Disable interrupts
     push byte 14 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler15:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 15 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler16:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 16 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler17:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 17 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler18:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 18 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler19:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 19 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler20:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 20 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler21:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 21 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler22:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 22 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler23:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 23 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler24:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 24 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler25:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 25 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler26:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 26 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler27:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 27 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler28:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 28 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler29:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 29 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler30:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 30 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler31:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 31 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_handler128:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push 128 ; Push interrupt number
-    jmp IDT_exceptionHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request0:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 32 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request1:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 33 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request2:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 34 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request3:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 35 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request4:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 36 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request5:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 37 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request6:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 38 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request7:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 39 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request8:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 40 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request9:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 41 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request10:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 42 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request11:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 43 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request12:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 44 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request13:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 45 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request14:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 46 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
 IDT_request15:
 
     cli ; Disable interrupts
     push byte 0 ; Push a dummy error code
     push byte 47 ; Push interrupt number
-    jmp IDT_irqHandlerCommon ; Go to common handler
+    jmp IDT_handlerCommon ; Go to common handler
 
