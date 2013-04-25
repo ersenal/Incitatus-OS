@@ -1,15 +1,32 @@
-#!/bin/sh
-Linker="/usr/local/cross/bin/i586-elf-ld"
-C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
+#!/bin/bash
+
+if [ $(uname -m) == 'x86_64' ]; then # We need a cross compiler tool-chain if using a 64-bit system (Incitatus is 32-bit)
+
+    Linker="/usr/local/cross/bin/i586-elf-ld"
+    C_Compiler="/usr/local/cross/bin/i586-elf-gcc"
+
+else # No need for a cross compiler toolchain if using a 32-bit system
+
+    Linker="ld"
+    C_Compiler="gcc"
+
+fi
+
+# Define C compiler flags
+# Append '-D NO_DEBUG' if you want to disable assertions and debug messages
 CFlags="-nostdlib -fno-builtin -fno-stack-protector -O0 -Wall -Wextra -Werror -std=gnu99 -I kernel/include/ -I user/include"
 
-#! User Space
+#------ User Space ------
+# Compile user space library
 $C_Compiler $CFlags -o incit.o    -c   user/src/Lib/Incitatus.c
 $C_Compiler $CFlags -o douglea.o  -c   user/src/Lib/libc/DougLea.c
 $C_Compiler $CFlags -o str.o      -c   user/src/Lib/libc/string.c
 $C_Compiler $CFlags -o stdio.o    -c   user/src/Lib/libc/stdio.c
+
+# Create a static library file from object files
 ar rcs bin/libIncitatus.a incit.o douglea.o str.o stdio.o
 
+# Compile and link user space applications (using the static library)
 $C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o Shell   shell.o     bin/libIncitatus.a
 
@@ -22,19 +39,23 @@ $Linker -T user/src/Apps/apps.ld -s -nostdlib -o InputTest   inputtest.o     bin
 $C_Compiler $CFlags -o calc.o    -c user/src/Apps/Calculator.c
 $Linker -T user/src/Apps/apps.ld -s -nostdlib -o Calculator   calc.o     bin/libIncitatus.a
 
+# Add user space application binaries to the ramdisk(tar archive)
 tar --delete --file bootloader/initrd.tar Shell HelloWorld InputTest Calculator
 tar --append --file bootloader/initrd.tar Shell HelloWorld InputTest Calculator
 
+# Clear
 rm Shell
 rm HelloWorld
 rm InputTest
 rm Calculator
-#!
+#------ End of User Space ------
 
-#! Kernel
+#------ Kernel ------
+# Compile asm files
 nasm -f elf -o start.o   kernel/src/Start.s
 nasm -f elf -o idtAsm.o  kernel/src/X86/IDT.s
 
+# Compile C files
 $C_Compiler $CFlags -o kernel.o  -c   kernel/src/Kernel.c
 $C_Compiler $CFlags -o sys.o     -c   kernel/src/Sys.c
 $C_Compiler $CFlags -o module.o  -c   kernel/src/Module.c
@@ -77,6 +98,7 @@ $C_Compiler $CFlags -o ramdisk.o -c   kernel/src/FileSystem/RamDisk.c
 $C_Compiler $CFlags -o tar.o     -c   kernel/src/FileSystem/Tar.c
 $C_Compiler $CFlags -o vfs.o     -c   kernel/src/FileSystem/VFS.c
 
+# Link kernel object files
 $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o \
                                                                         kernel.o \
                                                                         vga.o \
@@ -115,8 +137,11 @@ $Linker -Map bin/Mem.map -T kernel/src/Linker.ld -o bootloader/kernel   start.o 
                                                                         vfs.o \
                                                                         user.o \
 
+#------ End of Kernel ------
 
+# Make OS image
 genisoimage -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o bin/image.iso bootloader/
 
+# Clear
 rm *.o
 rm bootloader/kernel

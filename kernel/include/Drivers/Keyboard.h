@@ -45,9 +45,7 @@ void Keyboard_setLeds(bool numLock, bool capsLock, bool scrollLock);
 | DESCRIPTION:     Reads and returns a character stored inside circular key
 |                  buffer.
 |
-| RETURN:          'char'  -1 if no character in buffer, char value if there is
-|
-| NOTES:           Currently polls.
+| RETURN:          'char' char value
 \------------------------------------------------------------------------*/
 char Keyboard_getChar(void);
 #endif

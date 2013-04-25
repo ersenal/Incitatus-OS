@@ -213,15 +213,15 @@ PUBLIC char* VFS_getWorkingDirectoryStr(char* buf) {
 
 }
 
-PUBLIC void VFS_getFileStats(VFSNode* file, VFSNode* buf) {
-
-    Memory_copy(buf, file, sizeof(VFSNode));
-
-}
-
 PUBLIC VFSNode* VFS_getWorkingDirectoryPtr(void) {
 
     return Scheduler_getCurrentProcess()->workingDirectory;
+
+}
+
+PUBLIC void VFS_getFileStats(VFSNode* file, VFSNode* buf) {
+
+    Memory_copy(buf, file, sizeof(VFSNode));
 
 }
 
@@ -245,9 +245,10 @@ PUBLIC u32int VFS_write(VFSNode* self, u32int offset, u32int count, const char* 
     Debug_assert(self->vfs != NULL); /* Ensure we have a valid node */
     Debug_assert(offset + count <= self->fileSize); /* Valid boundaries? */
     Debug_assert(self->fileType == FILETYPE_NORMAL); //TODO: make a proper check
-    Debug_assert(self->mode == FILE_MODE_READ);
+    Debug_assert(self->mode == FILE_MODE_WRITE);
 
     //TODO: implement
+    Sys_panic("Write not implemented!");
     return self->vfs->write(self, offset, count, buffer);
 
 }
@@ -256,6 +257,7 @@ PUBLIC VFSNode* VFS_mkdir(const char* pathname) {
 
     //TODO: implement
     UNUSED(pathname);
+   Sys_panic("Write not implemented!");
     return NULL;
 
 }

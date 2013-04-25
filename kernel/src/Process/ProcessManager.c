@@ -380,7 +380,7 @@ PUBLIC Module* ProcessManager_getModule(void) {
         pmModule.moduleID   = MODULE_PROCESS;
         pmModule.init       = &ProcessManager_init;
         pmModule.numberOfDependencies = 1;
-        pmModule.dependencies[0] = MODULE_HEAP;
+        pmModule.dependencies[0] = MODULE_VFS;
 
     }
 

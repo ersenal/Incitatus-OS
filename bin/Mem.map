@@ -296,7 +296,7 @@ Linker script and memory map
                 0x000000000010f51c                Tar_getHeader
                 0x000000000010f563                Tar_getNumberOfFiles
  *fill*         0x000000000010f605        0x3 
- .text          0x000000000010f608     0x1178 vfs.o
+ .text          0x000000000010f608     0x1193 vfs.o
                 0x000000000010f89b                VFS_openFile
                 0x000000000010f9e6                VFS_closeFile
                 0x000000000010fafd                VFS_getParent
@@ -305,16 +305,17 @@ Linker script and memory map
                 0x000000000010fedd                VFS_changeDirectoryPtr
                 0x000000000010ffd1                VFS_changeDirectoryStr
                 0x00000000001100b3                VFS_getWorkingDirectoryStr
-                0x0000000000110157                VFS_getFileStats
-                0x0000000000110179                VFS_getWorkingDirectoryPtr
+                0x0000000000110157                VFS_getWorkingDirectoryPtr
+                0x0000000000110169                VFS_getFileStats
                 0x000000000011018b                VFS_read
                 0x000000000011045e                VFS_write
-                0x0000000000110731                VFS_mkdir
-                0x000000000011073b                VFS_getModule
- .text          0x0000000000110780      0x211 user.o
-                0x000000000011094c                Usermode_getModule
+                0x000000000011073d                VFS_mkdir
+                0x0000000000110756                VFS_getModule
+ *fill*         0x000000000011079b        0x1 
+ .text          0x000000000011079c      0x211 user.o
+                0x0000000000110968                Usermode_getModule
                 0x0000000000111000                . = ALIGN (0x1000)
- *fill*         0x0000000000110991      0x66f 
+ *fill*         0x00000000001109ad      0x653 
 
 .eh_frame       0x0000000000111000     0x2238
  .eh_frame      0x0000000000111000       0x94 kernel.o
@@ -478,10 +479,10 @@ Linker script and memory map
  *fill*         0x0000000000114175        0x3 
  .rodata        0x0000000000114178      0x101 ramdisk.o
  .rodata        0x0000000000114279       0x45 tar.o
- .rodata        0x00000000001142be       0xae vfs.o
- .rodata        0x000000000011436c       0x7e user.o
+ .rodata        0x00000000001142be       0xc5 vfs.o
+ .rodata        0x0000000000114383       0x7e user.o
                 0x0000000000115000                . = ALIGN (0x1000)
- *fill*         0x00000000001143ea      0xc16 
+ *fill*         0x0000000000114401      0xbff 
 
 .igot.plt       0x0000000000115000        0x0
  .igot.plt      0x0000000000000000        0x0 start.o

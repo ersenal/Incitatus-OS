@@ -181,7 +181,7 @@ static void ls(void) {
     while((file = readdir(cwd, i))) {
 
         fstat(file, &buf);
-        printf("%s%s%d%s", buf.fileName, ", " ,buf.fileSize, "bytes\n");
+        printf("%s%s%d%s", buf.fileName, ", ", buf.fileSize, "bytes\n");
         i++;
 
     }
