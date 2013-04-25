@@ -270,8 +270,8 @@ Linker script and memory map
                 0x000000000010c8e7                FCFS_getNextProcess
                 0x000000000010c906                FCFS_getCurrentProcess
  .text          0x000000000010c910     0x1040 pm.o
-                0x000000000010d134                ProcessManager_switch
-                0x000000000010d441                ProcessManager_killProcess
+                0x000000000010d139                ProcessManager_switch
+                0x000000000010d446                ProcessManager_killProcess
                 0x000000000010d5d1                ProcessManager_spawnProcess
                 0x000000000010d830                ProcessManager_blockCurrentProcess
                 0x000000000010d848                ProcessManager_waitPID

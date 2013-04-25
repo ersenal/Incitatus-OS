@@ -208,6 +208,7 @@ PRIVATE void ProcessManager_notify(void) {
 
 PRIVATE void ProcessManager_forceSwitch(void) {
 
+    Sys_enableInterrupts();
     asm volatile("int %0" : : "i" (IRQ0)); /* Force task switch */
 
 }
@@ -270,6 +271,7 @@ PUBLIC void ProcessManager_switch(Regs* context) {
     if(currentProcess == next) /* No need for a context switch */
         return;
 
+
     Debug_assert(next->kernelStack != NULL);
 
     if(next == kernelProcess) { /* Next process is kernel process */
@@ -301,7 +303,6 @@ PUBLIC void ProcessManager_killProcess(int exitCode) {
     ProcessManager_notify();
     Scheduler_removeProcess(current);
 
-    Sys_enableInterrupts();
     ProcessManager_forceSwitch();
     while(1); /* Should not reach here */
 
@@ -340,7 +341,7 @@ PUBLIC Process* ProcessManager_spawnProcess(const char* binary) {
     Memory_copy((void*) tempMapAddr, buffer, bin->fileSize);
 
     for(u32int y = 0; y < i; y++)
-         VirtualMemory_quickUnmap((void*) (tempMapAddr + (y * FRAME_SIZE)));
+        VirtualMemory_quickUnmap((void*) (tempMapAddr + (y * FRAME_SIZE)));
 
     HeapMemory_free(buffer);
     VFS_closeFile(bin);

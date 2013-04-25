@@ -27,17 +27,15 @@ $C_Compiler $CFlags -o stdio.o    -c   user/src/Lib/libc/stdio.c
 ar rcs bin/libIncitatus.a incit.o douglea.o str.o stdio.o
 
 # Compile and link user space applications (using the static library)
-$C_Compiler $CFlags -o shell.o    -c user/src/Apps/Shell.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o Shell   shell.o     bin/libIncitatus.a
+$C_Compiler $CFlags -o shell.o      -c user/src/Apps/Shell.c
+$C_Compiler $CFlags -o hw.o         -c user/src/Apps/HelloWorld.c
+$C_Compiler $CFlags -o inputtest.o  -c user/src/Apps/InputTest.c
+$C_Compiler $CFlags -o calc.o       -c user/src/Apps/Calculator.c
 
-$C_Compiler $CFlags -o hw.o    -c user/src/Apps/HelloWorld.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o HelloWorld   hw.o     bin/libIncitatus.a
-
-$C_Compiler $CFlags -o inputtest.o    -c user/src/Apps/InputTest.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o InputTest   inputtest.o     bin/libIncitatus.a
-
-$C_Compiler $CFlags -o calc.o    -c user/src/Apps/Calculator.c
-$Linker -T user/src/Apps/apps.ld -s -nostdlib -o Calculator   calc.o     bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -o Shell       shell.o      bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -o HelloWorld  hw.o         bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -o InputTest   inputtest.o  bin/libIncitatus.a
+$Linker -T user/src/Apps/apps.ld -o Calculator  calc.o       bin/libIncitatus.a
 
 # Add user space application binaries to the ramdisk(tar archive)
 tar --delete --file bootloader/initrd.tar Shell HelloWorld InputTest Calculator
