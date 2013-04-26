@@ -4,10 +4,26 @@
 |
 \------------------------------*/
 
+/* musl as a whole is licensed under the following standard MIT license:
+
+Copyright © 2005-2013 Rich Felker
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software. */
+
 #include <Lib/libc/string.h>
 #include <Lib/libc/limits.h>
 #include <Lib/libc/stdint.h>
 
+/* Silence the compiler warnings, I trust musl */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wpointer-sign"

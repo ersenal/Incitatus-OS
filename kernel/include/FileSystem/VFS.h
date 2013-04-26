@@ -48,8 +48,8 @@ struct VFS {
 
     u32int     deviceID;
     VFSNode*   rootNode;
-    void       (*open)      (VFSNode* self);
-    void       (*close)     (VFSNode* self);
+    VFSNode*   (*open)      (VFSNode* self);
+    VFSNode*   (*close)     (VFSNode* self);
     u32int     (*read)      (VFSNode* self, u32int offset, u32int count, char* buffer);
     u32int     (*write)     (VFSNode* self, u32int offset, u32int count, const char* buffer);
     VFSNode*   (*readDir)   (VFSNode* self, u32int index);
