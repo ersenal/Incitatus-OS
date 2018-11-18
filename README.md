@@ -4,11 +4,11 @@ Incitatus-OS
 Stage 3 Dissertation project. The aim is to create an X86-32bit operating system as a vehicle to learn about operating systems from a student perspective.
 
 
-##Progress
+## Progress
 
 ![ScreenShot](http://oi45.tinypic.com/2rqf3t5.jpg)
 
-##Running the OS
+## Running the OS
 
 	› The simplest and most risk-free way is to run it on emulators such as VirtualBox, Qemu or Bochs
 		› Boot from "image.iso"(inside bin folder) CD image.
@@ -16,7 +16,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 	› Or, you may test-run(at your own risk) the OS on a 32-bit or 64-bit X86 PC.
 		› Burn "image.iso" and boot from CD.
 
-##Tasks
+## Tasks
 
 	✔ Setup development environment
 		 ✔ OS
@@ -44,7 +44,7 @@ Stage 3 Dissertation project. The aim is to create an X86-32bit operating system
 		 ✔ System call interface
 		 ✔ Shell
 
-##License
+## License
 
 	Copyright 2013 Ali Ersenal. Licensed under WTFPL V2.
 
